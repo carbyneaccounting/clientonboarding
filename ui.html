@@ -9,19 +9,11 @@
   <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
 
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-    }
+    *{ margin:0; padding:0; box-sizing:border-box; }
 
     :root{
       --carbyne-blue:#00305B;
       --carbyne-blue-2:#0A3D6F;
-      --ink:#0f172a;
-      --muted:#475569;
-      --border:#e5e7eb;
-      --panel:#ffffff;
       --radius:18px;
       --shadow:0 28px 56px rgba(0,0,0,0.30);
     }
@@ -42,7 +34,6 @@
       top:20px;
       left:20px;
       color:#ffffff;
-      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .company-name{
@@ -85,7 +76,6 @@
       position:relative;
     }
 
-    /* TOP SECTION - Progress Bar */
     .top-section{
       padding:18px 30px;
       border-bottom:1px solid #e6e6e6;
@@ -109,26 +99,25 @@
       transition:width .25s ease;
     }
 
-    /* MIDDLE SECTION - Page 1 background */
+    /* PAGE 1: Nature background + dark black tint */
     .middle-section{
       flex:1;
       padding:26px 30px;
       overflow:auto;
       background:
         linear-gradient(
-          135deg,
-          rgba(0,48,91,.78) 0%,
-          rgba(10,61,111,.78) 50%,
-          rgba(0,48,91,.78) 100%
+          180deg,
+          rgba(0,0,0,0.52) 0%,
+          rgba(0,0,0,0.42) 45%,
+          rgba(0,0,0,0.52) 100%
         ),
-        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=80");
+        url("https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=2400&q=80");
       background-size:cover;
       background-position:center;
       background-repeat:no-repeat;
       position:relative;
     }
 
-    /* Center the access module inside the middle section */
     #accessMount{
       width:100%;
       min-height:100%;
@@ -149,7 +138,6 @@
       box-shadow:0 16px 32px rgba(0,0,0,0.18);
     }
 
-    /* BOTTOM SECTION - Navigation */
     .bottom-section{
       padding:18px 30px;
       border-top:1px solid #e6e6e6;
@@ -271,10 +259,7 @@
         const styleTags = Array.from(doc.querySelectorAll("style"));
         const linkTags = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
 
-        const fragmentRoot =
-          doc.querySelector("#accessModule") ||
-          doc.body ||
-          doc.documentElement;
+        const fragmentRoot = doc.querySelector("#accessModule") || doc.body || doc.documentElement;
 
         linkTags.forEach(l => {
           const href = l.getAttribute("href");
@@ -300,10 +285,7 @@
         } else {
           const wrapper = document.createElement("div");
           wrapper.innerHTML = html;
-          const extracted =
-            wrapper.querySelector("#accessModule") ||
-            wrapper.querySelector("body") ||
-            wrapper;
+          const extracted = wrapper.querySelector("#accessModule") || wrapper.querySelector("body") || wrapper;
 
           if (extracted){
             const nodes = Array.from(extracted.childNodes);
