@@ -1,4 +1,4 @@
-<!-- ui.html - WITH BUILT-IN INSTANT VALIDATION -->
+<!-- ui.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,7 +6,6 @@
   <title>Client Onboarding - Carbyne Accounting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     * {
@@ -20,7 +19,6 @@
       --carbyne-blue-2: #0A3D6F;
       --radius: 18px;
       --shadow: 0 28px 56px rgba(0, 0, 0, 0.30);
-      --danger: #b91c1c;
     }
 
     body {
@@ -125,6 +123,18 @@
       justify-content: center;
     }
 
+    .load-error {
+      width: min(760px, 92%);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: #111827;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+    }
+
     .bottom-section {
       padding: 18px 30px;
       border-top: 1px solid #e6e6e6;
@@ -192,122 +202,6 @@
       z-index: 10;
     }
 
-    /* Access Module Styles */
-    .access-shell {
-      width: min(740px, 92%);
-      padding: 2px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
-      box-shadow: 0 28px 64px rgba(0, 0, 0, 0.28);
-    }
-
-    .access-card {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      border-radius: 20px;
-      padding: 30px 30px 26px 30px;
-    }
-
-    .access-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #111827;
-      margin: 0 0 14px 0;
-      text-align: left;
-    }
-
-    .access-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: #334155;
-      margin: 0 0 8px 0;
-      text-align: left;
-      letter-spacing: 0.2px;
-    }
-
-    .access-input {
-      width: 100%;
-      padding: 14px 16px;
-      font-size: 15px;
-      border: 1px solid rgba(0, 0, 0, 0.18);
-      border-radius: 12px;
-      outline: none;
-      margin: 0 0 16px 0;
-      background: #ffffff;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .access-input:focus {
-      border-color: rgba(0, 48, 91, 0.75);
-      box-shadow: 0 0 0 3px rgba(0, 48, 91, 0.18);
-    }
-
-    .access-input.error {
-      border-color: var(--danger);
-    }
-
-    .access-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .access-submit {
-      padding: 11px 22px;
-      font-size: 14px;
-      font-weight: 800;
-      border-radius: 10px;
-      border: 1px solid rgba(0, 0, 0, 0.10);
-      background: linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      color: #ffffff;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 132px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
-      transition: opacity 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .access-submit:hover:not(:disabled) {
-      opacity: 0.95;
-    }
-
-    .access-submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .inline-msg {
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      display: none;
-      white-space: nowrap;
-      color: var(--danger);
-    }
-
-    .inline-msg.show {
-      display: inline;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #ffffff;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     /* Page 2+ styling */
     .page-content {
       width: min(740px, 92%);
@@ -340,7 +234,7 @@
     <div class="address">
       734 West Main Street, Suite 106<br>
       Louisville, Kentucky 40202<br>
-      (502) 632-9444 | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1b5877727e756f5b587a697962757e5a7878746e756f72757c35787476">[email&#160;protected]</a>
+      (502) 632-9444 | Client@CarbyneAccounting.com
     </div>
   </div>
 
@@ -370,189 +264,61 @@
 
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    // ============================================
-    // CONFIGURATION
-    // ============================================
+  <script>
+    // Configuration
     const TOTAL_PAGES = 5;
+    const ACCESS_URL = "access.html";
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
-    const CACHE_KEY = "carbyne_valid_codes_cache";
-    const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
-    const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
-    const TARGET_HEADER = "Unique Identifier";
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
-    // ============================================
-    // STATE
-    // ============================================
+    // State
     let currentPage = 1;
     let isAccessValidated = false;
-    let validCodesCache = null;
-    let isFetchingCodes = false;
 
-    // ============================================
-    // ELEMENTS
-    // ============================================
+    // Elements
     const pageMount = document.getElementById("pageMount");
     const progressBar = document.getElementById("progressBar");
     const pageIndicator = document.getElementById("pageIndicator");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // ============================================
-    // VALIDATION FUNCTIONS
-    // ============================================
-    function normalize(v) {
-      return (v ?? "").toString().trim();
-    }
-
-    function getCachedCodes() {
-      if (validCodesCache) return validCodesCache;
-
-      try {
-        const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-        const now = Date.now();
-
-        if (timestamp && (now - parseInt(timestamp)) < CACHE_DURATION) {
-          const cached = localStorage.getItem(CACHE_KEY);
-          if (cached) {
-            validCodesCache = JSON.parse(cached);
-            return validCodesCache;
-          }
-        }
-      } catch (e) {
-        console.error("Cache read error:", e);
-      }
-      return null;
-    }
-
-    function setCachedCodes(codes) {
-      validCodesCache = codes;
-      try {
-        localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
-        localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-      } catch (e) {
-        console.error("Cache write error:", e);
-      }
-    }
-
-    function findHeaderIndex(headers) {
-      const lower = headers.map(h => normalize(h).toLowerCase());
-      const target = TARGET_HEADER.toLowerCase();
-      
-      for (let i = 0; i < lower.length; i++) {
-        if (lower[i] === target) return i;
-      }
-      
-      return -1;
-    }
-
-    async function fetchValidCodes() {
-      if (isFetchingCodes) {
-        // Wait for existing fetch
-        while (isFetchingCodes) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        return validCodesCache;
-      }
-
-      isFetchingCodes = true;
-
-      try {
-        const res = await fetch(FILE_URL, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        const ab = await res.arrayBuffer();
-        const wb = XLSX.read(ab, { type: "array" });
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, {
-          header: 1,
-          raw: false,
-          defval: ""
-        });
-
-        if (!rows || rows.length < 2) {
-          throw new Error("No data found");
-        }
-
-        const headers = rows[0].map(v => normalize(v));
-        const col = findHeaderIndex(headers);
-
-        if (col < 0) {
-          throw new Error("Column 'Unique Identifier' not found");
-        }
-
-        const validCodes = [];
-        for (let r = 1; r < rows.length; r++) {
-          const row = rows[r] || [];
-          const cell = normalize(row[col] ?? "");
-          if (cell) {
-            validCodes.push(cell.toLowerCase());
-          }
-        }
-
-        setCachedCodes(validCodes);
-        return validCodes;
-
-      } catch (error) {
-        console.error("Fetch error:", error);
-        throw error;
-      } finally {
-        isFetchingCodes = false;
-      }
-    }
-
-    async function validateCode(code) {
-      const needle = code.toLowerCase();
-
-      // Check cache first
-      let codes = getCachedCodes();
-
-      if (codes && Array.isArray(codes)) {
-        // INSTANT validation from cache!
-        const isValid = codes.includes(needle);
-        
-        // Refresh cache in background
-        fetchValidCodes().catch(() => {});
-        
-        return isValid;
-      }
-
-      // No cache - fetch from SharePoint
-      try {
-        codes = await fetchValidCodes();
-        return codes.includes(needle);
-      } catch (error) {
-        return false;
-      }
-    }
-
-    // ============================================
-    // PAGE NAVIGATION
-    // ============================================
+    // Initialize
     function init() {
+      // Check if access code exists
       const accessCode = localStorage.getItem(STORAGE_KEY);
       isAccessValidated = !!accessCode;
 
+      // Get saved page or start at 1
       const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY)) || 1;
       currentPage = isAccessValidated ? savedPage : 1;
 
-      // Pre-load valid codes in background
-      if (!getCachedCodes()) {
-        fetchValidCodes().catch(() => {});
-      }
+      // Listen for validation success
+      window.addEventListener("message", handleValidationMessage);
 
+      // Load current page
       loadPage(currentPage);
 
+      // Setup navigation
       prevBtn.addEventListener("click", goToPreviousPage);
       nextBtn.addEventListener("click", goToNextPage);
     }
 
+    function handleValidationMessage(event) {
+      const data = event.data;
+      if (!data || data.type !== "carbyne-validate") return;
+
+      if (data.valid === true) {
+        isAccessValidated = true;
+        goToNextPage();
+      }
+    }
+
     function updateUI() {
+      // Update progress bar
       const progress = (currentPage / TOTAL_PAGES) * 100;
       progressBar.style.width = `${progress}%`;
 
+      // Update page indicator
       pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
 
       // Hide page indicator on page 1, show on all other pages
@@ -562,10 +328,11 @@
         pageIndicator.style.visibility = 'visible';
       }
 
-      // Update button states
+      // Update button states - disable both Previous and Next on page 1
       prevBtn.disabled = currentPage === 1;
       nextBtn.disabled = currentPage === TOTAL_PAGES || currentPage === 1;
 
+      // Save current page
       localStorage.setItem(CURRENT_PAGE_KEY, currentPage);
     }
 
@@ -583,127 +350,76 @@
       }
     }
 
-    function loadPage(pageNum) {
+    async function loadPage(pageNum) {
       pageMount.innerHTML = "";
       updateUI();
 
-      if (pageNum === 1) {
-        loadAccessModule();
-      } else {
-        if (!isAccessValidated) {
-          currentPage = 1;
-          loadAccessModule();
-          return;
-        }
-        loadPageContent(pageNum);
-      }
-    }
-
-    // ============================================
-    // ACCESS MODULE
-    // ============================================
-    function loadAccessModule() {
-      const accessHTML = `
-        <div class="access-shell">
-          <div class="access-card">
-            <div class="access-title">Enter Access Code</div>
-
-            <div class="access-label">Unique Identifier</div>
-            <input
-              type="text"
-              class="access-input"
-              id="accessCode"
-              placeholder="Enter your Unique Identifier"
-              autocomplete="off"
-            >
-
-            <div class="access-row">
-              <button type="button" class="access-submit" id="submitCode">
-                <span id="btnText">Submit</span>
-              </button>
-              <span class="inline-msg" id="inlineMsg">Invalid Access Code</span>
-            </div>
-          </div>
-        </div>
-      `;
-
-      pageMount.innerHTML = accessHTML;
-      initAccessModule();
-    }
-
-    function initAccessModule() {
-      const input = document.getElementById("accessCode");
-      const btn = document.getElementById("submitCode");
-      const btnText = document.getElementById("btnText");
-      const msg = document.getElementById("inlineMsg");
-
-      function showInvalid(show, message = "Invalid Access Code") {
-        if (show) {
-          msg.classList.add("show");
-          msg.textContent = message;
-          input.classList.add("error");
+      try {
+        if (pageNum === 1) {
+          // Load access module
+          await loadAccessModule();
         } else {
-          msg.classList.remove("show");
-          input.classList.remove("error");
-        }
-      }
-
-      function setBusy(isBusy) {
-        btn.disabled = !!isBusy;
-        if (isBusy) {
-          btnText.innerHTML = '<span class="spinner"></span>';
-        } else {
-          btnText.textContent = "Submit";
-        }
-      }
-
-      async function submit() {
-        showInvalid(false);
-
-        const code = normalize(input.value);
-        input.value = code;
-
-        if (!code) {
-          showInvalid(true, "Please enter a code");
-          return;
-        }
-
-        setBusy(true);
-
-        try {
-          const isValid = await validateCode(code);
-
-          if (isValid) {
-            localStorage.setItem(STORAGE_KEY, code);
-            isAccessValidated = true;
-            goToNextPage();
-          } else {
-            showInvalid(true);
+          // Check if access is validated
+          if (!isAccessValidated) {
+            currentPage = 1;
+            await loadAccessModule();
+            return;
           }
-        } catch (error) {
-          showInvalid(true, "Validation error");
-        } finally {
-          setBusy(false);
+
+          // Load page content
+          loadPageContent(pageNum);
         }
+      } catch (error) {
+        showError(`Failed to load page: ${error.message}`);
       }
-
-      btn.addEventListener("click", submit);
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submit();
-      });
-
-      const existing = localStorage.getItem(STORAGE_KEY);
-      if (existing) {
-        input.value = normalize(existing);
-      }
-
-      showInvalid(false);
-      input.focus();
     }
 
-    // ============================================
-    // PAGE CONTENT
-    // ============================================
+    async function loadAccessModule() {
+      try {
+        const res = await fetch(ACCESS_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+
+        // Extract styles
+        const styleTags = Array.from(doc.querySelectorAll("style"));
+        const linkTags = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+
+        // Add stylesheets
+        linkTags.forEach(l => {
+          const href = l.getAttribute("href");
+          if (!href) return;
+          const already = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+            .some(x => x.getAttribute("href") === href);
+          if (!already) {
+            const nl = document.createElement("link");
+            nl.rel = "stylesheet";
+            nl.href = href;
+            document.head.appendChild(nl);
+          }
+        });
+
+        // Add inline styles
+        styleTags.forEach(st => {
+          const ns = document.createElement("style");
+          ns.textContent = st.textContent || "";
+          document.head.appendChild(ns);
+        });
+
+        // Extract and mount module
+        const fragmentRoot = doc.querySelector("#accessModule");
+        if (fragmentRoot) {
+          pageMount.appendChild(fragmentRoot);
+        } else {
+          throw new Error("Access module not found");
+        }
+
+      } catch (error) {
+        showError(`Failed to load access module: ${error.message}`);
+      }
+    }
+
     function loadPageContent(pageNum) {
       const content = document.createElement("div");
       content.className = "page-content";
@@ -740,4 +456,24 @@
         default:
           content.innerHTML = `
             <h2>Page ${pageNum}</h2>
-            <p>Content for page ${pageNum} goes here.</
+            <p>Content for page ${pageNum} goes here.</p>
+          `;
+      }
+
+      pageMount.appendChild(content);
+    }
+
+    function showError(message) {
+      pageMount.innerHTML = `
+        <div class="load-error">
+          <strong>Error:</strong><br>
+          ${message}
+        </div>
+      `;
+    }
+
+    // Start the application
+    init();
+  </script>
+</body>
+</html>
