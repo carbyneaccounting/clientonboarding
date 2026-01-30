@@ -3,205 +3,227 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Client Onboarding</title>
+  <title>Client Onboarding - Carbyne Accounting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
 
   <style>
-    *{ margin:0; padding:0; box-sizing:border-box; }
-
-    :root{
-      --carbyne-blue:#00305B;
-      --carbyne-blue-2:#0A3D6F;
-      --radius:18px;
-      --shadow:0 28px 56px rgba(0,0,0,0.30);
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    body{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:40px 20px;
-      background:linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
-      position:relative;
-      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    :root {
+      --carbyne-blue: #00305B;
+      --carbyne-blue-2: #0A3D6F;
+      --radius: 18px;
+      --shadow: 0 28px 56px rgba(0, 0, 0, 0.30);
     }
 
-    .top-left-info{
-      position:absolute;
-      top:20px;
-      left:20px;
-      color:#ffffff;
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
+      position: relative;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    .company-name{
-      font-size:16px;
-      font-weight:700;
-      margin-bottom:2px;
+    .top-left-info {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #ffffff;
+      z-index: 10;
     }
 
-    .address{
-      font-size:13px;
-      font-weight:600;
-      letter-spacing:.2px;
-      line-height:1.35;
-      opacity:.98;
+    .company-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 2px;
     }
 
-    .container{
-      width:min(1200px, 95vw);
-      display:flex;
-      flex-direction:column;
+    .address {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      line-height: 1.35;
+      opacity: 0.98;
     }
 
-    h1{
-      font-family:'Baron', sans-serif;
-      font-size:22px;
-      color:#ffffff;
-      font-weight:normal;
-      margin-bottom:14px;
+    .container {
+      width: min(1200px, 95vw);
+      display: flex;
+      flex-direction: column;
     }
 
-    .card{
-      width:100%;
-      height:clamp(520px, 72vh, 860px);
-      background:#ffffff;
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-      position:relative;
+    h1 {
+      font-family: 'Baron', sans-serif;
+      font-size: 22px;
+      color: #ffffff;
+      font-weight: normal;
+      margin-bottom: 14px;
     }
 
-    .top-section{
-      padding:18px 30px;
-      border-bottom:1px solid #e6e6e6;
-      background:#ffffff;
-      z-index:2;
+    .card {
+      width: 100%;
+      height: clamp(520px, 72vh, 860px);
+      background: #ffffff;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
     }
 
-    .progress-bar-container{
-      width:100%;
-      height:8px;
-      background:#dedede;
-      border-radius:999px;
-      overflow:hidden;
+    .top-section {
+      padding: 18px 30px;
+      border-bottom: 1px solid #e6e6e6;
+      background: #ffffff;
+      z-index: 2;
     }
 
-    .progress-bar-fill{
-      height:100%;
-      width:20%;
-      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      border-radius:999px;
-      transition:width .25s ease;
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #dedede;
+      border-radius: 999px;
+      overflow: hidden;
     }
 
-    /* PAGE 1: winter scenic background + dark black tint */
-    .middle-section{
-      flex:1;
-      padding:26px 30px;
-      overflow:auto;
-      background:
-        linear-gradient(
-          180deg,
-          rgba(0,0,0,0.52) 0%,
-          rgba(0,0,0,0.42) 45%,
-          rgba(0,0,0,0.52) 100%
-        ),
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .middle-section {
+      flex: 1;
+      padding: 26px 30px;
+      overflow: auto;
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.52) 0%, rgba(0, 0, 0, 0.42) 45%, rgba(0, 0, 0, 0.52) 100%),
         url("https://images.unsplash.com/photo-1519681393784-d120267933ba");
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-      position:relative;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      position: relative;
     }
 
-    #accessMount{
-      width:100%;
-      min-height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    #pageMount {
+      width: 100%;
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .load-error{
-      width:min(760px, 92%);
-      background:rgba(255,255,255,0.92);
-      border:1px solid rgba(0,0,0,0.08);
-      border-radius:14px;
-      padding:18px 20px;
-      color:#111827;
-      font-size:14px;
-      line-height:1.4;
-      box-shadow:0 16px 32px rgba(0,0,0,0.18);
+    .load-error {
+      width: min(760px, 92%);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: #111827;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
     }
 
-    .bottom-section{
-      padding:18px 30px;
-      border-top:1px solid #e6e6e6;
-      background:#ffffff;
-      z-index:2;
+    .bottom-section {
+      padding: 18px 30px;
+      border-top: 1px solid #e6e6e6;
+      background: #ffffff;
+      z-index: 2;
     }
 
-    .navigation{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
     }
 
-    .nav-button{
-      padding:10px 24px;
-      border:none;
-      border-radius:8px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-      transition:opacity .15s ease, transform .15s ease;
+    .nav-button {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.15s ease;
     }
 
-    .nav-button.previous{
-      background:#f0f0f0;
-      color:#333;
+    .nav-button.previous {
+      background: #f0f0f0;
+      color: #333;
     }
 
-    .nav-button.previous:hover{
-      opacity:.95;
-      transform:translateY(-1px);
+    .nav-button.previous:hover:not(:disabled) {
+      opacity: 0.95;
+      transform: translateY(-1px);
     }
 
-    .nav-button.next{
-      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      color:#ffffff;
+    .nav-button.next {
+      background: linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
+      color: #ffffff;
     }
 
-    .nav-button.next:hover{
-      opacity:.95;
-      transform:translateY(-1px);
+    .nav-button.next:hover:not(:disabled) {
+      opacity: 0.95;
+      transform: translateY(-1px);
     }
 
-    .nav-button:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      transform:none;
+    .nav-button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
     }
 
-    .page-indicator{
-      font-size:14px;
-      color:#666;
-      font-weight:600;
+    .page-indicator {
+      font-size: 14px;
+      color: #666;
+      font-weight: 600;
     }
 
-    .footer{
-      position:absolute;
-      bottom:20px;
-      left:20px;
-      color:#ffffff;
-      font-size:13px;
-      font-weight:600;
-      opacity:.95;
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.95;
+      z-index: 10;
+    }
+
+    /* Page 2+ styling */
+    .page-content {
+      width: min(740px, 92%);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      padding: 30px;
+      color: #111827;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+    }
+
+    .page-content h2 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 16px;
+      color: var(--carbyne-blue);
+    }
+
+    .page-content p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 12px;
     }
   </style>
 </head>
@@ -222,19 +244,19 @@
     <div class="card">
       <div class="top-section">
         <div class="progress-bar-container">
-          <div class="progress-bar-fill"></div>
+          <div class="progress-bar-fill" id="progressBar"></div>
         </div>
       </div>
 
       <div class="middle-section">
-        <div id="accessMount"></div>
+        <div id="pageMount"></div>
       </div>
 
       <div class="bottom-section">
         <div class="navigation">
-          <button class="nav-button previous" disabled>Previous</button>
-          <span class="page-indicator">Step 1 of 5</span>
-          <button class="nav-button next">Next</button>
+          <button class="nav-button previous" id="prevBtn">Previous</button>
+          <span class="page-indicator" id="pageIndicator">Step 1 of 5</span>
+          <button class="nav-button next" id="nextBtn">Next</button>
         </div>
       </div>
     </div>
@@ -243,97 +265,208 @@
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
   <script>
-    const ACCESS_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/access.html";
+    // Configuration
+    const TOTAL_PAGES = 5;
+    const ACCESS_URL = "access.html";
+    const STORAGE_KEY = "carbyne_access_code";
+    const CURRENT_PAGE_KEY = "carbyne_current_page";
 
-    function resolveUrl(base, relative){
-      try{ return new URL(relative, base).toString(); }
-      catch(_){ return relative; }
+    // State
+    let currentPage = 1;
+    let isAccessValidated = false;
+
+    // Elements
+    const pageMount = document.getElementById("pageMount");
+    const progressBar = document.getElementById("progressBar");
+    const pageIndicator = document.getElementById("pageIndicator");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+
+    // Initialize
+    function init() {
+      // Check if access code exists
+      const accessCode = localStorage.getItem(STORAGE_KEY);
+      isAccessValidated = !!accessCode;
+
+      // Get saved page or start at 1
+      const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY)) || 1;
+      currentPage = isAccessValidated ? savedPage : 1;
+
+      // Listen for validation success
+      window.addEventListener("message", handleValidationMessage);
+
+      // Load current page
+      loadPage(currentPage);
+
+      // Setup navigation
+      prevBtn.addEventListener("click", goToPreviousPage);
+      nextBtn.addEventListener("click", goToNextPage);
     }
 
-    function clearInjectedAssets(){
-      document.querySelectorAll('[data-access-injected="1"]').forEach(n => n.remove());
+    function handleValidationMessage(event) {
+      const data = event.data;
+      if (!data || data.type !== "carbyne-validate") return;
+
+      if (data.valid === true) {
+        isAccessValidated = true;
+        goToNextPage();
+      }
     }
 
-    async function loadAccessModule(){
-      const mount = document.getElementById("accessMount");
-      mount.innerHTML = "";
-      clearInjectedAssets();
+    function updateUI() {
+      // Update progress bar
+      const progress = (currentPage / TOTAL_PAGES) * 100;
+      progressBar.style.width = `${progress}%`;
 
-      try{
+      // Update page indicator
+      pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
+
+      // Update button states
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === TOTAL_PAGES;
+
+      // Save current page
+      localStorage.setItem(CURRENT_PAGE_KEY, currentPage);
+    }
+
+    function goToPreviousPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        loadPage(currentPage);
+      }
+    }
+
+    function goToNextPage() {
+      if (currentPage < TOTAL_PAGES) {
+        currentPage++;
+        loadPage(currentPage);
+      }
+    }
+
+    async function loadPage(pageNum) {
+      pageMount.innerHTML = "";
+      updateUI();
+
+      try {
+        if (pageNum === 1) {
+          // Load access module
+          await loadAccessModule();
+        } else {
+          // Check if access is validated
+          if (!isAccessValidated) {
+            currentPage = 1;
+            await loadAccessModule();
+            return;
+          }
+
+          // Load page content
+          loadPageContent(pageNum);
+        }
+      } catch (error) {
+        showError(`Failed to load page: ${error.message}`);
+      }
+    }
+
+    async function loadAccessModule() {
+      try {
         const res = await fetch(ACCESS_URL, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const html = await res.text();
         const doc = new DOMParser().parseFromString(html, "text/html");
 
+        // Extract styles
         const styleTags = Array.from(doc.querySelectorAll("style"));
-        const linkTags  = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
-        const scriptTags = Array.from(doc.querySelectorAll("script"));
+        const linkTags = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
 
-        const fragmentRoot = doc.querySelector("#accessModule") || doc.body || doc.documentElement;
-
+        // Add stylesheets
         linkTags.forEach(l => {
           const href = l.getAttribute("href");
           if (!href) return;
-          const abs = resolveUrl(ACCESS_URL, href);
-
           const already = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
-            .some(x => x.getAttribute("href") === abs);
-
-          if (!already){
+            .some(x => x.getAttribute("href") === href);
+          if (!already) {
             const nl = document.createElement("link");
             nl.rel = "stylesheet";
-            nl.href = abs;
-            nl.setAttribute("data-access-injected","1");
+            nl.href = href;
             document.head.appendChild(nl);
           }
         });
 
+        // Add inline styles
         styleTags.forEach(st => {
           const ns = document.createElement("style");
           ns.textContent = st.textContent || "";
-          ns.setAttribute("data-access-injected","1");
           document.head.appendChild(ns);
         });
 
-        if (fragmentRoot && fragmentRoot.id === "accessModule"){
-          mount.appendChild(fragmentRoot);
+        // Extract and mount module
+        const fragmentRoot = doc.querySelector("#accessModule");
+        if (fragmentRoot) {
+          pageMount.appendChild(fragmentRoot);
         } else {
-          const wrapper = document.createElement("div");
-          wrapper.innerHTML = html;
-          const extracted = wrapper.querySelector("#accessModule") || wrapper.querySelector("body") || wrapper;
-
-          if (extracted){
-            const nodes = Array.from(extracted.childNodes);
-            nodes.forEach(n => mount.appendChild(n));
-          }
+          throw new Error("Access module not found");
         }
 
-        scriptTags.forEach(sc => {
-          const src = sc.getAttribute("src");
-          const ns = document.createElement("script");
-          ns.setAttribute("data-access-injected","1");
-
-          if (src){
-            ns.src = resolveUrl(ACCESS_URL, src);
-            ns.defer = true;
-          } else {
-            ns.textContent = sc.textContent || "";
-          }
-          document.body.appendChild(ns);
-        });
-
-      } catch (e){
-        mount.innerHTML = `
-          <div class="load-error">
-            <strong>Failed to load access module.</strong><br>
-            ${String(e.message || e)}
-          </div>
-        `;
+      } catch (error) {
+        showError(`Failed to load access module: ${error.message}`);
       }
     }
 
-    loadAccessModule();
+    function loadPageContent(pageNum) {
+      const content = document.createElement("div");
+      content.className = "page-content";
+
+      switch (pageNum) {
+        case 2:
+          content.innerHTML = `
+            <h2>Welcome to Step 2</h2>
+            <p>This is the second step of the onboarding process.</p>
+            <p>Add your content here for page 2.</p>
+          `;
+          break;
+        case 3:
+          content.innerHTML = `
+            <h2>Welcome to Step 3</h2>
+            <p>This is the third step of the onboarding process.</p>
+            <p>Add your content here for page 3.</p>
+          `;
+          break;
+        case 4:
+          content.innerHTML = `
+            <h2>Welcome to Step 4</h2>
+            <p>This is the fourth step of the onboarding process.</p>
+            <p>Add your content here for page 4.</p>
+          `;
+          break;
+        case 5:
+          content.innerHTML = `
+            <h2>Welcome to Step 5</h2>
+            <p>This is the final step of the onboarding process.</p>
+            <p>Add your content here for page 5.</p>
+          `;
+          break;
+        default:
+          content.innerHTML = `
+            <h2>Page ${pageNum}</h2>
+            <p>Content for page ${pageNum} goes here.</p>
+          `;
+      }
+
+      pageMount.appendChild(content);
+    }
+
+    function showError(message) {
+      pageMount.innerHTML = `
+        <div class="load-error">
+          <strong>Error:</strong><br>
+          ${message}
+        </div>
+      `;
+    }
+
+    // Start the application
+    init();
   </script>
 </body>
 </html>
