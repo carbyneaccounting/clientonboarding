@@ -23,34 +23,26 @@
       --sig-success:#16a34a;
       --sig-danger:#dc2626;
       --sig-focus:0 0 0 3px rgba(37,99,235,.18);
-      --sig-pad-h:92px;
-      --sig-adopted-h:64px;
+      --sig-pad-h:110px;
+      --sig-adopted-h:72px;
       --sig-max-w:520px;
     }
 
     [hidden]{display:none !important;}
 
-    .sig-shell{
-      width:100%;
-      max-width:var(--sig-max-w);
-      margin:0 auto;
-      background:var(--sig-bg);
-      border:1px solid var(--sig-border-2);
-      border-radius:var(--sig-radius);
-      box-shadow:var(--sig-shadow);
-      overflow:hidden;
-      color:var(--sig-ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-
+    /* ====== COMPONENT: HEADER ====== */
     .sig-header{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
       padding:8px 10px;
-      border-bottom:1px solid #e5e7eb;
+      border:1px solid var(--sig-border-2);
+      border-radius:12px;
       background:linear-gradient(180deg,#ffffff,#f9fafb);
+      box-shadow:0 8px 18px rgba(0,0,0,0.10);
+      color:var(--sig-ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .sig-brand{
@@ -110,6 +102,7 @@
       flex:0 0 auto;
     }
 
+    /* ====== BUTTONS ====== */
     .sig-btn{
       appearance:none;
       border:1px solid rgba(0,0,0,0.14);
@@ -124,6 +117,7 @@
       line-height:1;
       white-space:nowrap;
       box-shadow:0 5px 12px rgba(15,23,42,.07);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .sig-btn:hover{
@@ -158,41 +152,38 @@
       transform:none;
     }
 
-    .sig-body{
-      padding:8px 10px 10px;
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-
+    /* ====== CARD BASE ====== */
     .sig-card{
       background:var(--sig-card-bg);
       border:1px solid var(--sig-border-2);
       border-radius:var(--sig-radius-2);
       box-shadow:var(--sig-shadow-2);
-      padding:8px;
+      padding:10px;
       overflow:hidden;
+      color:var(--sig-ink);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .sig-card h4{
-      margin:0 0 6px;
-      font-size:11px;
+      margin:0 0 8px;
+      font-size:12px;
       letter-spacing:.2px;
       line-height:1.1;
       color:var(--sig-ink);
     }
 
+    /* ====== INPUT ====== */
     .sig-tabs{
       display:flex;
       gap:6px;
-      margin-bottom:6px;
+      margin-bottom:8px;
     }
 
     .sig-tab{
       appearance:none;
       border:1px solid var(--sig-border);
       background:#fff;
-      padding:5px 9px;
+      padding:6px 10px;
       border-radius:999px;
       font-size:11px;
       font-weight:800;
@@ -200,6 +191,7 @@
       color:var(--sig-muted);
       transition:background .15s ease, border-color .15s ease, box-shadow .15s ease;
       line-height:1;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .sig-tab:hover{
@@ -239,8 +231,8 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:6px;
-      padding:6px 8px;
+      gap:8px;
+      padding:8px 8px;
       border-top:1px solid var(--sig-border-2);
       background:#f9fafb;
       flex-wrap:wrap;
@@ -250,13 +242,13 @@
 
     .sig-mini{
       display:flex;
-      gap:8px;
+      gap:10px;
       align-items:center;
       flex-wrap:wrap;
     }
 
     .sig-range{
-      width:78px;
+      width:92px;
       accent-color:var(--sig-accent);
     }
 
@@ -268,12 +260,13 @@
     .sig-status.ok{color:var(--sig-success)}
     .sig-status.warn{color:var(--sig-danger)}
 
-    .sig-field{display:flex;flex-direction:column;gap:5px}
+    .sig-field{display:flex;flex-direction:column;gap:6px}
+
     .sig-label{font-size:10px;color:var(--sig-muted);line-height:1.1}
 
     .sig-text{
       width:100%;
-      padding:7px 9px;
+      padding:8px 10px;
       border-radius:10px;
       border:1px solid var(--sig-border);
       font-size:12px;
@@ -282,6 +275,7 @@
       background:#fff;
       color:var(--sig-ink);
       line-height:1.1;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .sig-text:focus{
@@ -291,28 +285,28 @@
 
     .sig-row{
       display:flex;
-      gap:6px;
+      gap:8px;
       align-items:center;
       flex-wrap:wrap;
-      margin-top:6px;
+      margin-top:8px;
     }
 
     .sig-preview{
       border:1px dashed rgba(0,0,0,0.18);
       border-radius:12px;
-      min-height:56px;
+      min-height:62px;
       display:flex;
       align-items:center;
       justify-content:center;
       background:#fafafa;
-      margin-top:6px;
-      padding:8px;
+      margin-top:8px;
+      padding:10px;
       overflow:hidden;
     }
 
     .sig-typed-render{
       font-family:"Arial Narrow", Arial, sans-serif;
-      font-size:10px;
+      font-size:12px;
       font-weight:700;
       white-space:nowrap;
       color:#020617;
@@ -322,28 +316,29 @@
     .sig-hint{
       font-size:10px;
       color:var(--sig-muted);
-      margin-top:6px;
+      margin-top:8px;
       line-height:1.25;
     }
 
+    /* ====== STATUS ====== */
     .sig-meta{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:6px;
+      gap:8px;
       margin-top:4px;
     }
 
     .sig-kv{
       border:1px solid var(--sig-border-2);
       border-radius:10px;
-      padding:7px;
+      padding:8px;
       background:#fff;
     }
 
     .sig-kv .k{
       font-size:9px;
       color:var(--sig-muted);
-      margin-bottom:5px;
+      margin-bottom:6px;
       line-height:1.1;
     }
 
@@ -354,17 +349,17 @@
     }
 
     .sig-adopted{
-      margin-top:6px;
+      margin-top:10px;
       border:1px solid var(--sig-border-2);
       border-radius:12px;
       background:#fff;
-      padding:7px;
+      padding:8px;
     }
 
     .sig-adopted .k{
       font-size:9px;
       color:var(--sig-muted);
-      margin-bottom:5px;
+      margin-bottom:6px;
       line-height:1.1;
     }
 
@@ -408,7 +403,7 @@
       width:100%;
       text-align:center;
       font-family:"Arial Narrow", Arial, sans-serif;
-      font-size:10px;
+      font-size:12px;
       font-weight:700;
       color:#020617;
       white-space:nowrap;
@@ -418,31 +413,26 @@
 </head>
 
 <body>
-  <!-- EXPORTABLE ELEMENTS -->
-  <template data-carbyne-sig="template" id="carbyne-sig-shell">
-    <div class="sig-shell" role="application" aria-label="Signature Creator">
-      <div class="sig-header" data-sig-slot="header"></div>
-      <div class="sig-body" data-sig-slot="body"></div>
-    </div>
-  </template>
-
+  <!-- EXPORTABLE COMPONENTS -->
   <template data-carbyne-sig="template" id="carbyne-sig-header">
-    <div class="sig-brand">
-      <div class="sig-mark">✍</div>
-      <div class="sig-title">
-        <h3>Create Your Signature</h3>
-        <p>Draw or type, then adopt</p>
+    <div class="sig-header" role="region" aria-label="Signature Header">
+      <div class="sig-brand">
+        <div class="sig-mark">✍</div>
+        <div class="sig-title">
+          <h3>Create Your Signature</h3>
+          <p>Draw or type, then adopt</p>
+        </div>
       </div>
-    </div>
 
-    <div class="sig-actions">
-      <button type="button" class="sig-btn danger" data-sig="clearAll">Clear</button>
-      <button type="button" class="sig-btn primary" data-sig="adopt" disabled>Adopt</button>
+      <div class="sig-actions">
+        <button type="button" class="sig-btn danger" data-sig="clearAll">Clear</button>
+        <button type="button" class="sig-btn primary" data-sig="adopt" disabled>Adopt</button>
+      </div>
     </div>
   </template>
 
   <template data-carbyne-sig="template" id="carbyne-sig-input-card">
-    <div class="sig-card">
+    <div class="sig-card" role="region" aria-label="Signature Input">
       <h4>Signature Input</h4>
 
       <div class="sig-tabs" role="tablist" aria-label="Signature mode">
@@ -452,7 +442,7 @@
 
       <div data-sig="panelDraw" role="tabpanel">
         <div class="sig-pad-wrap" aria-label="Signature pad container">
-          <canvas class="sig-pad" data-sig="pad" width="1200" height="360" aria-label="Signature pad"></canvas>
+          <canvas class="sig-pad" data-sig="pad" width="1200" height="420" aria-label="Signature pad"></canvas>
 
           <div class="sig-tools">
             <div class="sig-mini">
@@ -489,7 +479,7 @@
   </template>
 
   <template data-carbyne-sig="template" id="carbyne-sig-status-card">
-    <div class="sig-card">
+    <div class="sig-card" role="region" aria-label="Adoption Status">
       <h4>Adoption Status</h4>
 
       <div class="sig-meta" aria-label="Status values">
@@ -520,7 +510,7 @@
         <div class="sig-adopted-box">
           <div class="sig-adopted-stage">
             <div class="sig-adopted-empty" data-sig="adoptedEmpty">No adopted signature</div>
-            <canvas class="sig-adopted-canvas" data-sig="adoptedCanvas" width="900" height="220" style="display:none;"></canvas>
+            <canvas class="sig-adopted-canvas" data-sig="adoptedCanvas" width="900" height="260" style="display:none;"></canvas>
             <div class="sig-adopted-typed" data-sig="adoptedTyped" style="display:none;"></div>
           </div>
         </div>
@@ -534,18 +524,6 @@
 
       const KIT_GLOBAL = "CarbyneSignatureKit";
       const STORAGE_KEY = "carbyne_adopted_signature_v1";
-
-      function cloneTemplate(doc, id){
-        const t = doc.getElementById(id);
-        if (!t || t.tagName.toLowerCase() !== "template") throw new Error("Missing template: " + id);
-        return doc.importNode(t.content, true);
-      }
-
-      function nowStamp(){
-        const d = new Date();
-        const pad2 = (n) => String(n).padStart(2,"0");
-        return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-      }
 
       function safeJSONParse(s){
         try{ return JSON.parse(s); }catch(_){ return null; }
@@ -562,6 +540,20 @@
 
       function clearStored(){
         localStorage.removeItem(STORAGE_KEY);
+      }
+
+      function nowStamp(){
+        const d = new Date();
+        const pad2 = (n) => String(n).padStart(2,"0");
+        return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      }
+
+      function fillWhite(ctx, w, h){
+        ctx.save();
+        ctx.globalCompositeOperation = "source-over";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0,0,w,h);
+        ctx.restore();
       }
 
       function getInkBoundingBox(srcCanvas){
@@ -617,36 +609,43 @@
         return true;
       }
 
-      function fillWhite(ctx, w, h){
-        ctx.save();
-        ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0,0,w,h);
-        ctx.restore();
+      function cloneTemplate(hostDoc, sourceDoc, id){
+        const t = sourceDoc.getElementById(id);
+        if (!t || t.tagName.toLowerCase() !== "template") throw new Error("Missing template: " + id);
+        return hostDoc.importNode(t.content, true);
       }
 
-      function initInstance(doc, slots, options){
-        const scale = Number(options && options.scale) || 1;
+      function ensureInstalled(hostDoc, sourceDoc){
+        const STYLE_ATTR = 'data-carbyne-sig="style"';
+        const TEMPLATE_ATTR = 'data-carbyne-sig="template"';
 
-        const shellFrag = cloneTemplate(doc, "carbyne-sig-shell");
-        const headerFrag = cloneTemplate(doc, "carbyne-sig-header");
-        const inputFrag = cloneTemplate(doc, "carbyne-sig-input-card");
-        const statusFrag = cloneTemplate(doc, "carbyne-sig-status-card");
-
-        const shell = shellFrag.querySelector(".sig-shell");
-        const headerSlot = shell.querySelector('[data-sig-slot="header"]');
-        const bodySlot = shell.querySelector('[data-sig-slot="body"]');
-
-        headerSlot.appendChild(headerFrag);
-        bodySlot.appendChild(inputFrag);
-        bodySlot.appendChild(statusFrag);
-
-        if (scale !== 1){
-          shell.style.transformOrigin = "top center";
-          shell.style.transform = `scale(${scale})`;
+        const hasStyle = hostDoc.querySelector(`style[${STYLE_ATTR}]`);
+        if (!hasStyle){
+          const style = sourceDoc.querySelector(`style[${STYLE_ATTR}]`);
+          if (style){
+            const s = hostDoc.createElement("style");
+            s.setAttribute("data-carbyne-sig","style");
+            s.textContent = style.textContent || "";
+            hostDoc.head.appendChild(s);
+          }
         }
 
-        const q = (k) => shell.querySelector(`[data-sig="${k}"]`);
+        const libId = "__carbyne_sig_template_library__";
+        if (!hostDoc.getElementById(libId)){
+          const lib = hostDoc.createElement("div");
+          lib.id = libId;
+          lib.style.display = "none";
+
+          const templates = Array.from(sourceDoc.querySelectorAll(`template[${TEMPLATE_ATTR}]`));
+          for (const t of templates){
+            lib.appendChild(hostDoc.importNode(t, true));
+          }
+          hostDoc.body.appendChild(lib);
+        }
+      }
+
+      function initBehavior(root){
+        const q = (k) => root.querySelector(`[data-sig="${k}"]`);
 
         const tabDraw = q("tabDraw");
         const tabType = q("tabType");
@@ -947,37 +946,7 @@
           }
         }
 
-        return { shell, destroy };
-      }
-
-      function ensureInstalled(hostDoc, sourceDoc){
-        const STYLE_ATTR = 'data-carbyne-sig="style"';
-        const TEMPLATE_ATTR = 'data-carbyne-sig="template"';
-
-        const existsStyle = hostDoc.querySelector(`style[${STYLE_ATTR}]`);
-        if (!existsStyle){
-          const style = sourceDoc.querySelector(`style[${STYLE_ATTR}]`);
-          if (style){
-            const s = hostDoc.createElement("style");
-            s.setAttribute("data-carbyne-sig", "style");
-            s.textContent = style.textContent || "";
-            hostDoc.head.appendChild(s);
-          }
-        }
-
-        const libId = "__carbyne_sig_template_library__";
-        if (!hostDoc.getElementById(libId)){
-          const lib = hostDoc.createElement("div");
-          lib.id = libId;
-          lib.style.display = "none";
-
-          const templates = Array.from(sourceDoc.querySelectorAll(`template[${TEMPLATE_ATTR}]`));
-          for (const t of templates){
-            lib.appendChild(hostDoc.importNode(t, true));
-          }
-
-          hostDoc.body.appendChild(lib);
-        }
+        return { destroy };
       }
 
       window[KIT_GLOBAL] = {
@@ -987,24 +956,101 @@
           ensureInstalled(hostDoc, electronicsignatureDoc);
         },
 
-        mount(hostDoc, slots, options){
+        mount(hostDoc, slots){
+          if (!slots || !slots.header || !slots.input || !slots.status){
+            throw new Error("Missing slots: header, input, status");
+          }
+
+          const prev = slots.__carbyneSigInstance;
+          if (prev && prev.destroy) prev.destroy();
+
           const libId = "__carbyne_sig_template_library__";
           const lib = hostDoc.getElementById(libId);
           if (!lib) throw new Error("Signature templates not installed.");
 
-          const shadowDoc = hostDoc;
+          const sourceDoc = hostDoc;
 
-          if (!slots || !slots.shell) throw new Error("Missing slot: shell");
+          slots.header.innerHTML = "";
+          slots.input.innerHTML = "";
+          slots.status.innerHTML = "";
 
-          slots.shell.innerHTML = "";
+          const headerFrag = cloneTemplate(hostDoc, sourceDoc, "carbyne-sig-header");
+          const inputFrag  = cloneTemplate(hostDoc, sourceDoc, "carbyne-sig-input-card");
+          const statusFrag = cloneTemplate(hostDoc, sourceDoc, "carbyne-sig-status-card");
 
-          const prev = slots.shell.__carbyneSigInstance;
-          if (prev && prev.destroy) prev.destroy();
+          slots.header.appendChild(headerFrag);
+          slots.input.appendChild(inputFrag);
+          slots.status.appendChild(statusFrag);
 
-          const instance = initInstance(shadowDoc, slots, options);
-          slots.shell.appendChild(instance.shell);
+          const root = (function(){
+            const wrap = hostDoc.createElement("div");
+            wrap.style.display = "none";
+            hostDoc.body.appendChild(wrap);
+            return wrap;
+          })();
 
-          slots.shell.__carbyneSigInstance = instance;
+          root.appendChild(slots.header.cloneNode(true));
+          root.appendChild(slots.input.cloneNode(true));
+          root.appendChild(slots.status.cloneNode(true));
+
+          const headerLive = slots.header;
+          const inputLive = slots.input;
+          const statusLive = slots.status;
+
+          const combined = hostDoc.createElement("div");
+          combined.style.display = "none";
+          hostDoc.body.appendChild(combined);
+
+          const headerNodes = Array.from(headerLive.childNodes);
+          const inputNodes = Array.from(inputLive.childNodes);
+          const statusNodes = Array.from(statusLive.childNodes);
+
+          for (const n of headerNodes) combined.appendChild(n.cloneNode(true));
+          for (const n of inputNodes) combined.appendChild(n.cloneNode(true));
+          for (const n of statusNodes) combined.appendChild(n.cloneNode(true));
+
+          combined.remove();
+
+          const behaviorRoot = hostDoc.createElement("div");
+          behaviorRoot.style.display = "none";
+          hostDoc.body.appendChild(behaviorRoot);
+
+          for (const n of headerNodes) behaviorRoot.appendChild(n);
+          for (const n of inputNodes) behaviorRoot.appendChild(n);
+          for (const n of statusNodes) behaviorRoot.appendChild(n);
+
+          const instance = initBehavior(behaviorRoot);
+
+          while (behaviorRoot.firstChild){
+            const node = behaviorRoot.firstChild;
+            behaviorRoot.removeChild(node);
+
+            if (node.nodeType === 1 && node.classList.contains("sig-header")){
+              slots.header.appendChild(node);
+              continue;
+            }
+            if (node.nodeType === 1 && node.classList.contains("sig-card")){
+              if (!slots.input.querySelector(".sig-card")){
+                slots.input.appendChild(node);
+              } else {
+                slots.status.appendChild(node);
+              }
+              continue;
+            }
+
+            if (!slots.header.querySelector(".sig-header")){
+              slots.header.appendChild(node);
+            } else if (!slots.input.querySelector(".sig-card")){
+              slots.input.appendChild(node);
+            } else {
+              slots.status.appendChild(node);
+            }
+          }
+
+          behaviorRoot.remove();
+          root.remove();
+
+          slots.__carbyneSigInstance = instance;
           return instance;
         }
       };
