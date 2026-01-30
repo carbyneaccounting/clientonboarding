@@ -1,3 +1,4 @@
+<!-- ui.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,6 +6,7 @@
   <title>Client Onboarding</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
+
   <style>
     * { 
       margin: 0;
@@ -20,6 +22,7 @@
       padding: 40px 20px 40px 20px;
       background: linear-gradient(135deg, #00305B 0%, #0A3D6F 50%, #00305B 100%);
       position: relative;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
     }
     
     .top-left-info {
@@ -68,7 +71,6 @@
       overflow: hidden;
     }
     
-    /* TOP SECTION - Progress Bar */
     .top-section {
       padding: 20px 30px;
       border-bottom: 1px solid #e0e0e0;
@@ -90,14 +92,19 @@
       transition: width 0.3s ease;
     }
     
-    /* MIDDLE SECTION - Content */
     .middle-section {
       flex: 1;
-      padding: 30px;
-      overflow-y: auto;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .middle-section iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
     }
     
-    /* BOTTOM SECTION - Navigation */
     .bottom-section {
       padding: 20px 30px;
       border-top: 1px solid #e0e0e0;
@@ -159,6 +166,7 @@
   </style>
 </head>
 <body>
+
   <div class="top-left-info">
     <div class="company-name">Carbyne Accounting</div>
     <div class="address">
@@ -170,22 +178,20 @@
   
   <div class="container">
     <h1>Client Onboarding</h1>
+
     <div class="card">
-      <!-- TOP SECTION: Progress Bar -->
+
       <div class="top-section">
         <div class="progress-bar-container">
           <div class="progress-bar-fill"></div>
         </div>
       </div>
-      
-      <!-- MIDDLE SECTION: Content Area -->
+
+      <!-- MIDDLE SECTION (ACCESS IMPORT) -->
       <div class="middle-section">
-        <!-- Your content goes here -->
-        <h2>Welcome to Client Onboarding</h2>
-        <p>This is where your form content will appear.</p>
+        <iframe id="accessFrame" title="Enter Access Code"></iframe>
       </div>
-      
-      <!-- BOTTOM SECTION: Navigation -->
+
       <div class="bottom-section">
         <div class="navigation">
           <button class="nav-button previous" disabled>Previous</button>
@@ -193,11 +199,23 @@
           <button class="nav-button next">Next</button>
         </div>
       </div>
+
     </div>
   </div>
   
   <div class="footer">
     Carbyne Accounting™ - Confidential & Proprietary System
   </div>
+
+  <script>
+    // This fixes GitHub Pages path issues when ui.html is not at the site root.
+    // It loads access.html from the SAME folder as ui.html.
+    (function () {
+      const frame = document.getElementById("accessFrame");
+      const basePath = window.location.pathname.replace(/[^/]*$/, ""); // folder containing ui.html
+      frame.src = basePath + "access.html";
+    })();
+  </script>
+
 </body>
 </html>
