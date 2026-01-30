@@ -1,4 +1,4 @@
-<!-- ui.html - WITH BUILT-IN INSTANT VALIDATION (15 PAGES) -->
+<!-- ui.html (FULL FILE) -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -9,346 +9,336 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    *{margin:0;padding:0;box-sizing:border-box}
+
+    :root{
+      --carbyne-blue:#00305B;
+      --carbyne-blue-2:#0A3D6F;
+      --radius:18px;
+      --shadow:0 28px 56px rgba(0,0,0,0.30);
+      --danger:#b91c1c;
     }
 
-    :root {
-      --carbyne-blue: #00305B;
-      --carbyne-blue-2: #0A3D6F;
-      --radius: 18px;
-      --shadow: 0 28px 56px rgba(0, 0, 0, 0.30);
-      --danger: #b91c1c;
+    body{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:40px 20px;
+      background:linear-gradient(135deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 50%,var(--carbyne-blue) 100%);
+      position:relative;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     }
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      background: linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
-      position: relative;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    .top-left-info{
+      position:absolute;
+      top:20px;
+      left:20px;
+      color:#ffffff;
+      z-index:10;
     }
 
-    .top-left-info {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      color: #ffffff;
-      z-index: 10;
+    .company-name{font-size:16px;font-weight:700;margin-bottom:2px}
+
+    .address{
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:0.2px;
+      line-height:1.35;
+      opacity:0.98;
     }
 
-    .company-name {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 2px;
+    .container{
+      width:min(1200px,95vw);
+      display:flex;
+      flex-direction:column;
     }
 
-    .address {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.2px;
-      line-height: 1.35;
-      opacity: 0.98;
+    h1{
+      font-family:'Baron',sans-serif;
+      font-size:22px;
+      color:#ffffff;
+      font-weight:normal;
+      margin-bottom:14px;
     }
 
-    .container {
-      width: min(1200px, 95vw);
-      display: flex;
-      flex-direction: column;
+    .card{
+      width:100%;
+      height:clamp(520px,72vh,860px);
+      background:#ffffff;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      position:relative;
     }
 
-    h1 {
-      font-family: 'Baron', sans-serif;
-      font-size: 22px;
-      color: #ffffff;
-      font-weight: normal;
-      margin-bottom: 14px;
+    .top-section{
+      padding:18px 30px;
+      border-bottom:1px solid #e6e6e6;
+      background:#ffffff;
+      z-index:2;
     }
 
-    .card {
-      width: 100%;
-      height: clamp(520px, 72vh, 860px);
-      background: #ffffff;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
+    .progress-bar-container{
+      width:100%;
+      height:8px;
+      background:#dedede;
+      border-radius:999px;
+      overflow:hidden;
     }
 
-    .top-section {
-      padding: 18px 30px;
-      border-bottom: 1px solid #e6e6e6;
-      background: #ffffff;
-      z-index: 2;
+    .progress-bar-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
+      border-radius:999px;
+      transition:width 0.25s ease;
     }
 
-    .progress-bar-container {
-      width: 100%;
-      height: 8px;
-      background: #dedede;
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      border-radius: 999px;
-      transition: width 0.25s ease;
-    }
-
-    .middle-section {
-      flex: 1;
-      padding: 26px 30px;
-      overflow: auto;
-      background: linear-gradient(180deg, rgba(0, 0, 0, 0.52) 0%, rgba(0, 0, 0, 0.42) 45%, rgba(0, 0, 0, 0.52) 100%),
+    .middle-section{
+      flex:1;
+      padding:26px 30px;
+      overflow:auto;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.42) 45%, rgba(0,0,0,0.52) 100%),
         url("https://images.unsplash.com/photo-1519681393784-d120267933ba");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      position: relative;
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      position:relative;
     }
 
-    #pageMount {
-      width: 100%;
-      min-height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    #pageMount{
+      width:100%;
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
-    .bottom-section {
-      padding: 18px 30px;
-      border-top: 1px solid #e6e6e6;
-      background: #ffffff;
-      z-index: 2;
+    .bottom-section{
+      padding:18px 30px;
+      border-top:1px solid #e6e6e6;
+      background:#ffffff;
+      z-index:2;
     }
 
-    .navigation {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
+    .navigation{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
     }
 
-    .nav-button {
-      padding: 10px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.15s ease, transform 0.15s ease;
+    .nav-button{
+      padding:10px 24px;
+      border:none;
+      border-radius:8px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:opacity 0.15s ease, transform 0.15s ease;
     }
 
-    .nav-button.previous {
-      background: #f0f0f0;
-      color: #333;
-    }
+    .nav-button.previous{background:#f0f0f0;color:#333}
+    .nav-button.previous:hover:not(:disabled){opacity:0.95;transform:translateY(-1px)}
 
-    .nav-button.previous:hover:not(:disabled) {
-      opacity: 0.95;
-      transform: translateY(-1px);
+    .nav-button.next{
+      background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
+      color:#ffffff;
     }
+    .nav-button.next:hover:not(:disabled){opacity:0.95;transform:translateY(-1px)}
 
-    .nav-button.next {
-      background: linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      color: #ffffff;
-    }
+    .nav-button:disabled{opacity:0.45;cursor:not-allowed;transform:none}
 
-    .nav-button.next:hover:not(:disabled) {
-      opacity: 0.95;
-      transform: translateY(-1px);
-    }
+    .page-indicator{font-size:14px;color:#666;font-weight:600}
 
-    .nav-button:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .page-indicator {
-      font-size: 14px;
-      color: #666;
-      font-weight: 600;
-    }
-
-    .footer {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      color: #ffffff;
-      font-size: 13px;
-      font-weight: 600;
-      opacity: 0.95;
-      z-index: 10;
+    .footer{
+      position:absolute;
+      bottom:20px;
+      left:20px;
+      color:#ffffff;
+      font-size:13px;
+      font-weight:600;
+      opacity:0.95;
+      z-index:10;
     }
 
     /* Access Module Styles */
-    .access-shell {
-      width: min(900px, 92%);
-      padding: 2px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
-      box-shadow: 0 28px 64px rgba(0, 0, 0, 0.28);
-      min-height: 400px;
+    .access-shell{
+      width:min(900px,92%);
+      padding:2px;
+      border-radius:22px;
+      background:linear-gradient(135deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 50%,var(--carbyne-blue) 100%);
+      box-shadow:0 28px 64px rgba(0,0,0,0.28);
+      min-height:400px;
     }
 
-    .access-card {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      border-radius: 20px;
-      padding: 50px 40px;
-      min-height: 396px;
+    .access-card{
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.06);
+      border-radius:20px;
+      padding:50px 40px;
+      min-height:396px;
     }
 
-    .access-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #111827;
-      margin: 0 0 14px 0;
-      text-align: left;
+    .access-title{
+      font-size:18px;
+      font-weight:800;
+      color:#111827;
+      margin:0 0 14px 0;
+      text-align:left;
     }
 
-    .access-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: #334155;
-      margin: 0 0 8px 0;
-      text-align: left;
-      letter-spacing: 0.2px;
+    .access-label{
+      font-size:13px;
+      font-weight:800;
+      color:#334155;
+      margin:0 0 8px 0;
+      text-align:left;
+      letter-spacing:0.2px;
     }
 
-    .access-input {
-      width: 100%;
-      padding: 14px 16px;
-      font-size: 15px;
-      border: 1px solid rgba(0, 0, 0, 0.18);
-      border-radius: 12px;
-      outline: none;
-      margin: 0 0 16px 0;
-      background: #ffffff;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    .access-input{
+      width:100%;
+      padding:14px 16px;
+      font-size:15px;
+      border:1px solid rgba(0,0,0,0.18);
+      border-radius:12px;
+      outline:none;
+      margin:0 0 16px 0;
+      background:#ffffff;
+      transition:border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .access-input:focus {
-      border-color: rgba(0, 48, 91, 0.75);
-      box-shadow: 0 0 0 3px rgba(0, 48, 91, 0.18);
+    .access-input:focus{
+      border-color:rgba(0,48,91,0.75);
+      box-shadow:0 0 0 3px rgba(0,48,91,0.18);
     }
 
-    .access-input.error {
-      border-color: var(--danger);
+    .access-input.error{border-color:var(--danger)}
+
+    .access-row{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:flex-start;
+      flex-wrap:wrap;
     }
 
-    .access-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: flex-start;
-      flex-wrap: wrap;
+    .access-submit{
+      padding:11px 22px;
+      font-size:14px;
+      font-weight:800;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,0.10);
+      background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
+      color:#ffffff;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:132px;
+      box-shadow:0 10px 20px rgba(0,0,0,0.14);
+      transition:opacity 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .access-submit {
-      padding: 11px 22px;
-      font-size: 14px;
-      font-weight: 800;
-      border-radius: 10px;
-      border: 1px solid rgba(0, 0, 0, 0.10);
-      background: linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      color: #ffffff;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 132px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
-      transition: opacity 0.2s ease, box-shadow 0.2s ease;
-    }
+    .access-submit:hover:not(:disabled){opacity:0.95}
+    .access-submit:disabled{opacity:0.6;cursor:not-allowed;box-shadow:none}
 
-    .access-submit:hover:not(:disabled) {
-      opacity: 0.95;
+    .inline-msg{
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:0.2px;
+      display:none;
+      white-space:nowrap;
+      color:var(--danger);
     }
+    .inline-msg.show{display:inline}
 
-    .access-submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      box-shadow: none;
+    .spinner{
+      display:inline-block;
+      width:14px;
+      height:14px;
+      border:2px solid rgba(255,255,255,0.3);
+      border-radius:50%;
+      border-top-color:#ffffff;
+      animation:spin 0.6s linear infinite;
     }
-
-    .inline-msg {
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      display: none;
-      white-space: nowrap;
-      color: var(--danger);
-    }
-
-    .inline-msg.show {
-      display: inline;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #ffffff;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
     /* Page 2+ styling */
-    .page-content {
-      width: min(900px, 92%);
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      border-radius: 14px;
-      padding: 50px 40px;
-      color: #111827;
-      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
-      min-height: 400px;
-      max-height: 400px;
-      position: relative;
+    .page-content{
+      width:min(900px,92%);
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:14px;
+      padding:50px 40px;
+      color:#111827;
+      box-shadow:0 16px 32px rgba(0,0,0,0.18);
+      min-height:400px;
+      max-height:400px;
+      position:relative;
+      overflow:hidden;
     }
 
-    .page-content.scrollable {
-      overflow-y: auto;
+    .page-content h2{
+      font-size:20px;
+      font-weight:800;
+      margin-bottom:16px;
+      color:var(--carbyne-blue);
     }
 
-    .page-content h2 {
-      font-size: 20px;
-      font-weight: 800;
-      margin-bottom: 16px;
-      color: var(--carbyne-blue);
+    .page-content p{
+      font-size:14px;
+      line-height:1.6;
+      margin-bottom:12px;
     }
 
-    .page-content p {
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 12px;
+    .reference-number{
+      position:absolute;
+      top:20px;
+      right:30px;
+      font-size:12px;
+      font-weight:600;
+      color:#64748b;
+      letter-spacing:0.3px;
     }
 
-    .reference-number {
-      position: absolute;
-      top: 20px;
-      right: 30px;
-      font-size: 12px;
-      font-weight: 600;
-      color: #64748b;
-      letter-spacing: 0.3px;
+    /* PAGE 3: ONLY LAYOUT + IMPORTED ELEMENTS */
+    .sig-page3-wrap{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:flex-start;
+      margin-top:14px;
+    }
+    .sig-page3-shell{
+      width:min(560px,100%);
+      display:flex;
+      justify-content:center;
+    }
+
+    /* optional scaler for page 3 only */
+    .sig-page3-scale{
+      transform-origin:top center;
+      transform:scale(0.95);
+      width:100%;
+      display:flex;
+      justify-content:center;
+    }
+
+    .sig-loading{
+      font-size:14px;
+      font-weight:800;
+      color:#334155;
+      padding:14px 16px;
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:12px;
+      box-shadow:0 10px 20px rgba(0,0,0,0.12);
     }
   </style>
 </head>
@@ -400,7 +390,10 @@
     const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
     const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
     const TARGET_HEADER = "Unique Identifier";
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+    const CACHE_DURATION = 24 * 60 * 60 * 1000;
+
+    // IMPORTANT: this file must be the real HTML above (not markdown)
+    const ELECTRONIC_SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
 
     // ============================================
     // STATE
@@ -422,120 +415,98 @@
     // ============================================
     // VALIDATION FUNCTIONS
     // ============================================
-    function normalize(v) {
-      return (v ?? "").toString().trim();
-    }
+    function normalize(v){ return (v ?? "").toString().trim(); }
 
-    function getCachedCodes() {
+    function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
-
-      try {
+      try{
         const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
         const now = Date.now();
-
-        if (timestamp && (now - parseInt(timestamp)) < CACHE_DURATION) {
+        if (timestamp && (now - parseInt(timestamp,10)) < CACHE_DURATION){
           const cached = localStorage.getItem(CACHE_KEY);
-          if (cached) {
+          if (cached){
             validCodesCache = JSON.parse(cached);
             return validCodesCache;
           }
         }
-      } catch (e) {
+      }catch(e){
         console.error("Cache read error:", e);
       }
       return null;
     }
 
-    function setCachedCodes(codes) {
+    function setCachedCodes(codes){
       validCodesCache = codes;
-      try {
+      try{
         localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
         localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-      } catch (e) {
+      }catch(e){
         console.error("Cache write error:", e);
       }
     }
 
-    function findHeaderIndex(headers) {
+    function findHeaderIndex(headers){
       const lower = headers.map(h => normalize(h).toLowerCase());
       const target = TARGET_HEADER.toLowerCase();
-
-      for (let i = 0; i < lower.length; i++) {
+      for (let i=0;i<lower.length;i++){
         if (lower[i] === target) return i;
       }
-
       return -1;
     }
 
-    async function fetchValidCodes() {
-      if (isFetchingCodes) {
-        while (isFetchingCodes) {
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
+    async function fetchValidCodes(){
+      if (isFetchingCodes){
+        while (isFetchingCodes) await new Promise(r => setTimeout(r, 100));
         return validCodesCache;
       }
-
       isFetchingCodes = true;
 
-      try {
-        const res = await fetch(FILE_URL, { cache: "no-store" });
+      try{
+        const res = await fetch(FILE_URL, { cache:"no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const ab = await res.arrayBuffer();
-        const wb = XLSX.read(ab, { type: "array" });
+        const wb = XLSX.read(ab, { type:"array" });
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, {
-          header: 1,
-          raw: false,
-          defval: ""
-        });
+        const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:"" });
 
-        if (!rows || rows.length < 2) {
-          throw new Error("No data found");
-        }
+        if (!rows || rows.length < 2) throw new Error("No data found");
 
         const headers = rows[0].map(v => normalize(v));
         const col = findHeaderIndex(headers);
-
-        if (col < 0) {
-          throw new Error("Column 'Unique Identifier' not found");
-        }
+        if (col < 0) throw new Error("Column 'Unique Identifier' not found");
 
         const validCodes = [];
-        for (let r = 1; r < rows.length; r++) {
+        for (let r=1;r<rows.length;r++){
           const row = rows[r] || [];
           const cell = normalize(row[col] ?? "");
-          if (cell) {
-            validCodes.push(cell.toLowerCase());
-          }
+          if (cell) validCodes.push(cell.toLowerCase());
         }
 
         setCachedCodes(validCodes);
         return validCodes;
-
-      } catch (error) {
+      }catch(error){
         console.error("Fetch error:", error);
         throw error;
-      } finally {
+      }finally{
         isFetchingCodes = false;
       }
     }
 
-    async function validateCode(code) {
+    async function validateCode(code){
       const needle = code.toLowerCase();
-
       let codes = getCachedCodes();
 
-      if (codes && Array.isArray(codes)) {
+      if (codes && Array.isArray(codes)){
         const isValid = codes.includes(needle);
         fetchValidCodes().catch(() => {});
         return isValid;
       }
 
-      try {
+      try{
         codes = await fetchValidCodes();
         return codes.includes(needle);
-      } catch (error) {
+      }catch(_){
         return false;
       }
     }
@@ -543,14 +514,14 @@
     // ============================================
     // PAGE NAVIGATION
     // ============================================
-    function init() {
+    function init(){
       const accessCode = localStorage.getItem(STORAGE_KEY);
       isAccessValidated = !!accessCode;
 
-      const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY)) || 1;
-      currentPage = isAccessValidated ? savedPage : 1;
+      const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY),10) || 1;
+      currentPage = isAccessValidated ? Math.min(Math.max(savedPage,1), TOTAL_PAGES) : 1;
 
-      if (!getCachedCodes()) {
+      if (!getCachedCodes()){
         fetchValidCodes().catch(() => {});
       }
 
@@ -560,48 +531,44 @@
       nextBtn.addEventListener("click", goToNextPage);
     }
 
-    function updateUI() {
+    function updateUI(){
       const progress = (currentPage / TOTAL_PAGES) * 100;
       progressBar.style.width = `${progress}%`;
 
       pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
+      pageIndicator.style.visibility = (currentPage === 1) ? "hidden" : "visible";
 
-      if (currentPage === 1) {
-        pageIndicator.style.visibility = "hidden";
-      } else {
-        pageIndicator.style.visibility = "visible";
-      }
+      prevBtn.disabled = (currentPage === 1);
+      nextBtn.disabled = (currentPage === TOTAL_PAGES) || (currentPage === 1);
 
-      prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage === TOTAL_PAGES || currentPage === 1;
-
-      localStorage.setItem(CURRENT_PAGE_KEY, currentPage);
+      localStorage.setItem(CURRENT_PAGE_KEY, String(currentPage));
     }
 
-    function goToPreviousPage() {
-      if (currentPage > 1) {
+    function goToPreviousPage(){
+      if (currentPage > 1){
         currentPage--;
         loadPage(currentPage);
       }
     }
 
-    function goToNextPage() {
-      if (currentPage < TOTAL_PAGES) {
+    function goToNextPage(){
+      if (currentPage < TOTAL_PAGES){
         currentPage++;
         loadPage(currentPage);
       }
     }
 
-    function loadPage(pageNum) {
+    function loadPage(pageNum){
       pageMount.innerHTML = "";
       updateUI();
 
-      if (pageNum === 1) {
+      if (pageNum === 1){
         loadAccessModule();
       } else {
-        if (!isAccessValidated) {
+        if (!isAccessValidated){
           currentPage = 1;
           loadAccessModule();
+          updateUI();
           return;
         }
         loadPageContent(pageNum);
@@ -611,7 +578,7 @@
     // ============================================
     // ACCESS MODULE
     // ============================================
-    function loadAccessModule() {
+    function loadAccessModule(){
       const accessHTML = `
         <div class="access-shell">
           <div class="access-card">
@@ -635,19 +602,18 @@
           </div>
         </div>
       `;
-
       pageMount.innerHTML = accessHTML;
       initAccessModule();
     }
 
-    function initAccessModule() {
+    function initAccessModule(){
       const input = document.getElementById("accessCode");
       const btn = document.getElementById("submitCode");
       const btnText = document.getElementById("btnText");
       const msg = document.getElementById("inlineMsg");
 
-      function showInvalid(show, message = "Invalid Access Code") {
-        if (show) {
+      function showInvalid(show, message="Invalid Access Code"){
+        if (show){
           msg.classList.add("show");
           msg.textContent = message;
           input.classList.add("error");
@@ -657,87 +623,136 @@
         }
       }
 
-      function setBusy(isBusy) {
+      function setBusy(isBusy){
         btn.disabled = !!isBusy;
-        if (isBusy) {
-          btnText.innerHTML = '<span class="spinner"></span>';
-        } else {
-          btnText.textContent = "Submit";
-        }
+        btnText.innerHTML = isBusy ? '<span class="spinner"></span>' : "Submit";
       }
 
-      async function submit() {
+      async function submit(){
         showInvalid(false);
 
         const code = normalize(input.value);
         input.value = code;
 
-        if (!code) {
+        if (!code){
           showInvalid(true, "Please enter a code");
           return;
         }
 
         setBusy(true);
 
-        try {
+        try{
           const isValid = await validateCode(code);
-
-          if (isValid) {
+          if (isValid){
             localStorage.setItem(STORAGE_KEY, code);
             isAccessValidated = true;
             goToNextPage();
           } else {
             showInvalid(true);
           }
-        } catch (error) {
+        }catch(_){
           showInvalid(true, "Validation error");
-        } finally {
+        }finally{
           setBusy(false);
         }
       }
 
       btn.addEventListener("click", submit);
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submit();
-      });
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
 
       showInvalid(false);
       input.focus();
     }
 
     // ============================================
-    // PAGE CONTENT (2 - 15)
+    // PAGE 3: IMPORT ELEMENTS FROM electronicsignature.html
+    // (ui.html ONLY LOADS / MOUNTS; NO SIGNATURE LOGIC HERE)
     // ============================================
-    function loadPageContent(pageNum) {
+    let __sigKitLoaded = false;
+    let __sigKitLoadingPromise = null;
+
+    async function loadElectronicSignatureKit(){
+      if (__sigKitLoaded && window.CarbyneSignatureKit) return;
+      if (__sigKitLoadingPromise) return __sigKitLoadingPromise;
+
+      __sigKitLoadingPromise = (async () => {
+        const res = await fetch(ELECTRONIC_SIGNATURE_URL, { cache:"no-store" });
+        if (!res.ok) throw new Error("Signature file HTTP " + res.status);
+
+        const text = await res.text();
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, "text/html");
+
+        const kitScript = doc.querySelector('script[data-carbyne-sig="script"]');
+        if (!kitScript || !kitScript.textContent) throw new Error("Signature kit script missing.");
+
+        // install templates + style into this document
+        // (the kit will copy them from 'doc' into this page)
+        const tmpGlobalName = "CarbyneSignatureKit";
+        if (!window[tmpGlobalName]){
+          const s = document.createElement("script");
+          s.text = kitScript.textContent;
+          document.body.appendChild(s);
+        }
+
+        if (!window.CarbyneSignatureKit) throw new Error("Signature kit did not load.");
+
+        window.CarbyneSignatureKit.install(document, doc);
+
+        __sigKitLoaded = true;
+      })();
+
+      return __sigKitLoadingPromise;
+    }
+
+    async function mountSignatureOnPage3(shellEl){
+      await loadElectronicSignatureKit();
+      window.CarbyneSignatureKit.mount(document, { shell: shellEl }, { scale: 1 });
+    }
+
+    // ============================================
+    // PAGE CONTENT
+    // ============================================
+    function loadPageContent(pageNum){
       const content = document.createElement("div");
       content.className = "page-content";
 
-      if (pageNum >= 3) {
-        content.classList.add("scrollable");
-      }
-
       const secureCode = localStorage.getItem(STORAGE_KEY) || "";
 
-      if (pageNum >= 2 && pageNum <= 15) {
+      if (pageNum === 3){
         content.innerHTML = `
           <div class="reference-number">Reference Number: ${secureCode}</div>
-          <h2>Welcome to Step ${pageNum}</h2>
-          <p>This is step ${pageNum} of the onboarding process.</p>
-          <p>Add your content here for page ${pageNum}.</p>
+          <h2>Electronic Signature</h2>
+
+          <div class="sig-page3-wrap">
+            <div class="sig-page3-shell">
+              <div class="sig-page3-scale" id="sigShell">
+                <div class="sig-loading">Loading signature...</div>
+              </div>
+            </div>
+          </div>
         `;
-      } else {
-        content.innerHTML = `
-          <div class="reference-number">Reference Number: ${secureCode}</div>
-          <h2>Page ${pageNum}</h2>
-          <p>Content for page ${pageNum} goes here.</p>
-        `;
+        pageMount.appendChild(content);
+
+        const sigShell = content.querySelector("#sigShell");
+        mountSignatureOnPage3(sigShell).catch(() => {
+          sigShell.innerHTML = `<div class="sig-loading">Signature failed to load</div>`;
+        });
+
+        return;
       }
 
+      content.innerHTML = `
+        <div class="reference-number">Reference Number: ${secureCode}</div>
+        <h2>Step ${pageNum}</h2>
+        <p>Content for Step ${pageNum} goes here.</p>
+      `;
       pageMount.appendChild(content);
     }
 
     // ============================================
-    // START APPLICATION
+    // START
     // ============================================
     init();
   </script>
