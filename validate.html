@@ -1,1 +1,102 @@
+<!-- validate.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Validate</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body>
+  <script>
+    (function(){
+      const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
+      const TARGET_HEADER = "Unique Identifier";
+
+      function normalize(v){ return (v ?? "").toString().trim(); }
+
+      function getCode(){
+        const hash = (location.hash || "").replace(/^#/, "");
+        const params = new URLSearchParams(hash);
+        return normalize(params.get("code") || "");
+      }
+
+      function postResult(valid, code){
+        const payload = { type: "carbyne-validate", valid: !!valid, code: code || "" };
+
+        try{
+          if (window.parent && window.parent !== window){
+            window.parent.postMessage(payload, "*");
+          } else if (window.opener){
+            window.opener.postMessage(payload, "*");
+          }
+        } catch(_){}
+
+        document.body.textContent = valid ? "true" : "false";
+      }
+
+      function findHeaderIndex(headers){
+        const lower = headers.map(h => normalize(h).toLowerCase());
+        const target = TARGET_HEADER.toLowerCase();
+        for (let i = 0; i < lower.length; i++){
+          if (lower[i] === target) return i;
+        }
+        return -1;
+      }
+
+      async function validate(){
+        const code = getCode();
+        if (!code){
+          postResult(false, "");
+          return;
+        }
+
+        try{
+          const res = await fetch(FILE_URL, { cache: "no-store" });
+          if (!res.ok){
+            postResult(false, code);
+            return;
+          }
+
+          const ab = await res.arrayBuffer();
+          const wb = XLSX.read(ab, { type: "array" });
+
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
+
+          if (!rows || rows.length < 2){
+            postResult(false, code);
+            return;
+          }
+
+          const headers = rows[0].map(v => normalize(v));
+          const col = findHeaderIndex(headers);
+          if (col < 0){
+            postResult(false, code);
+            return;
+          }
+
+          const needle = code.toLowerCase();
+          let ok = false;
+
+          for (let r = 1; r < rows.length; r++){
+            const row = rows[r] || [];
+            const cell = normalize(row[col] ?? "");
+            if (cell && cell.toLowerCase() === needle){
+              ok = true;
+              break;
+            }
+          }
+
+          postResult(ok, code);
+        } catch(_){
+          postResult(false, code);
+        }
+      }
+
+      validate();
+    })();
+  </script>
+</body>
+</html>
 
