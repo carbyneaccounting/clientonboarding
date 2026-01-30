@@ -152,7 +152,6 @@
     .nav-button.next:hover:not(:disabled){opacity:0.95;transform:translateY(-1px)}
 
     .nav-button:disabled{opacity:0.45;cursor:not-allowed;transform:none}
-
     .page-indicator{font-size:14px;color:#666;font-weight:600}
 
     .footer{
@@ -307,28 +306,26 @@
       letter-spacing:0.3px;
     }
 
-    /* PAGE 3: ONLY LAYOUT + IMPORTED ELEMENTS */
-    .sig-page3-wrap{
+    /* PAGE 3: DIRECT LAYOUT (NO INNER CONTAINER FROM SIGNATURE FILE) */
+    .sig-page3{
       width:100%;
       display:flex;
-      justify-content:center;
-      align-items:flex-start;
-      margin-top:14px;
-    }
-    .sig-page3-shell{
-      width:min(560px,100%);
-      display:flex;
-      justify-content:center;
+      flex-direction:column;
+      gap:12px;
+      margin-top:10px;
     }
 
-    /* optional scaler for page 3 only */
-    .sig-page3-scale{
-      transform-origin:top center;
-      transform:scale(0.95);
+    .sig-page3-grid{
       width:100%;
-      display:flex;
-      justify-content:center;
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap:12px;
+      align-items:start;
     }
+
+    #sigHeaderSlot{width:100%}
+    #sigInputSlot{width:100%}
+    #sigStatusSlot{width:100%}
 
     .sig-loading{
       font-size:14px;
@@ -339,6 +336,11 @@
       border:1px solid rgba(0,0,0,0.08);
       border-radius:12px;
       box-shadow:0 10px 20px rgba(0,0,0,0.12);
+      display:inline-block;
+    }
+
+    @media (max-width: 980px){
+      .sig-page3-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -392,7 +394,6 @@
     const TARGET_HEADER = "Unique Identifier";
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    // IMPORTANT: this file must be the real HTML above (not markdown)
     const ELECTRONIC_SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
 
     // ============================================
@@ -665,8 +666,7 @@
     }
 
     // ============================================
-    // PAGE 3: IMPORT ELEMENTS FROM electronicsignature.html
-    // (ui.html ONLY LOADS / MOUNTS; NO SIGNATURE LOGIC HERE)
+    // PAGE 3: IMPORT COMPONENTS INTO PAGE 3 SLOTS
     // ============================================
     let __sigKitLoaded = false;
     let __sigKitLoadingPromise = null;
@@ -680,17 +680,13 @@
         if (!res.ok) throw new Error("Signature file HTTP " + res.status);
 
         const text = await res.text();
-
         const parser = new DOMParser();
         const doc = parser.parseFromString(text, "text/html");
 
         const kitScript = doc.querySelector('script[data-carbyne-sig="script"]');
         if (!kitScript || !kitScript.textContent) throw new Error("Signature kit script missing.");
 
-        // install templates + style into this document
-        // (the kit will copy them from 'doc' into this page)
-        const tmpGlobalName = "CarbyneSignatureKit";
-        if (!window[tmpGlobalName]){
+        if (!window.CarbyneSignatureKit){
           const s = document.createElement("script");
           s.text = kitScript.textContent;
           document.body.appendChild(s);
@@ -699,16 +695,19 @@
         if (!window.CarbyneSignatureKit) throw new Error("Signature kit did not load.");
 
         window.CarbyneSignatureKit.install(document, doc);
-
         __sigKitLoaded = true;
       })();
 
       return __sigKitLoadingPromise;
     }
 
-    async function mountSignatureOnPage3(shellEl){
+    async function mountSignatureOnPage3(headerSlot, inputSlot, statusSlot){
       await loadElectronicSignatureKit();
-      window.CarbyneSignatureKit.mount(document, { shell: shellEl }, { scale: 1 });
+      window.CarbyneSignatureKit.mount(document, {
+        header: headerSlot,
+        input: inputSlot,
+        status: statusSlot
+      });
     }
 
     // ============================================
@@ -725,19 +724,28 @@
           <div class="reference-number">Reference Number: ${secureCode}</div>
           <h2>Electronic Signature</h2>
 
-          <div class="sig-page3-wrap">
-            <div class="sig-page3-shell">
-              <div class="sig-page3-scale" id="sigShell">
-                <div class="sig-loading">Loading signature...</div>
-              </div>
+          <div class="sig-page3">
+            <div id="sigHeaderSlot">
+              <span class="sig-loading">Loading signature...</span>
+            </div>
+
+            <div class="sig-page3-grid">
+              <div id="sigInputSlot"></div>
+              <div id="sigStatusSlot"></div>
             </div>
           </div>
         `;
+
         pageMount.appendChild(content);
 
-        const sigShell = content.querySelector("#sigShell");
-        mountSignatureOnPage3(sigShell).catch(() => {
-          sigShell.innerHTML = `<div class="sig-loading">Signature failed to load</div>`;
+        const headerSlot = content.querySelector("#sigHeaderSlot");
+        const inputSlot = content.querySelector("#sigInputSlot");
+        const statusSlot = content.querySelector("#sigStatusSlot");
+
+        mountSignatureOnPage3(headerSlot, inputSlot, statusSlot).catch(() => {
+          headerSlot.innerHTML = `<span class="sig-loading">Signature failed to load</span>`;
+          inputSlot.innerHTML = "";
+          statusSlot.innerHTML = "";
         });
 
         return;
