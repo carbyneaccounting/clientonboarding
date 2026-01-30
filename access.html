@@ -1,273 +1,205 @@
 <!-- access.html -->
-<div id="accessModule">
-  <style>
-    :root{
-      --carbyne-blue:#00305B;
-      --carbyne-blue-2:#0A3D6F;
-      --ink:#0f172a;
-      --muted:#475569;
-      --danger:#b91c1c;
-      --ok:#166534;
-    }
-    /* Bigger module */
-    .access-shell{
-      width:min(860px, 94%);
-      padding:2px;
-      border-radius:20px;
-      background:linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
-      box-shadow:0 26px 58px rgba(0,0,0,0.28);
-    }
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Access</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+  <div id="accessModule">
+    <style>
+      :root{
+        --carbyne-blue:#00305B;
+        --carbyne-blue-2:#0A3D6F;
+        --danger:#b91c1c;
+      }
 
-    .access-card{
-      background:rgba(255,255,255,0.92);
-      border:1px solid rgba(0,0,0,0.06);
-      border-radius:18px;
-      padding:28px 28px 24px 28px;
-    }
+      .access-shell{
+        width:min(740px, 92%);
+        padding:2px;
+        border-radius:22px;
+        background:linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
+        box-shadow:0 28px 64px rgba(0,0,0,0.28);
+      }
 
-    .access-title{
-      font-size:18px;
-      font-weight:800;
-      color:#111827;
-      margin:0 0 14px 0;
-      text-align:left;
-    }
+      .access-card{
+        background:rgba(255,255,255,0.92);
+        border:1px solid rgba(0,0,0,0.06);
+        border-radius:20px;
+        padding:30px 30px 26px 30px;
+      }
 
-    .access-label{
-      font-size:13px;
-      font-weight:800;
-      color:#334155;
-      margin:0 0 8px 0;
-      text-align:left;
-      letter-spacing:.2px;
-    }
+      .access-title{
+        font-size:18px;
+        font-weight:800;
+        color:#111827;
+        margin:0 0 14px 0;
+        text-align:left;
+      }
 
-    .access-input{
-      width:100%;
-      padding:14px 16px;
-      font-size:15px;
-      border:1px solid rgba(0,0,0,0.18);
-      border-radius:12px;
-      outline:none;
-      margin:0 0 14px 0;
-      background:#ffffff;
-    }
+      .access-label{
+        font-size:13px;
+        font-weight:800;
+        color:#334155;
+        margin:0 0 8px 0;
+        text-align:left;
+        letter-spacing:.2px;
+      }
 
-    .access-input:focus{
-      border-color:rgba(0,48,91,0.75);
-      box-shadow:0 0 0 3px rgba(0,48,91,0.18);
-    }
+      .access-input{
+        width:100%;
+        padding:14px 16px;
+        font-size:15px;
+        border:1px solid rgba(0,0,0,0.18);
+        border-radius:12px;
+        outline:none;
+        margin:0 0 16px 0;
+        background:#ffffff;
+      }
 
-    /* Button + inline status to the right */
-    .access-row{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:flex-start;
-      flex-wrap:wrap;
-    }
+      .access-input:focus{
+        border-color:rgba(0,48,91,0.75);
+        box-shadow:0 0 0 3px rgba(0,48,91,0.18);
+      }
 
-    .access-submit{
-      padding:11px 22px;
-      font-size:14px;
-      font-weight:800;
-      border-radius:10px;
-      border:1px solid rgba(0,0,0,0.10);
-      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      color:#ffffff;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width:132px;
-      box-shadow:0 10px 20px rgba(0,0,0,0.14);
-    }
+      .access-row{
+        display:flex;
+        gap:12px;
+        align-items:center;
+        justify-content:flex-start;
+        flex-wrap:wrap;
+      }
 
-    .access-submit:hover{ opacity:.95; }
-    .access-submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+      .access-submit{
+        padding:11px 22px;
+        font-size:14px;
+        font-weight:800;
+        border-radius:10px;
+        border:1px solid rgba(0,0,0,0.10);
+        background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
+        color:#ffffff;
+        cursor:pointer;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:132px;
+        box-shadow:0 10px 20px rgba(0,0,0,0.14);
+      }
 
-    .inline-msg{
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.2px;
-      display:none;
-      white-space:nowrap;
-    }
-    .inline-msg.error{ color:var(--danger); }
-    .inline-msg.ok{ color:var(--ok); }
+      .access-submit:hover{ opacity:.95; }
+      .access-submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
 
-    /* Small helper line under row (kept subtle) */
-    .access-substatus{
-      margin-top:12px;
-      font-size:13px;
-      color:var(--muted);
-      text-align:left;
-      min-height:18px;
-    }
-  </style>
+      .inline-msg{
+        font-size:13px;
+        font-weight:800;
+        letter-spacing:.2px;
+        display:none;
+        white-space:nowrap;
+        color:var(--danger);
+      }
 
-  <div class="access-shell">
-    <div class="access-card">
-      <div class="access-title">Enter Access Code</div>
+      .sr-only{
+        position:absolute;
+        width:1px;
+        height:1px;
+        padding:0;
+        margin:-1px;
+        overflow:hidden;
+        clip:rect(0,0,0,0);
+        white-space:nowrap;
+        border:0;
+      }
+    </style>
 
-      <div class="access-label">Unique Identifier</div>
-      <input
-        type="text"
-        class="access-input"
-        id="accessCode"
-        placeholder="Enter your Unique Identifier"
-        autocomplete="off"
-      >
+    <div class="access-shell">
+      <div class="access-card">
+        <div class="access-title">Enter Access Code</div>
 
-      <div class="access-row">
-        <button type="button" class="access-submit" id="submitCode">Submit</button>
-        <span class="inline-msg" id="inlineMsg"></span>
+        <div class="access-label">Unique Identifier</div>
+        <input
+          type="text"
+          class="access-input"
+          id="accessCode"
+          placeholder="Enter your Unique Identifier"
+          autocomplete="off"
+        >
+
+        <div class="access-row">
+          <button type="button" class="access-submit" id="submitCode">Submit</button>
+          <span class="inline-msg" id="inlineMsg">Invalid Access Code</span>
+        </div>
+
+        <iframe id="validatorFrame" class="sr-only" title="validator"></iframe>
       </div>
-
-      <div class="access-substatus" id="subStatus"></div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script>
-    (function(){
-      const STORAGE_KEY = "carbyne_access_code";
+    <script>
+      (function(){
+        const STORAGE_KEY = "carbyne_access_code";
+        const VALIDATOR_URL = "validate.html";
+        const NEXT_PAGE_URL = "index.html";
 
-      const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
+        const input = document.getElementById("accessCode");
+        const btn   = document.getElementById("submitCode");
+        const msg   = document.getElementById("inlineMsg");
+        const frame = document.getElementById("validatorFrame");
 
-      const input = document.getElementById("accessCode");
-      const btn = document.getElementById("submitCode");
-      const inlineMsg = document.getElementById("inlineMsg");
-      const subStatus = document.getElementById("subStatus");
+        function normalize(v){ return (v ?? "").toString().trim(); }
 
-      function normalize(v){ return (v ?? "").toString().trim(); }
-
-      function setInline(text, cls){
-        if (!text){
-          inlineMsg.style.display = "none";
-          inlineMsg.textContent = "";
-          inlineMsg.className = "inline-msg";
-          return;
+        function showInvalid(show){
+          msg.style.display = show ? "inline" : "none";
         }
-        inlineMsg.style.display = "inline";
-        inlineMsg.textContent = text;
-        inlineMsg.className = "inline-msg " + (cls || "");
-      }
 
-      function setSub(text){
-        subStatus.textContent = text || "";
-      }
-
-      function findIdentifierColumnIndex(headers){
-        const targets = [
-          "unique identifier",
-          "unique id",
-          "identifier",
-          "uid",
-          "access code",
-          "access id"
-        ];
-        const lower = headers.map(h => normalize(h).toLowerCase());
-
-        for (let i = 0; i < lower.length; i++){
-          if (targets.includes(lower[i])) return i;
+        function setBusy(isBusy){
+          btn.disabled = !!isBusy;
         }
-        for (let i = 0; i < lower.length; i++){
-          const h = lower[i];
-          if (h.includes("unique") && h.includes("id")) return i;
-          if (h.includes("identifier")) return i;
-          if (h.includes("access") && (h.includes("code") || h.includes("id"))) return i;
+
+        function submit(){
+          showInvalid(false);
+
+          const code = normalize(input.value);
+          input.value = code;
+
+          if (!code){
+            showInvalid(true);
+            return;
+          }
+
+          setBusy(true);
+          const src = VALIDATOR_URL + "#code=" + encodeURIComponent(code) + "&t=" + Date.now();
+          frame.src = src;
         }
-        return 0;
-      }
 
-      async function loadExcelRows(){
-        const res = await fetch(FILE_URL, { cache: "no-store" });
-        if (!res.ok) throw new Error("Excel download failed (HTTP " + res.status + ")");
+        window.addEventListener("message", (ev) => {
+          const d = ev.data;
+          if (!d || d.type !== "carbyne-validate") return;
 
-        const ab = await res.arrayBuffer();
-        const wb = XLSX.read(ab, { type: "array" });
+          setBusy(false);
 
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
+          if (d.valid === true){
+            const finalCode = normalize(d.code || input.value);
+            localStorage.setItem(STORAGE_KEY, finalCode);
+            showInvalid(false);
+            window.location.href = NEXT_PAGE_URL;
+            return;
+          }
 
-        if (!rows || !rows.length) return { headers: [], data: [] };
-
-        const headers = rows[0].map(v => normalize(v));
-        const data = rows
-          .slice(1)
-          .filter(r => (r || []).some(v => normalize(v) !== ""));
-
-        const width = headers.length || Math.max(...data.map(r => (r || []).length), 0);
-        const normData = data.map(r => {
-          const out = new Array(width).fill("");
-          for (let i = 0; i < width; i++) out[i] = normalize((r || [])[i]);
-          return out;
+          showInvalid(true);
         });
 
-        return { headers, data: normData };
-      }
+        btn.addEventListener("click", submit);
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") submit();
+        });
 
-      async function validateAccessCode(){
-        const code = normalize(input.value);
-        input.value = code;
+        const existing = localStorage.getItem(STORAGE_KEY);
+        if (existing) input.value = normalize(existing);
 
-        setInline("", "");
-        setSub("");
-
-        if (!code){
-          setInline("Invalid Access Code", "error");
-          return;
-        }
-
-        btn.disabled = true;
-        setSub("Checking...");
-
-        try{
-          const { headers, data } = await loadExcelRows();
-          if (!data.length){
-            setInline("Invalid Access Code", "error");
-            setSub("No records found.");
-            btn.disabled = false;
-            return;
-          }
-
-          const colIndex = findIdentifierColumnIndex(headers);
-          const codeLower = code.toLowerCase();
-
-          const exists = data.some(r => normalize(r[colIndex]).toLowerCase() === codeLower);
-
-          if (!exists){
-            setInline("Invalid Access Code", "error");
-            setSub("");
-            btn.disabled = false;
-            return;
-          }
-
-          localStorage.setItem(STORAGE_KEY, code);
-
-          setInline("Verified", "ok");
-          setSub("");
-
-          // Move onto next page
-          window.location.href = "index.html";
-
-        } catch (e){
-          setInline("Invalid Access Code", "error");
-          setSub("Check failed.");
-          btn.disabled = false;
-        }
-      }
-
-      btn.addEventListener("click", validateAccessCode);
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") validateAccessCode();
-      });
-
-      const existing = localStorage.getItem(STORAGE_KEY);
-      if (existing) input.value = normalize(existing);
-
-      input.focus();
-    })();
-  </script>
-</div>
+        showInvalid(false);
+        input.focus();
+      })();
+    </script>
+  </div>
+</body>
+</html>
