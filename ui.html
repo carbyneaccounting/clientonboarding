@@ -409,6 +409,9 @@
       const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY)) || 1;
       currentPage = isAccessValidated ? savedPage : 1;
 
+      // Preload valid codes in background for instant validation
+      preloadValidCodes();
+
       // Listen for validation success
       window.addEventListener("message", handleValidationMessage);
 
@@ -418,6 +421,33 @@
       // Setup navigation
       prevBtn.addEventListener("click", goToPreviousPage);
       nextBtn.addEventListener("click", goToNextPage);
+    }
+
+    // Preload valid codes from SharePoint in background
+    function preloadValidCodes() {
+      const CACHE_KEY = "carbyne_valid_codes_cache";
+      const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
+      const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+      // Check if cache already exists and is fresh
+      const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+      if (timestamp && (Date.now() - parseInt(timestamp)) < CACHE_DURATION) {
+        // Cache is fresh, no need to reload
+        return;
+      }
+
+      // Create hidden iframe to trigger validate.html preload
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = 'validate.html#code=PRELOAD&t=' + Date.now();
+      document.body.appendChild(iframe);
+      
+      // Remove iframe after 10 seconds
+      setTimeout(() => {
+        if (iframe.parentNode) {
+          iframe.parentNode.removeChild(iframe);
+        }
+      }, 10000);
     }
 
     function handleValidationMessage(event) {
@@ -594,12 +624,7 @@
         if (e.key === "Enter") submit();
       });
 
-      // Initialize
-      const existing = localStorage.getItem(STORAGE_KEY);
-      if (existing) {
-        input.value = normalize(existing);
-      }
-
+      // Initialize - DO NOT prepopulate the input field for security
       showInvalid(false);
       input.focus();
     }
