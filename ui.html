@@ -1,274 +1,339 @@
-<!-- access.html -->
-<div id="accessModule">
+<!-- ui.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Client Onboarding</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
+
   <style>
+    *{ margin:0; padding:0; box-sizing:border-box; }
+
     :root{
       --carbyne-blue:#00305B;
       --carbyne-blue-2:#0A3D6F;
-      --ink:#0f172a;
-      --muted:#475569;
-      --danger:#b91c1c;
-      --ok:#166534;
+      --radius:18px;
+      --shadow:0 28px 56px rgba(0,0,0,0.30);
     }
 
-    /* Bigger module */
-    .access-shell{
-      width:min(860px, 94%);
-      padding:2px;
-      border-radius:20px;
-      background:linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
-      box-shadow:0 26px 58px rgba(0,0,0,0.28);
-    }
-
-    .access-card{
-      background:rgba(255,255,255,0.92);
-      border:1px solid rgba(0,0,0,0.06);
-      border-radius:18px;
-      padding:28px 28px 24px 28px;
-    }
-
-    .access-title{
-      font-size:18px;
-      font-weight:800;
-      color:#111827;
-      margin:0 0 14px 0;
-      text-align:left;
-    }
-
-    .access-label{
-      font-size:13px;
-      font-weight:800;
-      color:#334155;
-      margin:0 0 8px 0;
-      text-align:left;
-      letter-spacing:.2px;
-    }
-
-    .access-input{
-      width:100%;
-      padding:14px 16px;
-      font-size:15px;
-      border:1px solid rgba(0,0,0,0.18);
-      border-radius:12px;
-      outline:none;
-      margin:0 0 14px 0;
-      background:#ffffff;
-    }
-
-    .access-input:focus{
-      border-color:rgba(0,48,91,0.75);
-      box-shadow:0 0 0 3px rgba(0,48,91,0.18);
-    }
-
-    /* Button + inline status to the right */
-    .access-row{
+    body{
+      min-height:100vh;
       display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:flex-start;
-      flex-wrap:wrap;
-    }
-
-    .access-submit{
-      padding:11px 22px;
-      font-size:14px;
-      font-weight:800;
-      border-radius:10px;
-      border:1px solid rgba(0,0,0,0.10);
-      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      color:#ffffff;
-      cursor:pointer;
-      display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:132px;
-      box-shadow:0 10px 20px rgba(0,0,0,0.14);
+      padding:40px 20px;
+      background:linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
+      position:relative;
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    .access-submit:hover{ opacity:.95; }
-    .access-submit:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+    .top-left-info{
+      position:absolute;
+      top:20px;
+      left:20px;
+      color:#ffffff;
+    }
 
-    .inline-msg{
+    .company-name{
+      font-size:16px;
+      font-weight:700;
+      margin-bottom:2px;
+    }
+
+    .address{
       font-size:13px;
-      font-weight:800;
+      font-weight:600;
       letter-spacing:.2px;
-      display:none;
-      white-space:nowrap;
+      line-height:1.35;
+      opacity:.98;
     }
-    .inline-msg.error{ color:var(--danger); }
-    .inline-msg.ok{ color:var(--ok); }
 
-    /* Small helper line under row (kept subtle) */
-    .access-substatus{
-      margin-top:12px;
+    .container{
+      width:min(1200px, 95vw);
+      display:flex;
+      flex-direction:column;
+    }
+
+    h1{
+      font-family:'Baron', sans-serif;
+      font-size:22px;
+      color:#ffffff;
+      font-weight:normal;
+      margin-bottom:14px;
+    }
+
+    .card{
+      width:100%;
+      height:clamp(520px, 72vh, 860px);
+      background:#ffffff;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .top-section{
+      padding:18px 30px;
+      border-bottom:1px solid #e6e6e6;
+      background:#ffffff;
+      z-index:2;
+    }
+
+    .progress-bar-container{
+      width:100%;
+      height:8px;
+      background:#dedede;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar-fill{
+      height:100%;
+      width:20%;
+      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+
+    /* PAGE 1: winter scenic background + dark black tint */
+    .middle-section{
+      flex:1;
+      padding:26px 30px;
+      overflow:auto;
+      background:
+        linear-gradient(
+          180deg,
+          rgba(0,0,0,0.52) 0%,
+          rgba(0,0,0,0.42) 45%,
+          rgba(0,0,0,0.52) 100%
+        ),
+        url("https://images.unsplash.com/photo-1519681393784-d120267933ba");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      position:relative;
+    }
+
+    #accessMount{
+      width:100%;
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .load-error{
+      width:min(760px, 92%);
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:14px;
+      padding:18px 20px;
+      color:#111827;
+      font-size:14px;
+      line-height:1.4;
+      box-shadow:0 16px 32px rgba(0,0,0,0.18);
+    }
+
+    .bottom-section{
+      padding:18px 30px;
+      border-top:1px solid #e6e6e6;
+      background:#ffffff;
+      z-index:2;
+    }
+
+    .navigation{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .nav-button{
+      padding:10px 24px;
+      border:none;
+      border-radius:8px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:opacity .15s ease, transform .15s ease;
+    }
+
+    .nav-button.previous{
+      background:#f0f0f0;
+      color:#333;
+    }
+
+    .nav-button.previous:hover{
+      opacity:.95;
+      transform:translateY(-1px);
+    }
+
+    .nav-button.next{
+      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
+      color:#ffffff;
+    }
+
+    .nav-button.next:hover{
+      opacity:.95;
+      transform:translateY(-1px);
+    }
+
+    .nav-button:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .page-indicator{
+      font-size:14px;
+      color:#666;
+      font-weight:600;
+    }
+
+    .footer{
+      position:absolute;
+      bottom:20px;
+      left:20px;
+      color:#ffffff;
       font-size:13px;
-      color:var(--muted);
-      text-align:left;
-      min-height:18px;
+      font-weight:600;
+      opacity:.95;
     }
   </style>
+</head>
 
-  <div class="access-shell">
-    <div class="access-card">
-      <div class="access-title">Enter Access Code</div>
-
-      <div class="access-label">Unique Identifier</div>
-      <input
-        type="text"
-        class="access-input"
-        id="accessCode"
-        placeholder="Enter your Unique Identifier"
-        autocomplete="off"
-      >
-
-      <div class="access-row">
-        <button type="button" class="access-submit" id="submitCode">Submit</button>
-        <span class="inline-msg" id="inlineMsg"></span>
-      </div>
-
-      <div class="access-substatus" id="subStatus"></div>
+<body>
+  <div class="top-left-info">
+    <div class="company-name">Carbyne Accounting</div>
+    <div class="address">
+      734 West Main Street, Suite 106<br>
+      Louisville, Kentucky 40202<br>
+      (502) 632-9444 | Client@CarbyneAccounting.com
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <div class="container">
+    <h1>Client Onboarding</h1>
+
+    <div class="card">
+      <div class="top-section">
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div class="middle-section">
+        <div id="accessMount"></div>
+      </div>
+
+      <div class="bottom-section">
+        <div class="navigation">
+          <button class="nav-button previous" disabled>Previous</button>
+          <span class="page-indicator">Step 1 of 5</span>
+          <button class="nav-button next">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
+
   <script>
-    (function(){
-      const STORAGE_KEY = "carbyne_access_code";
+    const ACCESS_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/access.html";
 
-      const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
+    function resolveUrl(base, relative){
+      try{ return new URL(relative, base).toString(); }
+      catch(_){ return relative; }
+    }
 
-      const input = document.getElementById("accessCode");
-      const btn = document.getElementById("submitCode");
-      const inlineMsg = document.getElementById("inlineMsg");
-      const subStatus = document.getElementById("subStatus");
+    function clearInjectedAssets(){
+      document.querySelectorAll('[data-access-injected="1"]').forEach(n => n.remove());
+    }
 
-      function normalize(v){ return (v ?? "").toString().trim(); }
+    async function loadAccessModule(){
+      const mount = document.getElementById("accessMount");
+      mount.innerHTML = "";
+      clearInjectedAssets();
 
-      function setInline(text, cls){
-        if (!text){
-          inlineMsg.style.display = "none";
-          inlineMsg.textContent = "";
-          inlineMsg.className = "inline-msg";
-          return;
-        }
-        inlineMsg.style.display = "inline";
-        inlineMsg.textContent = text;
-        inlineMsg.className = "inline-msg " + (cls || "");
-      }
+      try{
+        const res = await fetch(ACCESS_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      function setSub(text){
-        subStatus.textContent = text || "";
-      }
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
 
-      function findIdentifierColumnIndex(headers){
-        const targets = [
-          "unique identifier",
-          "unique id",
-          "identifier",
-          "uid",
-          "access code",
-          "access id"
-        ];
-        const lower = headers.map(h => normalize(h).toLowerCase());
+        const styleTags = Array.from(doc.querySelectorAll("style"));
+        const linkTags  = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+        const scriptTags = Array.from(doc.querySelectorAll("script"));
 
-        for (let i = 0; i < lower.length; i++){
-          if (targets.includes(lower[i])) return i;
-        }
-        for (let i = 0; i < lower.length; i++){
-          const h = lower[i];
-          if (h.includes("unique") && h.includes("id")) return i;
-          if (h.includes("identifier")) return i;
-          if (h.includes("access") && (h.includes("code") || h.includes("id"))) return i;
-        }
-        return 0;
-      }
+        const fragmentRoot = doc.querySelector("#accessModule") || doc.body || doc.documentElement;
 
-      async function loadExcelRows(){
-        const res = await fetch(FILE_URL, { cache: "no-store" });
-        if (!res.ok) throw new Error("Excel download failed (HTTP " + res.status + ")");
+        linkTags.forEach(l => {
+          const href = l.getAttribute("href");
+          if (!href) return;
+          const abs = resolveUrl(ACCESS_URL, href);
 
-        const ab = await res.arrayBuffer();
-        const wb = XLSX.read(ab, { type: "array" });
+          const already = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+            .some(x => x.getAttribute("href") === abs);
 
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
-
-        if (!rows || !rows.length) return { headers: [], data: [] };
-
-        const headers = rows[0].map(v => normalize(v));
-        const data = rows
-          .slice(1)
-          .filter(r => (r || []).some(v => normalize(v) !== ""));
-
-        const width = headers.length || Math.max(...data.map(r => (r || []).length), 0);
-        const normData = data.map(r => {
-          const out = new Array(width).fill("");
-          for (let i = 0; i < width; i++) out[i] = normalize((r || [])[i]);
-          return out;
+          if (!already){
+            const nl = document.createElement("link");
+            nl.rel = "stylesheet";
+            nl.href = abs;
+            nl.setAttribute("data-access-injected","1");
+            document.head.appendChild(nl);
+          }
         });
 
-        return { headers, data: normData };
-      }
+        styleTags.forEach(st => {
+          const ns = document.createElement("style");
+          ns.textContent = st.textContent || "";
+          ns.setAttribute("data-access-injected","1");
+          document.head.appendChild(ns);
+        });
 
-      async function validateAccessCode(){
-        const code = normalize(input.value);
-        input.value = code;
+        if (fragmentRoot && fragmentRoot.id === "accessModule"){
+          mount.appendChild(fragmentRoot);
+        } else {
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = html;
+          const extracted = wrapper.querySelector("#accessModule") || wrapper.querySelector("body") || wrapper;
 
-        setInline("", "");
-        setSub("");
-
-        if (!code){
-          setInline("Invalid Access Code", "error");
-          return;
+          if (extracted){
+            const nodes = Array.from(extracted.childNodes);
+            nodes.forEach(n => mount.appendChild(n));
+          }
         }
 
-        btn.disabled = true;
-        setSub("Checking...");
+        scriptTags.forEach(sc => {
+          const src = sc.getAttribute("src");
+          const ns = document.createElement("script");
+          ns.setAttribute("data-access-injected","1");
 
-        try{
-          const { headers, data } = await loadExcelRows();
-          if (!data.length){
-            setInline("Invalid Access Code", "error");
-            setSub("No records found.");
-            btn.disabled = false;
-            return;
+          if (src){
+            ns.src = resolveUrl(ACCESS_URL, src);
+            ns.defer = true;
+          } else {
+            ns.textContent = sc.textContent || "";
           }
+          document.body.appendChild(ns);
+        });
 
-          const colIndex = findIdentifierColumnIndex(headers);
-          const codeLower = code.toLowerCase();
-
-          const exists = data.some(r => normalize(r[colIndex]).toLowerCase() === codeLower);
-
-          if (!exists){
-            setInline("Invalid Access Code", "error");
-            setSub("");
-            btn.disabled = false;
-            return;
-          }
-
-          localStorage.setItem(STORAGE_KEY, code);
-
-          setInline("Verified", "ok");
-          setSub("");
-
-          // Move onto next page
-          window.location.href = "index.html";
-
-        } catch (e){
-          setInline("Invalid Access Code", "error");
-          setSub("Check failed.");
-          btn.disabled = false;
-        }
+      } catch (e){
+        mount.innerHTML = `
+          <div class="load-error">
+            <strong>Failed to load access module.</strong><br>
+            ${String(e.message || e)}
+          </div>
+        `;
       }
+    }
 
-      btn.addEventListener("click", validateAccessCode);
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") validateAccessCode();
-      });
-
-      const existing = localStorage.getItem(STORAGE_KEY);
-      if (existing) input.value = normalize(existing);
-
-      input.focus();
-    })();
+    loadAccessModule();
   </script>
-</div>
+</body>
+</html>
