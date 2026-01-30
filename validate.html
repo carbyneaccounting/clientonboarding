@@ -1,20 +1,15 @@
-<!-- validate.html -->
+<!-- validate.html - ONLY USES CACHE FROM INDEX.HTML -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Validate Access Code</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <script>
     (function() {
-      const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
-      const TARGET_HEADER = "Unique Identifier";
       const CACHE_KEY = "carbyne_valid_codes_cache";
-      const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
-      const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
       function normalize(v) {
         return (v ?? "").toString().trim();
@@ -47,88 +42,7 @@
         document.body.textContent = valid ? "Valid" : "Invalid";
       }
 
-      function getCachedCodes() {
-        try {
-          const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-          const now = Date.now();
-
-          if (timestamp && (now - parseInt(timestamp)) < CACHE_DURATION) {
-            const cached = localStorage.getItem(CACHE_KEY);
-            if (cached) {
-              return JSON.parse(cached);
-            }
-          }
-        } catch (e) {
-          console.error("Cache read error:", e);
-        }
-        return null;
-      }
-
-      function setCachedCodes(codes) {
-        try {
-          localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
-          localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-        } catch (e) {
-          console.error("Cache write error:", e);
-        }
-      }
-
-      function findHeaderIndex(headers) {
-        const lower = headers.map(h => normalize(h).toLowerCase());
-        const target = TARGET_HEADER.toLowerCase();
-        
-        for (let i = 0; i < lower.length; i++) {
-          if (lower[i] === target) return i;
-        }
-        
-        return -1;
-      }
-
-      async function fetchValidCodes() {
-        try {
-          const res = await fetch(FILE_URL, { cache: "no-store" });
-          if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-          }
-
-          const ab = await res.arrayBuffer();
-          const wb = XLSX.read(ab, { type: "array" });
-          const ws = wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(ws, {
-            header: 1,
-            raw: false,
-            defval: ""
-          });
-
-          if (!rows || rows.length < 2) {
-            throw new Error("No data found");
-          }
-
-          const headers = rows[0].map(v => normalize(v));
-          const col = findHeaderIndex(headers);
-
-          if (col < 0) {
-            throw new Error("Column 'Unique Identifier' not found");
-          }
-
-          const validCodes = [];
-          for (let r = 1; r < rows.length; r++) {
-            const row = rows[r] || [];
-            const cell = normalize(row[col] ?? "");
-            if (cell) {
-              validCodes.push(cell.toLowerCase());
-            }
-          }
-
-          return validCodes;
-
-        } catch (error) {
-          console.error("Fetch error:", error);
-          throw error;
-        }
-      }
-
-      async function validate() {
+      function validate() {
         const code = getCode();
 
         if (!code) {
@@ -136,27 +50,31 @@
           return;
         }
 
-        const needle = code.toLowerCase();
-
-        // Try cache first for INSTANT validation
-        let codes = getCachedCodes();
-
-        if (codes && Array.isArray(codes) && codes.length > 0) {
-          // INSTANT validation from cache!
-          const isValid = codes.includes(needle);
-          postResult(isValid, code);
-          return;
-        }
-
-        // No cache - try to fetch from SharePoint (first time only)
+        // Read ONLY from cache created by index.html
         try {
-          codes = await fetchValidCodes();
-          setCachedCodes(codes);
+          const cached = localStorage.getItem(CACHE_KEY);
+          
+          if (!cached) {
+            console.error("No cache found - index.html must be opened first");
+            postResult(false, code);
+            return;
+          }
 
+          const codes = JSON.parse(cached);
+          
+          if (!Array.isArray(codes)) {
+            console.error("Invalid cache format");
+            postResult(false, code);
+            return;
+          }
+
+          // INSTANT validation from cache
+          const needle = code.toLowerCase();
           const isValid = codes.includes(needle);
           postResult(isValid, code);
 
         } catch (error) {
+          console.error("Validation error:", error);
           postResult(false, code);
         }
       }
