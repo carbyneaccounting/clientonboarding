@@ -3,58 +3,40 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Electronic Signature Creator</title>
+  <title>Create Your Signature</title>
 
   <style>
     :root{
-      --bg:#f6f8fb;
-      --panel:#ffffff;
-      --panel-soft:#f9fafb;
       --border:#e5e7eb;
-      --border-strong:#d1d5db;
-
       --ink:#0f172a;
       --muted:#475569;
-
       --accent:#2563eb;
       --accent-soft:#e0e7ff;
       --success:#16a34a;
       --danger:#dc2626;
-
-      --radius-lg:20px;
-      --radius-md:14px;
-
-      --shadow-lg:0 24px 60px rgba(15,23,42,.10);
-      --shadow-md:0 10px 28px rgba(15,23,42,.08);
-      --shadow-sm:0 6px 16px rgba(15,23,42,.06);
-      --focus:0 0 0 4px rgba(37,99,235,.18);
+      --focus:0 0 0 3px rgba(37,99,235,.18);
     }
 
     *{box-sizing:border-box}
     html,body{height:100%}
-    [hidden]{display:none !important;}
-
     body{
       margin:0;
-      min-height:100vh;
-      background:
-        radial-gradient(900px 500px at 10% 0%, #eef2ff, transparent 60%),
-        radial-gradient(800px 500px at 90% 10%, #ecfeff, transparent 55%),
-        linear-gradient(180deg, #f8fafc, var(--bg));
+      padding:0;
+      background:transparent;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--ink);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:28px;
     }
+    [hidden]{display:none !important;}
 
+    /* HARD WIDTH CAP FOR UI EMBED */
     .shell{
-      width:min(1100px,100%);
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:28px;
-      box-shadow:var(--shadow-lg);
+      width:100%;
+      max-width:520px;            /* << keeps it narrow */
+      margin:0 auto;              /* centers inside parent */
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:14px;
+      box-shadow:0 10px 24px rgba(0,0,0,0.14);
       overflow:hidden;
     }
 
@@ -62,31 +44,31 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:16px;
-      padding:18px 22px;
+      gap:10px;
+      padding:10px 12px;
       border-bottom:1px solid var(--border);
-      background:linear-gradient(180deg, #ffffff, #f9fafb);
+      background:linear-gradient(180deg,#ffffff,#f9fafb);
     }
 
     .brand{
       display:flex;
-      gap:14px;
       align-items:center;
+      gap:10px;
       min-width:0;
     }
 
     .mark{
-      width:44px;
-      height:44px;
-      border-radius:14px;
-      background:linear-gradient(135deg, #2563eb, #60a5fa);
+      width:30px;
+      height:30px;
+      border-radius:12px;
+      background:linear-gradient(135deg,#2563eb,#60a5fa);
       color:white;
       display:grid;
       place-items:center;
       font-weight:900;
-      box-shadow:var(--shadow-sm);
       user-select:none;
       flex:0 0 auto;
+      font-size:14px;
     }
 
     .title{
@@ -98,7 +80,7 @@
 
     .title h1{
       margin:0;
-      font-size:15px;
+      font-size:13px;
       letter-spacing:.2px;
       white-space:nowrap;
       overflow:hidden;
@@ -107,54 +89,56 @@
 
     .title p{
       margin:0;
-      font-size:12px;
+      font-size:11px;
       color:var(--muted);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
 
-    .actions{display:flex;gap:10px;flex-wrap:wrap}
+    .actions{
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex:0 0 auto;
+    }
 
     .btn{
       appearance:none;
-      border:1px solid var(--border-strong);
+      border:1px solid rgba(0,0,0,0.14);
       background:#fff;
-      padding:10px 14px;
-      border-radius:var(--radius-md);
-      font-size:13px;
-      font-weight:700;
+      padding:7px 10px;
+      border-radius:12px;
+      font-size:12px;
+      font-weight:800;
       cursor:pointer;
-      box-shadow:var(--shadow-sm);
-      transition:transform .08s ease, box-shadow .15s ease, border-color .15s ease;
+      transition:transform .08s ease, box-shadow .15s ease, border-color .15s ease, opacity .15s ease;
       color:var(--ink);
+      line-height:1;
+      white-space:nowrap;
+      box-shadow:0 6px 14px rgba(15,23,42,.08);
     }
 
     .btn:hover{
-      box-shadow:var(--shadow-md);
+      box-shadow:0 10px 20px rgba(15,23,42,.10);
       border-color:#c7d2fe;
     }
-
     .btn:active{transform:translateY(1px)}
-
     .btn:focus{
       outline:none;
-      box-shadow:var(--focus), var(--shadow-md);
+      box-shadow:var(--focus), 0 10px 20px rgba(15,23,42,.10);
       border-color:#c7d2fe;
     }
-
     .btn.primary{
       background:linear-gradient(180deg,#eef2ff,#fff);
       border-color:#c7d2fe;
       color:#1e3a8a;
     }
-
     .btn.danger{
       background:linear-gradient(180deg,#fee2e2,#fff);
       border-color:#fecaca;
       color:#7f1d1d;
     }
-
     .btn:disabled{
       opacity:.5;
       cursor:not-allowed;
@@ -163,57 +147,55 @@
     }
 
     .content{
-      padding:20px;
-      display:grid;
-      grid-template-columns:1.25fr .75fr;
-      gap:18px;
-    }
-
-    @media (max-width: 980px){
-      .content{grid-template-columns:1fr}
+      padding:10px 12px 12px;
+      display:flex;
+      flex-direction:column; /* always stacked to stay narrow */
+      gap:10px;
     }
 
     .card{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:var(--radius-lg);
-      box-shadow:var(--shadow-md);
-      padding:18px;
+      background:rgba(255,255,255,0.96);
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:14px;
+      box-shadow:0 10px 22px rgba(0,0,0,0.10);
+      padding:10px;
+      overflow:hidden;
     }
 
     .card h2{
-      margin:0 0 14px;
-      font-size:14px;
+      margin:0 0 8px;
+      font-size:12px;
       letter-spacing:.2px;
     }
 
     .tabs{
       display:flex;
-      gap:10px;
-      margin-bottom:16px;
+      gap:8px;
+      margin-bottom:8px;
     }
 
     .tab{
       appearance:none;
-      border:1px solid var(--border);
+      border:1px solid rgba(0,0,0,0.10);
       background:#fff;
-      padding:9px 14px;
+      padding:6px 10px;
       border-radius:999px;
       font-size:12px;
-      font-weight:700;
+      font-weight:800;
       cursor:pointer;
       color:var(--muted);
-      transition:box-shadow .15s ease, border-color .15s ease, background .15s ease;
+      transition:background .15s ease, border-color .15s ease, box-shadow .15s ease;
+      line-height:1;
     }
 
     .tab:hover{
       border-color:#c7d2fe;
-      box-shadow:var(--shadow-sm);
+      box-shadow:0 6px 14px rgba(15,23,42,.08);
     }
 
     .tab:focus{
       outline:none;
-      box-shadow:var(--focus), var(--shadow-sm);
+      box-shadow:var(--focus), 0 6px 14px rgba(15,23,42,.08);
       border-color:#c7d2fe;
     }
 
@@ -224,15 +206,15 @@
     }
 
     .pad-wrap{
-      border:1px solid var(--border);
-      border-radius:var(--radius-lg);
+      border:1px solid rgba(0,0,0,0.10);
+      border-radius:14px;
       overflow:hidden;
-      background:var(--panel-soft);
+      background:#f8fafc;
     }
 
     canvas#pad{
       width:100%;
-      height:260px;
+      height:140px;
       background:#fff;
       cursor:crosshair;
       touch-action:none;
@@ -243,12 +225,12 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
-      padding:12px 14px;
-      border-top:1px solid var(--border);
+      gap:8px;
+      padding:8px 10px;
+      border-top:1px solid rgba(0,0,0,0.08);
       background:#f9fafb;
       flex-wrap:wrap;
-      font-size:12px;
+      font-size:11px;
       color:var(--muted);
     }
 
@@ -260,26 +242,27 @@
     }
 
     input[type="range"]{
-      width:150px;
+      width:92px;
       accent-color:var(--accent);
     }
 
     .status{
-      font-weight:800;
-      font-size:12px;
+      font-weight:900;
+      font-size:11px;
+      line-height:1;
     }
     .status.ok{color:var(--success)}
     .status.warn{color:var(--danger)}
 
-    .field{display:flex;flex-direction:column;gap:8px}
-    label{font-size:12px;color:var(--muted)}
+    .field{display:flex;flex-direction:column;gap:6px}
+    label{font-size:11px;color:var(--muted)}
 
     input[type="text"]{
       width:100%;
-      padding:12px 14px;
-      border-radius:var(--radius-md);
-      border:1px solid var(--border);
-      font-size:14px;
+      padding:9px 10px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,0.10);
+      font-size:13px;
       outline:none;
       transition:border-color .15s ease, box-shadow .15s ease;
       background:#fff;
@@ -290,27 +273,27 @@
 
     input[type="text"]:focus{
       border-color:#c7d2fe;
-      box-shadow:0 0 0 3px #e0e7ff;
+      box-shadow:0 0 0 3px rgba(224,231,255,0.9);
     }
 
     .row{
       display:flex;
-      gap:12px;
+      gap:8px;
       align-items:center;
       flex-wrap:wrap;
-      margin-top:12px;
+      margin-top:8px;
     }
 
     .sig-preview{
-      border:1px dashed var(--border-strong);
-      border-radius:var(--radius-lg);
-      min-height:140px;
+      border:1px dashed rgba(0,0,0,0.18);
+      border-radius:14px;
+      min-height:78px;
       display:flex;
       align-items:center;
       justify-content:center;
       background:#fafafa;
-      margin-top:14px;
-      padding:14px;
+      margin-top:8px;
+      padding:10px;
       overflow:hidden;
     }
 
@@ -324,69 +307,66 @@
     }
 
     .hint{
-      font-size:12px;
+      font-size:11px;
       color:var(--muted);
-      margin-top:10px;
+      margin-top:8px;
       line-height:1.35;
     }
 
     .meta{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:12px;
-      margin-top:6px;
-    }
-
-    @media (max-width: 980px){
-      .meta{grid-template-columns:1fr}
+      gap:8px;
+      margin-top:4px;
     }
 
     .kv{
-      border:1px solid var(--border);
-      border-radius:var(--radius-md);
-      padding:12px;
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:12px;
+      padding:8px;
       background:#fff;
     }
 
     .kv .k{
-      font-size:11px;
+      font-size:10px;
       color:var(--muted);
       margin-bottom:6px;
     }
 
     .kv .v{
-      font-size:12px;
-      font-weight:800;
+      font-size:11px;
+      font-weight:900;
+      line-height:1;
     }
 
     .adopted{
-      margin-top:14px;
-      border:1px solid var(--border);
-      border-radius:var(--radius-lg);
+      margin-top:8px;
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:14px;
       background:#fff;
-      padding:14px;
+      padding:8px;
     }
 
     .adopted .k{
-      font-size:11px;
+      font-size:10px;
       color:var(--muted);
-      margin-bottom:10px;
+      margin-bottom:6px;
     }
 
     .adopted-box{
-      border:1px dashed var(--border-strong);
-      border-radius:16px;
+      border:1px dashed rgba(0,0,0,0.18);
+      border-radius:12px;
       background:#fafafa;
-      height:140px;
-      padding:12px;
+      height:86px;
+      padding:8px;
       overflow:hidden;
       position:relative;
     }
 
     .adopted-stage{
       position:absolute;
-      inset:12px;
-      border-radius:12px;
+      inset:8px;
+      border-radius:10px;
       background:#fff;
       display:flex;
       align-items:center;
@@ -395,7 +375,7 @@
     }
 
     .adopted-empty{
-      font-size:12px;
+      font-size:11px;
       color:var(--muted);
       text-align:center;
       padding:0 10px;
@@ -428,87 +408,95 @@
         <div class="mark">✍</div>
         <div class="title">
           <h1>Create Your Signature</h1>
-          <p>Draw or type your electronic signature and  adopt it to sign your onboarding documents</p>
+          <p>Draw or type, then adopt for signing</p>
         </div>
       </div>
+
       <div class="actions">
-        <button class="btn danger" id="btnClear" type="button">Clear</button>
-        <button class="btn primary" id="btnAdopt" type="button" disabled>Adopt Signature</button>
+        <button type="button" class="btn danger" id="clearAllBtn">Clear</button>
+        <button type="button" class="btn primary" id="adoptBtn" disabled>Adopt</button>
       </div>
     </header>
 
     <div class="content">
-      <section class="card" aria-label="Signature Input">
+      <section class="card" aria-label="Signature input section">
         <h2>Signature Input</h2>
 
         <div class="tabs" role="tablist" aria-label="Signature mode">
-          <button class="tab" id="tabDraw" type="button" aria-selected="true" aria-controls="panelDraw">Draw</button>
-          <button class="tab" id="tabType" type="button" aria-selected="false" aria-controls="panelType">Type</button>
+          <button class="tab" id="tabDraw" role="tab" aria-selected="true" aria-controls="panelDraw">Draw</button>
+          <button class="tab" id="tabType" role="tab" aria-selected="false" aria-controls="panelType">Type</button>
         </div>
 
-        <div id="panelDraw" role="tabpanel" aria-label="Draw signature">
-          <div class="pad-wrap">
-            <canvas id="pad" width="1200" height="500" aria-label="Signature pad"></canvas>
+        <div id="panelDraw" role="tabpanel" aria-labelledby="tabDraw">
+          <div class="pad-wrap" aria-label="Signature pad container">
+            <canvas id="pad" width="1200" height="420" aria-label="Signature pad"></canvas>
+
             <div class="pad-tools">
               <div class="mini">
-                <span>Stroke</span>
-                <input id="stroke" type="range" min="1" max="10" value="3" />
-                <span id="strokeVal">3</span>
+                <span>Stroke <strong id="strokeVal">3</strong></span>
+                <input id="stroke" type="range" min="1" max="8" step="1" value="3" aria-label="Stroke width" />
+                <span class="status warn" id="drawStatus">Empty</span>
               </div>
-              <span id="padStatus" class="status warn">Empty</span>
+
+              <button type="button" class="btn" id="clearDrawBtn">Clear</button>
             </div>
           </div>
+
           <div class="hint">Switching modes clears the other mode.</div>
         </div>
 
-        <div id="panelType" role="tabpanel" aria-label="Type signature" hidden>
+        <div id="panelType" role="tabpanel" aria-labelledby="tabType" hidden>
           <div class="field">
-            <label for="typedName">Type your name</label>
-            <input id="typedName" type="text" placeholder="Enter your full name" autocomplete="name" />
+            <label for="typedInput">Type your name</label>
+            <input id="typedInput" type="text" placeholder="Full Name" autocomplete="off" />
           </div>
 
           <div class="row">
-            <button class="btn" id="btnRenderTyped" type="button">Render</button>
-            <span id="typedStatus" class="status warn">Empty</span>
+            <button type="button" class="btn" id="renderTypeBtn">Render</button>
+            <span class="status warn" id="typeStatus">Empty</span>
           </div>
 
           <div class="sig-preview" aria-label="Typed signature preview">
-            <div id="typedRender" class="typed-render"></div>
+            <div class="typed-render" id="typedRender">/s/ Full Name</div>
           </div>
 
-          <div class="hint">Renders as: <code>/s/ Full Name</code> (Arial Narrow, 10, bold)</div>
+          <div class="hint">Switching modes clears the other mode.</div>
         </div>
       </section>
 
-      <aside class="card" aria-label="Adoption Status">
+      <aside class="card" aria-label="Adoption status section">
         <h2>Adoption Status</h2>
 
-        <div class="meta">
+        <div class="meta" aria-label="Status values">
           <div class="kv">
             <div class="k">Mode</div>
-            <div class="v" id="metaMode">Draw</div>
+            <div class="v" id="statusMode">Draw</div>
           </div>
+
           <div class="kv">
             <div class="k">Has signature</div>
-            <div class="v" id="metaHas">No</div>
+            <div class="v" id="statusHas">No</div>
           </div>
+
           <div class="kv">
             <div class="k">Adopt button</div>
-            <div class="v" id="metaBtn">Disabled</div>
+            <div class="v" id="statusAdopt">Disabled</div>
           </div>
+
           <div class="kv">
             <div class="k">Last adopted</div>
-            <div class="v" id="metaLast">None</div>
+            <div class="v" id="statusWhen">None</div>
           </div>
         </div>
 
-        <div class="adopted" aria-label="Adopted signature">
+        <div class="adopted">
           <div class="k">Adopted signature</div>
+
           <div class="adopted-box">
-            <div class="adopted-stage">
-              <div id="adoptedEmpty" class="adopted-empty">No adopted signature</div>
+            <div class="adopted-stage" id="adoptedStage">
+              <div class="adopted-empty" id="adoptedEmpty">No adopted signature</div>
               <canvas id="adoptedCanvas" width="900" height="220" style="display:none;"></canvas>
-              <div id="adoptedTyped" class="adopted-typed" style="display:none;"></div>
+              <div class="adopted-typed" id="adoptedTyped" style="display:none;"></div>
             </div>
           </div>
         </div>
@@ -517,423 +505,311 @@
   </div>
 
   <script>
-    (function(){
-      "use strict";
+    const el = (id) => document.getElementById(id);
 
-      const STORAGE_KEY = "carbyne.signature.adopted.session.v1";
-      const STORE = window.sessionStorage;
+    const tabDraw = el("tabDraw");
+    const tabType = el("tabType");
+    const panelDraw = el("panelDraw");
+    const panelType = el("panelType");
 
-      const el = (id) => document.getElementById(id);
+    const stroke = el("stroke");
+    const strokeVal = el("strokeVal");
+    const clearDrawBtn = el("clearDrawBtn");
+    const clearAllBtn = el("clearAllBtn");
 
-      const tabDraw = el("tabDraw");
-      const tabType = el("tabType");
-      const panelDraw = el("panelDraw");
-      const panelType = el("panelType");
+    const typedInput = el("typedInput");
+    const renderTypeBtn = el("renderTypeBtn");
+    const typedRender = el("typedRender");
 
-      const btnClear = el("btnClear");
-      const btnAdopt = el("btnAdopt");
+    const adoptBtn = el("adoptBtn");
 
-      const canvas = el("pad");
-      const ctx = canvas.getContext("2d");
+    const statusMode = el("statusMode");
+    const statusHas = el("statusHas");
+    const statusAdopt = el("statusAdopt");
+    const statusWhen = el("statusWhen");
 
-      const stroke = el("stroke");
-      const strokeVal = el("strokeVal");
-      const padStatus = el("padStatus");
+    const drawStatus = el("drawStatus");
+    const typeStatus = el("typeStatus");
 
-      const typedName = el("typedName");
-      const btnRenderTyped = el("btnRenderTyped");
-      const typedRender = el("typedRender");
-      const typedStatus = el("typedStatus");
+    const adoptedEmpty = el("adoptedEmpty");
+    const adoptedCanvas = el("adoptedCanvas");
+    const adoptedTyped = el("adoptedTyped");
 
-      const metaMode = el("metaMode");
-      const metaHas = el("metaHas");
-      const metaBtn = el("metaBtn");
-      const metaLast = el("metaLast");
+    const canvas = el("pad");
+    const ctx = canvas.getContext("2d");
 
-      const adoptedEmpty = el("adoptedEmpty");
-      const adoptedCanvas = el("adoptedCanvas");
-      const adoptedCtx = adoptedCanvas.getContext("2d");
-      const adoptedTyped = el("adoptedTyped");
+    let mode = "draw";
+    let drawing = false;
+    let hasDrawInk = false;
+    let hasTypeInk = false;
+    let lastTypeText = "";
 
-      const state = {
-        mode: "draw",
-        hasSignature: false,
-        drawing: false,
-        typedText: "",
-        lastAdoptedAt: null
+    function setStatusText(node, ok, text){
+      node.textContent = text;
+      node.classList.remove("ok","warn");
+      node.classList.add(ok ? "ok" : "warn");
+    }
+
+    function updateAdoptButton(){
+      const hasSig = (mode === "draw" && hasDrawInk) || (mode === "type" && hasTypeInk);
+      adoptBtn.disabled = !hasSig;
+      statusHas.textContent = hasSig ? "Yes" : "No";
+      statusAdopt.textContent = hasSig ? "Enabled" : "Disabled";
+      statusAdopt.style.color = hasSig ? "var(--success)" : "var(--ink)";
+    }
+
+    function setMode(next){
+      if (next === mode) return;
+
+      if (next === "draw"){
+        clearTypeInternal();
+      } else {
+        clearDrawInternal();
+      }
+
+      mode = next;
+      statusMode.textContent = next === "draw" ? "Draw" : "Type";
+
+      const drawSelected = next === "draw";
+      tabDraw.setAttribute("aria-selected", drawSelected ? "true" : "false");
+      tabType.setAttribute("aria-selected", drawSelected ? "false" : "true");
+      panelDraw.hidden = !drawSelected;
+      panelType.hidden = drawSelected;
+
+      updateAdoptButton();
+    }
+
+    tabDraw.addEventListener("click", () => setMode("draw"));
+    tabType.addEventListener("click", () => setMode("type"));
+
+    function fillWhite(c, w, h){
+      c.save();
+      c.globalCompositeOperation = "source-over";
+      c.fillStyle = "#ffffff";
+      c.fillRect(0,0,w,h);
+      c.restore();
+    }
+
+    function resetPad(){
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      fillWhite(ctx, canvas.width, canvas.height);
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.strokeStyle = "#0f172a";
+      ctx.lineWidth = Number(stroke.value);
+    }
+
+    resetPad();
+
+    function canvasPoint(e){
+      const r = canvas.getBoundingClientRect();
+      const touch = e.touches && e.touches[0];
+      const cx = touch ? touch.clientX : e.clientX;
+      const cy = touch ? touch.clientY : e.clientY;
+      return {
+        x: (cx - r.left) * canvas.width / r.width,
+        y: (cy - r.top) * canvas.height / r.height
       };
+    }
 
-      function fillWhite(c, w, h){
-        c.save();
-        c.setTransform(1,0,0,1,0,0);
-        c.globalAlpha = 1;
-        c.fillStyle = "#ffffff";
-        c.fillRect(0,0,w,h);
-        c.restore();
+    function beginDraw(e){
+      if (mode !== "draw") return;
+      drawing = true;
+      const p = canvasPoint(e);
+      ctx.beginPath();
+      ctx.moveTo(p.x,p.y);
+      e.preventDefault();
+    }
+
+    function moveDraw(e){
+      if (!drawing || mode !== "draw") return;
+      const p = canvasPoint(e);
+      ctx.lineTo(p.x,p.y);
+      ctx.stroke();
+      hasDrawInk = true;
+      setStatusText(drawStatus, true, "Ready");
+      updateAdoptButton();
+      e.preventDefault();
+    }
+
+    function endDraw(){
+      if (!drawing) return;
+      drawing = false;
+      ctx.closePath();
+    }
+
+    canvas.addEventListener("mousedown", beginDraw);
+    canvas.addEventListener("mousemove", moveDraw);
+    window.addEventListener("mouseup", endDraw);
+
+    canvas.addEventListener("touchstart", beginDraw, { passive:false });
+    canvas.addEventListener("touchmove", moveDraw, { passive:false });
+    window.addEventListener("touchend", endDraw);
+
+    stroke.addEventListener("input", () => {
+      strokeVal.textContent = stroke.value;
+      ctx.lineWidth = Number(stroke.value);
+    });
+
+    function clearDrawInternal(){
+      resetPad();
+      hasDrawInk = false;
+      setStatusText(drawStatus, false, "Empty");
+      updateAdoptButton();
+    }
+
+    clearDrawBtn.addEventListener("click", clearDrawInternal);
+
+    function clearTypeInternal(){
+      typedInput.value = "";
+      hasTypeInk = false;
+      lastTypeText = "";
+      typedRender.textContent = "/s/ Full Name";
+      setStatusText(typeStatus, false, "Empty");
+      updateAdoptButton();
+    }
+
+    function renderTyped(){
+      const v = (typedInput.value || "").trim();
+      if (!v){
+        hasTypeInk = false;
+        lastTypeText = "";
+        setStatusText(typeStatus, false, "Empty");
+        typedRender.textContent = "/s/ Full Name";
+        updateAdoptButton();
+        return;
       }
 
-      function clearMainCanvas(){
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        fillWhite(ctx, canvas.width, canvas.height);
+      hasTypeInk = true;
+      lastTypeText = v;
+      setStatusText(typeStatus, true, "Ready");
+      typedRender.textContent = `/s/ ${v}`;
+      updateAdoptButton();
+    }
+
+    renderTypeBtn.addEventListener("click", renderTyped);
+    typedInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") renderTyped();
+    });
+
+    function clearAdopted(){
+      adoptedCanvas.style.display = "none";
+      adoptedTyped.style.display = "none";
+      adoptedEmpty.style.display = "block";
+      adoptedEmpty.textContent = "No adopted signature";
+      statusWhen.textContent = "None";
+    }
+
+    function stampWhen(){
+      const d = new Date();
+      const pad2 = (n) => String(n).padStart(2,"0");
+      const stamp = `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      statusWhen.textContent = stamp;
+    }
+
+    function getInkBoundingBox(srcCanvas){
+      const sctx = srcCanvas.getContext("2d");
+      const { width:w, height:h } = srcCanvas;
+      const img = sctx.getImageData(0,0,w,h).data;
+
+      let minX = w, minY = h, maxX = 0, maxY = 0;
+      let found = false;
+
+      for (let y=0; y<h; y++){
+        for (let x=0; x<w; x++){
+          const i = (y*w + x) * 4;
+          const r = img[i], g = img[i+1], b = img[i+2], a = img[i+3];
+          if (a === 0) continue;
+          if (r > 245 && g > 245 && b > 245) continue;
+
+          found = true;
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
       }
 
-      function clearAdoptedPreview(){
-        adoptedEmpty.style.display = "block";
-        adoptedCanvas.style.display = "none";
+      if (!found) return null;
+      return { x:minX, y:minY, w:(maxX-minX+1), h:(maxY-minY+1) };
+    }
+
+    function drawCroppedTo(dstCtx, srcCanvas, dstW, dstH){
+      dstCtx.clearRect(0,0,dstW,dstH);
+      dstCtx.fillStyle = "#ffffff";
+      dstCtx.fillRect(0,0,dstW,dstH);
+
+      const bbox = getInkBoundingBox(srcCanvas);
+      if (!bbox) return false;
+
+      const padding = 10;
+      const availW = Math.max(1, dstW - padding * 2);
+      const availH = Math.max(1, dstH - padding * 2);
+
+      const scale = Math.min(availW / bbox.w, availH / bbox.h);
+      const drawW = bbox.w * scale;
+      const drawH = bbox.h * scale;
+
+      const dx = (dstW - drawW) / 2;
+      const dy = (dstH - drawH) / 2;
+
+      dstCtx.drawImage(
+        srcCanvas,
+        bbox.x, bbox.y, bbox.w, bbox.h,
+        dx, dy, drawW, drawH
+      );
+      return true;
+    }
+
+    function adoptCurrent(){
+      clearAdopted();
+
+      if (mode === "draw"){
+        if (!hasDrawInk) return;
+
+        adoptedEmpty.style.display = "none";
         adoptedTyped.style.display = "none";
-        adoptedTyped.textContent = "";
+        adoptedCanvas.style.display = "block";
 
-        adoptedCtx.clearRect(0, 0, adoptedCanvas.width, adoptedCanvas.height);
-        fillWhite(adoptedCtx, adoptedCanvas.width, adoptedCanvas.height);
+        const dctx = adoptedCanvas.getContext("2d");
+        drawCroppedTo(dctx, canvas, adoptedCanvas.width, adoptedCanvas.height);
+        stampWhen();
+        return;
       }
 
-      function setStatus(which, ok){
-        if(which === "draw"){
-          padStatus.textContent = ok ? "Ready" : "Empty";
-          padStatus.className = "status " + (ok ? "ok" : "warn");
-        }else{
-          typedStatus.textContent = ok ? "Ready" : "Empty";
-          typedStatus.className = "status " + (ok ? "ok" : "warn");
-        }
-      }
+      if (mode === "type"){
+        if (!hasTypeInk || !lastTypeText) return;
 
-      function updateUI(){
-        metaMode.textContent = state.mode === "draw" ? "Draw" : "Type";
-        metaHas.textContent = state.hasSignature ? "Yes" : "No";
-        btnAdopt.disabled = !state.hasSignature;
-        metaBtn.textContent = btnAdopt.disabled ? "Disabled" : "Enabled";
-        metaLast.textContent = state.lastAdoptedAt || "None";
-      }
-
-      function clearInputOnly(){
-        state.hasSignature = false;
-        state.drawing = false;
-        state.typedText = "";
-
-        clearMainCanvas();
-
-        typedName.value = "";
-        typedRender.textContent = "";
-
-        setStatus("draw", false);
-        setStatus("type", false);
-
-        updateUI();
-      }
-
-      function removeStoredSignature(){
-        try{ STORE.removeItem(STORAGE_KEY); }catch(_){}
-      }
-
-      function clearAll(){
-        clearInputOnly();
-        clearAdoptedPreview();
-        removeStoredSignature();
-      }
-
-      function switchMode(mode){
-        if(mode === state.mode) return;
-
-        clearInputOnly();
-        state.mode = mode;
-
-        panelDraw.hidden = mode !== "draw";
-        panelType.hidden = mode !== "type";
-
-        tabDraw.setAttribute("aria-selected", String(mode === "draw"));
-        tabType.setAttribute("aria-selected", String(mode === "type"));
-
-        updateUI();
-      }
-
-      function canvasPoint(e){
-        const r = canvas.getBoundingClientRect();
-        const cx = (e.touches ? e.touches[0].clientX : e.clientX);
-        const cy = (e.touches ? e.touches[0].clientY : e.clientY);
-        return {
-          x: (cx - r.left) * canvas.width / r.width,
-          y: (cy - r.top) * canvas.height / r.height
-        };
-      }
-
-      function beginDraw(e){
-        if(state.mode !== "draw") return;
-        e.preventDefault();
-
-        state.drawing = true;
-
-        const p = canvasPoint(e);
-        ctx.beginPath();
-        ctx.moveTo(p.x, p.y);
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.strokeStyle = "#020617";
-        ctx.lineWidth = Number(stroke.value);
-
-        state.hasSignature = true;
-        setStatus("draw", true);
-        updateUI();
-      }
-
-      function moveDraw(e){
-        if(state.mode !== "draw") return;
-        if(!state.drawing) return;
-        e.preventDefault();
-
-        const p = canvasPoint(e);
-        ctx.lineTo(p.x, p.y);
-        ctx.stroke();
-      }
-
-      function endDraw(){
-        if(state.mode !== "draw") return;
-        state.drawing = false;
-      }
-
-      function buildTypedLine(name){
-        const clean = (name || "").trim().replace(/\s+/g, " ");
-        if(!clean) return "";
-        return "/s/ " + clean;
-      }
-
-      function renderTyped(){
-        if(state.mode !== "type") return;
-
-        const line = buildTypedLine(typedName.value);
-
-        if(!line){
-          state.typedText = "";
-          typedRender.textContent = "";
-          state.hasSignature = false;
-          setStatus("type", false);
-          updateUI();
-          return;
-        }
-
-        state.typedText = line;
-        typedRender.textContent = line;
-        state.hasSignature = true;
-        setStatus("type", true);
-        updateUI();
-      }
-
-      function getInkBoundingBox(srcCanvas){
-        const w = srcCanvas.width;
-        const h = srcCanvas.height;
-        const sctx = srcCanvas.getContext("2d", { willReadFrequently: true });
-        const img = sctx.getImageData(0, 0, w, h).data;
-
-        let minX = w, minY = h, maxX = -1, maxY = -1;
-
-        for(let y = 0; y < h; y++){
-          let rowIndex = y * w * 4;
-          for(let x = 0; x < w; x++){
-            const i = rowIndex + x * 4;
-            const r = img[i], g = img[i+1], b = img[i+2], a = img[i+3];
-            if(a === 0) continue;
-
-            const isWhite = (r >= 250 && g >= 250 && b >= 250);
-            if(isWhite) continue;
-
-            if(x < minX) minX = x;
-            if(y < minY) minY = y;
-            if(x > maxX) maxX = x;
-            if(y > maxY) maxY = y;
-          }
-        }
-
-        if(maxX < 0) return null;
-
-        const pad = 6;
-        minX = Math.max(0, minX - pad);
-        minY = Math.max(0, minY - pad);
-        maxX = Math.min(w - 1, maxX + pad);
-        maxY = Math.min(h - 1, maxY + pad);
-
-        return { x:minX, y:minY, w:(maxX - minX + 1), h:(maxY - minY + 1) };
-      }
-
-      function renderAdoptedTypedCentered(line){
         adoptedEmpty.style.display = "none";
         adoptedCanvas.style.display = "none";
         adoptedTyped.style.display = "block";
-        adoptedTyped.textContent = line;
+        adoptedTyped.textContent = `/s/ ${lastTypeText}`;
+        stampWhen();
+        return;
       }
+    }
 
-      function renderAdoptedDrawCentered(){
-        adoptedEmpty.style.display = "none";
-        adoptedTyped.style.display = "none";
-        adoptedTyped.textContent = "";
-        adoptedCanvas.style.display = "block";
+    adoptBtn.addEventListener("click", adoptCurrent);
 
-        adoptedCtx.clearRect(0, 0, adoptedCanvas.width, adoptedCanvas.height);
-        fillWhite(adoptedCtx, adoptedCanvas.width, adoptedCanvas.height);
+    function clearAll(){
+      clearDrawInternal();
+      clearTypeInternal();
+      clearAdopted();
+      setMode("draw");
+      updateAdoptButton();
+    }
 
-        const bbox = getInkBoundingBox(canvas);
-        if(!bbox) return;
-
-        const dstW = adoptedCanvas.width;
-        const dstH = adoptedCanvas.height;
-
-        const padding = 18;
-        const availW = Math.max(1, dstW - padding * 2);
-        const availH = Math.max(1, dstH - padding * 2);
-
-        const scale = Math.min(availW / bbox.w, availH / bbox.h);
-
-        const drawW = bbox.w * scale;
-        const drawH = bbox.h * scale;
-
-        const dx = (dstW - drawW) / 2;
-        const dy = (dstH - drawH) / 2;
-
-        adoptedCtx.imageSmoothingEnabled = true;
-        adoptedCtx.imageSmoothingQuality = "high";
-        adoptedCtx.drawImage(
-          canvas,
-          bbox.x, bbox.y, bbox.w, bbox.h,
-          dx, dy, drawW, drawH
-        );
-      }
-
-      function saveAdoptedToSession(payload){
-        try{
-          STORE.removeItem(STORAGE_KEY);
-          STORE.setItem(STORAGE_KEY, JSON.stringify(payload));
-        }catch(_){}
-      }
-
-      function loadAdoptedFromSession(){
-        try{
-          const raw = STORE.getItem(STORAGE_KEY);
-          if(!raw) return null;
-          const obj = JSON.parse(raw);
-          if(!obj || (obj.mode !== "type" && obj.mode !== "draw")) return null;
-          return obj;
-        }catch(_){
-          return null;
-        }
-      }
-
-      function adoptSignature(){
-        if(!state.hasSignature) return;
-
-        clearAdoptedPreview();       // clears on-screen adopted result first
-        removeStoredSignature();     // deletes old stored signature every adopt
-
-        const nowIso = new Date().toISOString();
-        state.lastAdoptedAt = nowIso;
-
-        if(state.mode === "type"){
-          const line = state.typedText;
-          renderAdoptedTypedCentered(line);
-          saveAdoptedToSession({
-            mode: "type",
-            typed: line,
-            drawDataUrl: null,
-            createdAt: nowIso
-          });
-        }else{
-          renderAdoptedDrawCentered();
-          const png = adoptedCanvas.toDataURL("image/png");
-          saveAdoptedToSession({
-            mode: "draw",
-            typed: null,
-            drawDataUrl: png,
-            createdAt: nowIso
-          });
-        }
-
-        updateUI();
-
-        window.dispatchEvent(new CustomEvent("signature:adopt", {
-          detail: {
-            mode: state.mode,
-            typed: state.mode === "type" ? state.typedText : null
-          }
-        }));
-      }
-
-      function hydrateAdopted(obj){
-        if(!obj){
-          clearAdoptedPreview();
-          state.lastAdoptedAt = null;
-          updateUI();
-          return;
-        }
-
-        state.lastAdoptedAt = obj.createdAt || null;
-
-        clearAdoptedPreview();
-
-        if(obj.mode === "type" && typeof obj.typed === "string" && obj.typed.trim()){
-          renderAdoptedTypedCentered(obj.typed);
-        }else if(obj.mode === "draw" && typeof obj.drawDataUrl === "string" && obj.drawDataUrl.startsWith("data:image/")){
-          adoptedEmpty.style.display = "none";
-          adoptedTyped.style.display = "none";
-          adoptedTyped.textContent = "";
-          adoptedCanvas.style.display = "block";
-
-          const img = new Image();
-          img.onload = function(){
-            adoptedCtx.clearRect(0, 0, adoptedCanvas.width, adoptedCanvas.height);
-            fillWhite(adoptedCtx, adoptedCanvas.width, adoptedCanvas.height);
-
-            const scale = Math.min(adoptedCanvas.width / img.width, adoptedCanvas.height / img.height);
-            const w = img.width * scale;
-            const h = img.height * scale;
-            const x = (adoptedCanvas.width - w) / 2;
-            const y = (adoptedCanvas.height - h) / 2;
-
-            adoptedCtx.imageSmoothingEnabled = true;
-            adoptedCtx.imageSmoothingQuality = "high";
-            adoptedCtx.drawImage(img, x, y, w, h);
-          };
-          img.src = obj.drawDataUrl;
-        }else{
-          clearAdoptedPreview();
-          state.lastAdoptedAt = null;
-          removeStoredSignature();
-        }
-
-        updateUI();
-      }
-
-      tabDraw.addEventListener("click", () => switchMode("draw"));
-      tabType.addEventListener("click", () => switchMode("type"));
-
-      stroke.addEventListener("input", () => { strokeVal.textContent = stroke.value; });
-
-      btnClear.addEventListener("click", clearAll);
-      btnAdopt.addEventListener("click", adoptSignature);
-
-      btnRenderTyped.addEventListener("click", renderTyped);
-      typedName.addEventListener("keydown", (e) => {
-        if(e.key === "Enter"){
-          e.preventDefault();
-          renderTyped();
-        }
-      });
-
-      canvas.addEventListener("mousedown", beginDraw);
-      canvas.addEventListener("mousemove", moveDraw);
-      window.addEventListener("mouseup", endDraw);
-
-      canvas.addEventListener("touchstart", beginDraw, { passive:false });
-      canvas.addEventListener("touchmove", moveDraw, { passive:false });
-      window.addEventListener("touchend", endDraw, { passive:false });
-      window.addEventListener("touchcancel", endDraw, { passive:false });
-
-      clearMainCanvas();
+    function initDefaultStates(){
       strokeVal.textContent = stroke.value;
-      setStatus("draw", false);
-      setStatus("type", false);
+      setStatusText(drawStatus, false, "Empty");
+      setStatusText(typeStatus, false, "Empty");
+      clearAdopted();
+      updateAdoptButton();
+    }
 
-      const saved = loadAdoptedFromSession();
-      hydrateAdopted(saved);
+    clearAllBtn.addEventListener("click", clearAll);
 
-      updateUI();
-    })();
+    initDefaultStates();
   </script>
 </body>
 </html>
