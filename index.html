@@ -391,6 +391,10 @@
 
         sortState = { col: -1, dir: 1 };
         updatedEl.textContent = `Last loaded: ${new Date().toLocaleString()}`;
+        
+        // Save valid codes to localStorage for validation
+        saveValidCodesToCache();
+        
         applySearch();
 
       } catch (e) {
@@ -398,6 +402,35 @@
         rawRows = [];
         tbody.innerHTML = `<tr><td colspan="100" class="error-message">Failed to load data: ${e.message}</td></tr>`;
         setStatus(`Load failed`);
+      }
+    }
+
+    function saveValidCodesToCache() {
+      const TARGET_HEADER = "Unique Identifier";
+      const CACHE_KEY = "carbyne_valid_codes_cache";
+      const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
+      
+      try {
+        // Find the "Unique Identifier" column
+        const colIndex = headers.findIndex(h => 
+          h.toLowerCase().trim() === TARGET_HEADER.toLowerCase()
+        );
+        
+        if (colIndex === -1) return;
+        
+        // Extract all non-blank values from that column
+        const validCodes = rawRows
+          .map(row => (row[colIndex] ?? "").toString().trim())
+          .filter(code => code !== "")
+          .map(code => code.toLowerCase());
+        
+        // Save to localStorage
+        localStorage.setItem(CACHE_KEY, JSON.stringify(validCodes));
+        localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+        
+        console.log(`Cached ${validCodes.length} valid codes`);
+      } catch (e) {
+        console.error("Failed to cache valid codes:", e);
       }
     }
 
