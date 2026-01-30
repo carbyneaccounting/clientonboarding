@@ -1,9 +1,11 @@
+<!-- ui.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Client Onboarding</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
 
   <style>
@@ -13,15 +15,26 @@
       box-sizing:border-box;
     }
 
+    :root{
+      --carbyne-blue:#00305B;
+      --carbyne-blue-2:#0A3D6F;
+      --ink:#0f172a;
+      --muted:#475569;
+      --border:#e5e7eb;
+      --panel:#ffffff;
+      --radius:18px;
+      --shadow:0 28px 56px rgba(0,0,0,0.30);
+    }
+
     body{
       min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
       padding:40px 20px;
-      background:linear-gradient(135deg,#00305B 0%,#0A3D6F 50%,#00305B 100%);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
       position:relative;
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
     .top-left-info{
@@ -29,13 +42,168 @@
       top:20px;
       left:20px;
       color:#ffffff;
-      font-size:13px;
-      line-height:1.4;
+      font-family:system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
 
-    .top-left-info .company{
-      font-weight:600;
+    .company-name{
+      font-size:16px;
+      font-weight:700;
       margin-bottom:2px;
+    }
+
+    .address{
+      font-size:13px;
+      font-weight:600;
+      letter-spacing:.2px;
+      line-height:1.35;
+      opacity:.98;
+    }
+
+    .container{
+      width:min(1200px, 95vw);
+      display:flex;
+      flex-direction:column;
+    }
+
+    h1{
+      font-family:'Baron', sans-serif;
+      font-size:22px;
+      color:#ffffff;
+      font-weight:normal;
+      margin-bottom:14px;
+    }
+
+    .card{
+      width:100%;
+      height:clamp(520px, 72vh, 860px);
+      background:#ffffff;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      position:relative;
+    }
+
+    /* TOP SECTION - Progress Bar */
+    .top-section{
+      padding:18px 30px;
+      border-bottom:1px solid #e6e6e6;
+      background:#ffffff;
+      z-index:2;
+    }
+
+    .progress-bar-container{
+      width:100%;
+      height:8px;
+      background:#dedede;
+      border-radius:999px;
+      overflow:hidden;
+    }
+
+    .progress-bar-fill{
+      height:100%;
+      width:20%;
+      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
+      border-radius:999px;
+      transition:width .25s ease;
+    }
+
+    /* MIDDLE SECTION - Page 1 background */
+    .middle-section{
+      flex:1;
+      padding:26px 30px;
+      overflow:auto;
+      background:
+        linear-gradient(
+          135deg,
+          rgba(0,48,91,.78) 0%,
+          rgba(10,61,111,.78) 50%,
+          rgba(0,48,91,.78) 100%
+        ),
+        url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2400&q=80");
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      position:relative;
+    }
+
+    /* Center the access module inside the middle section */
+    #accessMount{
+      width:100%;
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .load-error{
+      width:min(760px, 92%);
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.08);
+      border-radius:14px;
+      padding:18px 20px;
+      color:#111827;
+      font-size:14px;
+      line-height:1.4;
+      box-shadow:0 16px 32px rgba(0,0,0,0.18);
+    }
+
+    /* BOTTOM SECTION - Navigation */
+    .bottom-section{
+      padding:18px 30px;
+      border-top:1px solid #e6e6e6;
+      background:#ffffff;
+      z-index:2;
+    }
+
+    .navigation{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+
+    .nav-button{
+      padding:10px 24px;
+      border:none;
+      border-radius:8px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:opacity .15s ease, transform .15s ease;
+    }
+
+    .nav-button.previous{
+      background:#f0f0f0;
+      color:#333;
+    }
+
+    .nav-button.previous:hover{
+      opacity:.95;
+      transform:translateY(-1px);
+    }
+
+    .nav-button.next{
+      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
+      color:#ffffff;
+    }
+
+    .nav-button.next:hover{
+      opacity:.95;
+      transform:translateY(-1px);
+    }
+
+    .nav-button:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .page-indicator{
+      font-size:14px;
+      color:#666;
+      font-weight:600;
     }
 
     .footer{
@@ -44,126 +212,20 @@
       left:20px;
       color:#ffffff;
       font-size:13px;
-      opacity:0.85;
-    }
-
-    .container{
-      width:min(1200px,95vw);
-      display:flex;
-      flex-direction:column;
-    }
-
-    h1{
-      font-family:'Baron',sans-serif;
-      font-size:20px;
-      color:#ffffff;
-      font-weight:normal;
-      margin-bottom:14px;
-    }
-
-    .card{
-      width:100%;
-      height:clamp(520px,70vh,820px);
-      background:#ffffff;
-      border-radius:18px;
-      box-shadow:0 28px 56px rgba(0,0,0,0.30);
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
-
-    .top-section{
-      padding:20px 30px;
-      border-bottom:1px solid #e0e0e0;
-      background:#ffffff;
-    }
-
-    .progress-bar{
-      width:100%;
-      height:8px;
-      background:#e0e0e0;
-      border-radius:10px;
-      overflow:hidden;
-    }
-
-    .progress-fill{
-      height:100%;
-      width:20%;
-      background:linear-gradient(90deg,#00305B 0%,#0A3D6F 100%);
-      border-radius:10px;
-    }
-
-    /* PAGE 1 CONTENT BACKGROUND */
-    .middle-section{
-      flex:1;
-      position:relative;
-      background:
-        linear-gradient(
-          rgba(0,48,91,0.88),
-          rgba(0,48,91,0.88)
-        ),
-        url("https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=2000&q=80");
-      background-size:cover;
-      background-position:center;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:30px;
-    }
-
-    .middle-section iframe{
-      width:100%;
-      height:100%;
-      border:none;
-      background:transparent;
-    }
-
-    .bottom-section{
-      padding:20px 30px;
-      border-top:1px solid #e0e0e0;
-      background:#ffffff;
-    }
-
-    .navigation{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-    }
-
-    .nav-button{
-      padding:10px 22px;
-      border-radius:8px;
-      border:none;
-      font-size:14px;
       font-weight:600;
-      cursor:pointer;
-    }
-
-    .nav-button.previous{
-      background:#f0f0f0;
-      color:#999;
-      cursor:not-allowed;
-    }
-
-    .nav-button.next{
-      background:linear-gradient(90deg,#00305B 0%,#0A3D6F 100%);
-      color:#ffffff;
-    }
-
-    .page-indicator{
-      font-size:14px;
-      color:#666;
+      opacity:.95;
     }
   </style>
 </head>
 
 <body>
-
   <div class="top-left-info">
-    <div class="company">Carbyne Accounting</div>
-    734 West Main Street, Suite 106<br>
-    Louisville, Kentucky 40202<br>
-    (502) 632-9444 | Client@CarbyneAccounting.com
+    <div class="company-name">Carbyne Accounting</div>
+    <div class="address">
+      734 West Main Street, Suite 106<br>
+      Louisville, Kentucky 40202<br>
+      (502) 632-9444 | Client@CarbyneAccounting.com
+    </div>
   </div>
 
   <div class="container">
@@ -171,15 +233,13 @@
 
     <div class="card">
       <div class="top-section">
-        <div class="progress-bar">
-          <div class="progress-fill"></div>
+        <div class="progress-bar-container">
+          <div class="progress-bar-fill"></div>
         </div>
       </div>
 
       <div class="middle-section">
-        <iframe
-          src="https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/access.html">
-        </iframe>
+        <div id="accessMount"></div>
       </div>
 
       <div class="bottom-section">
@@ -192,9 +252,76 @@
     </div>
   </div>
 
-  <div class="footer">
-    Carbyne Accounting™ – Confidential & Proprietary System
-  </div>
+  <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
+  <script>
+    const ACCESS_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/access.html";
+
+    async function loadAccessModule(){
+      const mount = document.getElementById("accessMount");
+      mount.innerHTML = "";
+
+      try{
+        const res = await fetch(ACCESS_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
+
+        const styleTags = Array.from(doc.querySelectorAll("style"));
+        const linkTags = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
+
+        const fragmentRoot =
+          doc.querySelector("#accessModule") ||
+          doc.body ||
+          doc.documentElement;
+
+        linkTags.forEach(l => {
+          const href = l.getAttribute("href");
+          if (!href) return;
+          const already = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+            .some(x => x.getAttribute("href") === href);
+          if (!already){
+            const nl = document.createElement("link");
+            nl.rel = "stylesheet";
+            nl.href = href;
+            document.head.appendChild(nl);
+          }
+        });
+
+        styleTags.forEach(st => {
+          const ns = document.createElement("style");
+          ns.textContent = st.textContent || "";
+          document.head.appendChild(ns);
+        });
+
+        if (fragmentRoot && fragmentRoot.id === "accessModule"){
+          mount.appendChild(fragmentRoot);
+        } else {
+          const wrapper = document.createElement("div");
+          wrapper.innerHTML = html;
+          const extracted =
+            wrapper.querySelector("#accessModule") ||
+            wrapper.querySelector("body") ||
+            wrapper;
+
+          if (extracted){
+            const nodes = Array.from(extracted.childNodes);
+            nodes.forEach(n => mount.appendChild(n));
+          }
+        }
+
+      } catch (e){
+        mount.innerHTML = `
+          <div class="load-error">
+            <strong>Failed to load access module.</strong><br>
+            ${String(e.message || e)}
+          </div>
+        `;
+      }
+    }
+
+    loadAccessModule();
+  </script>
 </body>
 </html>
