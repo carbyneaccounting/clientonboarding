@@ -141,17 +141,14 @@
         // Try cache first for INSTANT validation
         let codes = getCachedCodes();
 
-        if (codes && Array.isArray(codes)) {
+        if (codes && Array.isArray(codes) && codes.length > 0) {
           // INSTANT validation from cache!
           const isValid = codes.includes(needle);
           postResult(isValid, code);
-
-          // Refresh cache in background
-          fetchValidCodes().then(setCachedCodes).catch(() => {});
           return;
         }
 
-        // No cache - fetch from SharePoint (first time only)
+        // No cache - try to fetch from SharePoint (first time only)
         try {
           codes = await fetchValidCodes();
           setCachedCodes(codes);
