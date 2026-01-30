@@ -351,7 +351,7 @@
     <div class="address">
       734 West Main Street, Suite 106<br>
       Louisville, Kentucky 40202<br>
-      (502) 632-9444 | Client@CarbyneAccounting.com
+      (502) 632-9444 | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8ac9e6e3efe4fecac9ebf8e8f3e4efcbe9e9e5ffe4fee3e4eda4e9e5e7">[email&#160;protected]</a>
     </div>
   </div>
 
@@ -381,7 +381,7 @@
 
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // Configuration
     const TOTAL_PAGES = 5;
     const STORAGE_KEY = "carbyne_access_code";
@@ -571,9 +571,11 @@
 
       // Listen for validation response
       window.addEventListener("message", (ev) => {
+        console.log("Message received:", ev.data);
         const d = ev.data;
         if (!d || d.type !== "carbyne-validate") return;
 
+        console.log("Validation result:", d.valid);
         setBusy(false);
 
         if (d.valid === true) {
@@ -633,17 +635,4 @@
           `;
           break;
         default:
-          content.innerHTML = `
-            <h2>Page ${pageNum}</h2>
-            <p>Content for page ${pageNum} goes here.</p>
-          `;
-      }
-
-      pageMount.appendChild(content);
-    }
-
-    // Start the application
-    init();
-  </script>
-</body>
-</html>
+          content.innerH
