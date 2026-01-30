@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enter Access Code</title>
+
+<style>
+:root{
+  --ink:#0f172a;
+  --muted:#475569;
+  --border:#e5e7eb;
+  --panel:#ffffff;
+  --accent:#00305B;
+  --radius:10px;
+  --shadow:0 12px 30px rgba(2,6,23,.08);
+  --bg:#f8fafc;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+}
+
+.container{
+  width:100%;
+  max-width:420px;
+  padding:0 16px;
+}
+
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:28px;
+  text-align:center;
+}
+
+.card h1{
+  margin:0 0 20px 0;
+  font-size:18px;
+  font-weight:600;
+}
+
+input[type="text"]{
+  width:100%;
+  padding:12px 14px;
+  font-size:14px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  outline:none;
+  margin-bottom:16px;
+}
+
+input[type="text"]:focus{
+  border-color:var(--accent);
+}
+
+button{
+  width:100%;
+  padding:12px 14px;
+  font-size:14px;
+  font-weight:500;
+  border-radius:10px;
+  border:1px solid var(--accent);
+  background:var(--accent);
+  color:#ffffff;
+  cursor:pointer;
+}
+
+button:hover{
+  opacity:.95;
+}
+</style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Enter Access Code</h1>
+      <input type="text" id="accessCode" placeholder="Access Code">
+      <button type="button" id="submitCode">Submit</button>
+    </div>
+  </div>
+</body>
+</html>
