@@ -340,7 +340,7 @@
     <div class="address">
       734 West Main Street, Suite 106<br>
       Louisville, Kentucky 40202<br>
-      (502) 632-9444 | Client@CarbyneAccounting.com
+      (502) 632-9444 | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1b5877727e756f5b587a697962757e5a7878746e756f72757c35787476">[email&#160;protected]</a>
     </div>
   </div>
 
@@ -370,7 +370,7 @@
 
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ============================================
     // CONFIGURATION
     // ============================================
@@ -555,8 +555,16 @@
 
       pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
 
+      // Hide page indicator on page 1, show on all other pages
+      if (currentPage === 1) {
+        pageIndicator.style.visibility = 'hidden';
+      } else {
+        pageIndicator.style.visibility = 'visible';
+      }
+
+      // Update button states
       prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage === TOTAL_PAGES;
+      nextBtn.disabled = currentPage === TOTAL_PAGES || currentPage === 1;
 
       localStorage.setItem(CURRENT_PAGE_KEY, currentPage);
     }
@@ -732,17 +740,4 @@
         default:
           content.innerHTML = `
             <h2>Page ${pageNum}</h2>
-            <p>Content for page ${pageNum} goes here.</p>
-          `;
-      }
-
-      pageMount.appendChild(content);
-    }
-
-    // ============================================
-    // START APPLICATION
-    // ============================================
-    init();
-  </script>
-</body>
-</html>
+            <p>Content for page ${pageNum} goes here.</
