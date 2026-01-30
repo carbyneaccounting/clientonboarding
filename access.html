@@ -1,102 +1,96 @@
 <!-- access.html -->
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>Access</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+<div id="accessModule">
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
+    :root{
+      --carbyne-blue:#00305B;
+      --carbyne-blue-2:#0A3D6F;
+      --border:#e5e7eb;
+      --ink:#0f172a;
+      --muted:#475569;
+      --radius:16px;
     }
 
-    body{
-      height:100%;
-      background:transparent;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    /* OUTER GRADIENT BORDER */
     .access-shell{
-      width:100%;
-      max-width:560px;
-      padding:2px; /* thickness of gradient border */
+      width:min(720px, 92%);
+      padding:2px;
       border-radius:18px;
-      background:linear-gradient(135deg, #00305B 0%, #0A3D6F 100%);
-      box-shadow:0 18px 40px rgba(0,0,0,0.35);
+      background:linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
+      box-shadow:0 22px 44px rgba(0,0,0,0.25);
     }
 
-    /* INNER WHITE CONTAINER */
-    .access-inner{
-      background:#d3d3d3;
+    .access-card{
+      background:rgba(255,255,255,0.92);
+      border:1px solid rgba(0,0,0,0.06);
       border-radius:16px;
-      padding:24px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
+      padding:22px 22px 20px 22px;
     }
 
     .access-title{
       font-size:16px;
-      font-weight:600;
-      color:#0f172a;
-      letter-spacing:.3px;
+      font-weight:800;
+      color:#111827;
+      margin:0 0 12px 0;
+      text-align:left;
     }
 
     .access-input{
       width:100%;
       padding:12px 14px;
       font-size:14px;
-      border:1px solid #cbd5e1;
-      border-radius:10px;
+      border:1px solid rgba(0,0,0,0.18);
+      border-radius:12px;
       outline:none;
+      margin:0 0 12px 0;
+      background:#ffffff;
     }
 
     .access-input:focus{
-      border-color:#00305B;
+      border-color:rgba(0,48,91,0.75);
+      box-shadow:0 0 0 3px rgba(0,48,91,0.18);
     }
 
     .access-submit{
-      width:fit-content;
-      padding:10px 22px;
+      padding:10px 18px;
       font-size:14px;
-      font-weight:600;
+      font-weight:800;
       border-radius:10px;
-      border:none;
-      background:#00305B;
+      border:1px solid rgba(0,0,0,0.10);
+      background:linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
       color:#ffffff;
       cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
     }
 
     .access-submit:hover{
-      opacity:.9;
+      opacity:.95;
     }
   </style>
-</head>
 
-<body>
   <div class="access-shell">
-    <div class="access-inner">
+    <div class="access-card">
       <div class="access-title">Enter Access Code</div>
-      <input
-        type="text"
-        class="access-input"
-        placeholder="Access Code"
-        autocomplete="off"
-      />
-      <button
-        type="button"
-        class="access-submit"
-      >
-        Submit
-      </button>
+      <input type="text" class="access-input" id="accessCode" placeholder="Access Code" autocomplete="off">
+      <button type="button" class="access-submit" id="submitCode">Submit</button>
     </div>
   </div>
-</body>
-</html>
+
+  <script>
+    (function(){
+      const input = document.getElementById("accessCode");
+      const btn = document.getElementById("submitCode");
+
+      if (!input || !btn) return;
+
+      btn.addEventListener("click", () => {
+        const v = (input.value || "").trim();
+        input.value = v;
+      });
+
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") btn.click();
+      });
+    })();
+  </script>
+</div>
