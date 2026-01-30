@@ -1,4 +1,4 @@
-<!-- ui.html - UPDATED WITH EMBEDDED ACCESS MODULE -->
+<!-- ui.html - WITH BUILT-IN INSTANT VALIDATION -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,6 +6,7 @@
   <title>Client Onboarding - Carbyne Accounting</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
     * {
@@ -293,18 +294,6 @@
       display: inline;
     }
 
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
     .spinner {
       display: inline-block;
       width: 14px;
@@ -351,7 +340,7 @@
     <div class="address">
       734 West Main Street, Suite 106<br>
       Louisville, Kentucky 40202<br>
-      (502) 632-9444 | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8ac9e6e3efe4fecac9ebf8e8f3e4efcbe9e9e5ffe4fee3e4eda4e9e5e7">[email&#160;protected]</a>
+      (502) 632-9444 | Client@CarbyneAccounting.com
     </div>
   </div>
 
@@ -381,75 +370,202 @@
 
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-    // Configuration
+  <script>
+    // ============================================
+    // CONFIGURATION
+    // ============================================
     const TOTAL_PAGES = 5;
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
-    const VALIDATOR_URL = "validate.html";
+    const CACHE_KEY = "carbyne_valid_codes_cache";
+    const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
+    const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
+    const TARGET_HEADER = "Unique Identifier";
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
-    // State
+    // ============================================
+    // STATE
+    // ============================================
     let currentPage = 1;
     let isAccessValidated = false;
+    let validCodesCache = null;
+    let isFetchingCodes = false;
 
-    // Elements
+    // ============================================
+    // ELEMENTS
+    // ============================================
     const pageMount = document.getElementById("pageMount");
     const progressBar = document.getElementById("progressBar");
     const pageIndicator = document.getElementById("pageIndicator");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // Initialize
+    // ============================================
+    // VALIDATION FUNCTIONS
+    // ============================================
+    function normalize(v) {
+      return (v ?? "").toString().trim();
+    }
+
+    function getCachedCodes() {
+      if (validCodesCache) return validCodesCache;
+
+      try {
+        const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+        const now = Date.now();
+
+        if (timestamp && (now - parseInt(timestamp)) < CACHE_DURATION) {
+          const cached = localStorage.getItem(CACHE_KEY);
+          if (cached) {
+            validCodesCache = JSON.parse(cached);
+            return validCodesCache;
+          }
+        }
+      } catch (e) {
+        console.error("Cache read error:", e);
+      }
+      return null;
+    }
+
+    function setCachedCodes(codes) {
+      validCodesCache = codes;
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
+        localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+      } catch (e) {
+        console.error("Cache write error:", e);
+      }
+    }
+
+    function findHeaderIndex(headers) {
+      const lower = headers.map(h => normalize(h).toLowerCase());
+      const target = TARGET_HEADER.toLowerCase();
+      
+      for (let i = 0; i < lower.length; i++) {
+        if (lower[i] === target) return i;
+      }
+      
+      return -1;
+    }
+
+    async function fetchValidCodes() {
+      if (isFetchingCodes) {
+        // Wait for existing fetch
+        while (isFetchingCodes) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return validCodesCache;
+      }
+
+      isFetchingCodes = true;
+
+      try {
+        const res = await fetch(FILE_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const ab = await res.arrayBuffer();
+        const wb = XLSX.read(ab, { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {
+          header: 1,
+          raw: false,
+          defval: ""
+        });
+
+        if (!rows || rows.length < 2) {
+          throw new Error("No data found");
+        }
+
+        const headers = rows[0].map(v => normalize(v));
+        const col = findHeaderIndex(headers);
+
+        if (col < 0) {
+          throw new Error("Column 'Unique Identifier' not found");
+        }
+
+        const validCodes = [];
+        for (let r = 1; r < rows.length; r++) {
+          const row = rows[r] || [];
+          const cell = normalize(row[col] ?? "");
+          if (cell) {
+            validCodes.push(cell.toLowerCase());
+          }
+        }
+
+        setCachedCodes(validCodes);
+        return validCodes;
+
+      } catch (error) {
+        console.error("Fetch error:", error);
+        throw error;
+      } finally {
+        isFetchingCodes = false;
+      }
+    }
+
+    async function validateCode(code) {
+      const needle = code.toLowerCase();
+
+      // Check cache first
+      let codes = getCachedCodes();
+
+      if (codes && Array.isArray(codes)) {
+        // INSTANT validation from cache!
+        const isValid = codes.includes(needle);
+        
+        // Refresh cache in background
+        fetchValidCodes().catch(() => {});
+        
+        return isValid;
+      }
+
+      // No cache - fetch from SharePoint
+      try {
+        codes = await fetchValidCodes();
+        return codes.includes(needle);
+      } catch (error) {
+        return false;
+      }
+    }
+
+    // ============================================
+    // PAGE NAVIGATION
+    // ============================================
     function init() {
-      // Check if access code exists
       const accessCode = localStorage.getItem(STORAGE_KEY);
       isAccessValidated = !!accessCode;
 
-      // Get saved page or start at 1
       const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY)) || 1;
       currentPage = isAccessValidated ? savedPage : 1;
 
-      // Listen for validation success
-      window.addEventListener("message", handleValidationMessage);
+      // Pre-load valid codes in background
+      if (!getCachedCodes()) {
+        fetchValidCodes().catch(() => {});
+      }
 
-      // Load current page
       loadPage(currentPage);
 
-      // Setup navigation
       prevBtn.addEventListener("click", goToPreviousPage);
       nextBtn.addEventListener("click", goToNextPage);
     }
 
-    function handleValidationMessage(event) {
-      const data = event.data;
-      if (!data || data.type !== "carbyne-validate") return;
-
-      if (data.valid === true) {
-        isAccessValidated = true;
-        goToNextPage();
-      }
-    }
-
     function updateUI() {
-      // Update progress bar
       const progress = (currentPage / TOTAL_PAGES) * 100;
       progressBar.style.width = `${progress}%`;
 
-      // Update page indicator
       pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
 
-      // Hide page indicator on page 1, show on all other pages
+      // Hide page indicator on page 1
       if (currentPage === 1) {
         pageIndicator.style.visibility = 'hidden';
       } else {
         pageIndicator.style.visibility = 'visible';
       }
 
-      // Update button states - disable both Previous and Next on page 1
+      // Disable both buttons on page 1
       prevBtn.disabled = currentPage === 1;
       nextBtn.disabled = currentPage === TOTAL_PAGES || currentPage === 1;
 
-      // Save current page
       localStorage.setItem(CURRENT_PAGE_KEY, currentPage);
     }
 
@@ -472,21 +588,20 @@
       updateUI();
 
       if (pageNum === 1) {
-        // Load access module (embedded)
         loadAccessModule();
       } else {
-        // Check if access is validated
         if (!isAccessValidated) {
           currentPage = 1;
           loadAccessModule();
           return;
         }
-
-        // Load page content
         loadPageContent(pageNum);
       }
     }
 
+    // ============================================
+    // ACCESS MODULE
+    // ============================================
     function loadAccessModule() {
       const accessHTML = `
         <div class="access-shell">
@@ -500,7 +615,6 @@
               id="accessCode"
               placeholder="Enter your Unique Identifier"
               autocomplete="off"
-              aria-label="Unique Identifier"
             >
 
             <div class="access-row">
@@ -509,8 +623,6 @@
               </button>
               <span class="inline-msg" id="inlineMsg">Invalid Access Code</span>
             </div>
-
-            <iframe id="validatorFrame" class="sr-only" title="validator" aria-hidden="true"></iframe>
           </div>
         </div>
       `;
@@ -524,15 +636,11 @@
       const btn = document.getElementById("submitCode");
       const btnText = document.getElementById("btnText");
       const msg = document.getElementById("inlineMsg");
-      const frame = document.getElementById("validatorFrame");
 
-      function normalize(v) {
-        return (v ?? "").toString().trim();
-      }
-
-      function showInvalid(show) {
+      function showInvalid(show, message = "Invalid Access Code") {
         if (show) {
           msg.classList.add("show");
+          msg.textContent = message;
           input.classList.add("error");
         } else {
           msg.classList.remove("show");
@@ -549,58 +657,53 @@
         }
       }
 
-      function submit() {
+      async function submit() {
         showInvalid(false);
 
         const code = normalize(input.value);
         input.value = code;
 
         if (!code) {
-          showInvalid(true);
-          msg.textContent = "Please enter a code";
+          showInvalid(true, "Please enter a code");
           return;
         }
 
         setBusy(true);
-        msg.textContent = "Invalid Access Code";
 
-        // Load validator with code
-        const src = VALIDATOR_URL + "#code=" + encodeURIComponent(code) + "&t=" + Date.now();
-        frame.src = src;
+        try {
+          const isValid = await validateCode(code);
+
+          if (isValid) {
+            localStorage.setItem(STORAGE_KEY, code);
+            isAccessValidated = true;
+            goToNextPage();
+          } else {
+            showInvalid(true);
+          }
+        } catch (error) {
+          showInvalid(true, "Validation error");
+        } finally {
+          setBusy(false);
+        }
       }
 
-      // Listen for validation response
-      window.addEventListener("message", (ev) => {
-        console.log("Message received:", ev.data);
-        const d = ev.data;
-        if (!d || d.type !== "carbyne-validate") return;
-
-        console.log("Validation result:", d.valid);
-        setBusy(false);
-
-        if (d.valid === true) {
-          const finalCode = normalize(d.code || input.value);
-          localStorage.setItem(STORAGE_KEY, finalCode);
-          showInvalid(false);
-          isAccessValidated = true;
-          goToNextPage();
-          return;
-        }
-
-        showInvalid(true);
-      });
-
-      // Event listeners
       btn.addEventListener("click", submit);
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") submit();
       });
 
-      // Initialize - DO NOT prepopulate the input field for security
+      const existing = localStorage.getItem(STORAGE_KEY);
+      if (existing) {
+        input.value = normalize(existing);
+      }
+
       showInvalid(false);
       input.focus();
     }
 
+    // ============================================
+    // PAGE CONTENT
+    // ============================================
     function loadPageContent(pageNum) {
       const content = document.createElement("div");
       content.className = "page-content";
@@ -635,4 +738,19 @@
           `;
           break;
         default:
-          content.innerH
+          content.innerHTML = `
+            <h2>Page ${pageNum}</h2>
+            <p>Content for page ${pageNum} goes here.</p>
+          `;
+      }
+
+      pageMount.appendChild(content);
+    }
+
+    // ============================================
+    // START APPLICATION
+    // ============================================
+    init();
+  </script>
+</body>
+</html>
