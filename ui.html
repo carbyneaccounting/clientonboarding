@@ -194,18 +194,20 @@
 
     /* Access Module Styles */
     .access-shell {
-      width: min(740px, 92%);
+      width: min(900px, 92%);
       padding: 2px;
       border-radius: 22px;
       background: linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
       box-shadow: 0 28px 64px rgba(0, 0, 0, 0.28);
+      min-height: 400px;
     }
 
     .access-card {
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(0, 0, 0, 0.06);
       border-radius: 20px;
-      padding: 30px 30px 26px 30px;
+      padding: 50px 40px;
+      min-height: 396px;
     }
 
     .access-title {
@@ -310,13 +312,31 @@
 
     /* Page 2+ styling */
     .page-content {
-      width: min(740px, 92%);
+      width: min(900px, 92%);
       background: rgba(255, 255, 255, 0.92);
       border: 1px solid rgba(0, 0, 0, 0.08);
       border-radius: 14px;
-      padding: 30px;
+      padding: 50px 40px;
       color: #111827;
       box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+      min-height: 400px;
+      max-height: 400px;
+      position: relative;
+    }
+
+    /* Add scrollbar for pages 3+ */
+    .page-content.scrollable {
+      overflow-y: auto;
+    }
+
+    .reference-number {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      letter-spacing: 0.3px;
     }
 
     .page-content h2 {
@@ -340,7 +360,7 @@
     <div class="address">
       734 West Main Street, Suite 106<br>
       Louisville, Kentucky 40202<br>
-      (502) 632-9444 | Client@CarbyneAccounting.com
+      (502) 632-9444 | <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d497b8bdb1baa09497b5a6b6adbab195b7b7bba1baa0bdbab3fab7bbb9">[email&#160;protected]</a>
     </div>
   </div>
 
@@ -370,7 +390,7 @@
 
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ============================================
     // CONFIGURATION
     // ============================================
@@ -692,11 +712,7 @@
         if (e.key === "Enter") submit();
       });
 
-      const existing = localStorage.getItem(STORAGE_KEY);
-      if (existing) {
-        input.value = normalize(existing);
-      }
-
+      // DO NOT prepopulate input field for security
       showInvalid(false);
       input.focus();
     }
@@ -707,10 +723,19 @@
     function loadPageContent(pageNum) {
       const content = document.createElement("div");
       content.className = "page-content";
+      
+      // Add scrollbar for pages 3+
+      if (pageNum >= 3) {
+        content.classList.add("scrollable");
+      }
+
+      // Get the secure access code from localStorage
+      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
 
       switch (pageNum) {
         case 2:
           content.innerHTML = `
+            <div class="reference-number">Reference Number: ${secureCode}</div>
             <h2>Welcome to Step 2</h2>
             <p>This is the second step of the onboarding process.</p>
             <p>Add your content here for page 2.</p>
@@ -718,6 +743,7 @@
           break;
         case 3:
           content.innerHTML = `
+            <div class="reference-number">Reference Number: ${secureCode}</div>
             <h2>Welcome to Step 3</h2>
             <p>This is the third step of the onboarding process.</p>
             <p>Add your content here for page 3.</p>
@@ -725,6 +751,7 @@
           break;
         case 4:
           content.innerHTML = `
+            <div class="reference-number">Reference Number: ${secureCode}</div>
             <h2>Welcome to Step 4</h2>
             <p>This is the fourth step of the onboarding process.</p>
             <p>Add your content here for page 4.</p>
@@ -732,6 +759,7 @@
           break;
         case 5:
           content.innerHTML = `
+            <div class="reference-number">Reference Number: ${secureCode}</div>
             <h2>Welcome to Step 5</h2>
             <p>This is the final step of the onboarding process.</p>
             <p>Add your content here for page 5.</p>
@@ -739,18 +767,6 @@
           break;
         default:
           content.innerHTML = `
+            <div class="reference-number">Reference Number: ${secureCode}</div>
             <h2>Page ${pageNum}</h2>
-            <p>Content for page ${pageNum} goes here.</p>
-          `;
-      }
-
-      pageMount.appendChild(content);
-    }
-
-    // ============================================
-    // START APPLICATION
-    // ============================================
-    init();
-  </script>
-</body>
-</html>
+            <p>Content for page ${pageNum} goes here.</
