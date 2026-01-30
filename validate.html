@@ -3,100 +3,135 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Validate</title>
+  <title>Validate Access Code</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
   <script>
-    (function(){
+    (function() {
+      // Configuration
       const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
       const TARGET_HEADER = "Unique Identifier";
 
-      function normalize(v){ return (v ?? "").toString().trim(); }
+      // Helper functions
+      function normalize(v) {
+        return (v ?? "").toString().trim();
+      }
 
-      function getCode(){
+      function getCode() {
         const hash = (location.hash || "").replace(/^#/, "");
         const params = new URLSearchParams(hash);
         return normalize(params.get("code") || "");
       }
 
-      function postResult(valid, code){
-        const payload = { type: "carbyne-validate", valid: !!valid, code: code || "" };
+      function postResult(valid, code) {
+        const payload = {
+          type: "carbyne-validate",
+          valid: !!valid,
+          code: code || ""
+        };
 
-        try{
-          if (window.parent && window.parent !== window){
+        try {
+          // Post to parent window (ui.html via access.html iframe)
+          if (window.parent && window.parent !== window) {
             window.parent.postMessage(payload, "*");
-          } else if (window.opener){
+          }
+          // Fallback to opener
+          if (window.opener) {
             window.opener.postMessage(payload, "*");
           }
-        } catch(_){}
+        } catch (e) {
+          console.error("Failed to post message:", e);
+        }
 
-        document.body.textContent = valid ? "true" : "false";
+        // Display result in body for debugging
+        document.body.textContent = valid ? "Valid" : "Invalid";
       }
 
-      function findHeaderIndex(headers){
+      function findHeaderIndex(headers) {
         const lower = headers.map(h => normalize(h).toLowerCase());
         const target = TARGET_HEADER.toLowerCase();
-        for (let i = 0; i < lower.length; i++){
+        
+        for (let i = 0; i < lower.length; i++) {
           if (lower[i] === target) return i;
         }
+        
         return -1;
       }
 
-      async function validate(){
+      async function validate() {
         const code = getCode();
-        if (!code){
+
+        // Empty code is invalid
+        if (!code) {
           postResult(false, "");
           return;
         }
 
-        try{
+        try {
+          // Fetch Excel file from SharePoint
           const res = await fetch(FILE_URL, { cache: "no-store" });
-          if (!res.ok){
+          if (!res.ok) {
+            console.error("Failed to fetch file:", res.status);
             postResult(false, code);
             return;
           }
 
+          // Parse Excel file
           const ab = await res.arrayBuffer();
           const wb = XLSX.read(ab, { type: "array" });
 
+          // Get first sheet
           const ws = wb.Sheets[wb.SheetNames[0]];
-          const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
+          const rows = XLSX.utils.sheet_to_json(ws, {
+            header: 1,
+            raw: false,
+            defval: ""
+          });
 
-          if (!rows || rows.length < 2){
+          // Check if we have data
+          if (!rows || rows.length < 2) {
+            console.error("No data found in spreadsheet");
             postResult(false, code);
             return;
           }
 
+          // Find the "Unique Identifier" column
           const headers = rows[0].map(v => normalize(v));
           const col = findHeaderIndex(headers);
-          if (col < 0){
+
+          if (col < 0) {
+            console.error("Column 'Unique Identifier' not found");
             postResult(false, code);
             return;
           }
 
+          // Check if code matches any value in the column
           const needle = code.toLowerCase();
-          let ok = false;
+          let isValid = false;
 
-          for (let r = 1; r < rows.length; r++){
+          for (let r = 1; r < rows.length; r++) {
             const row = rows[r] || [];
             const cell = normalize(row[col] ?? "");
-            if (cell && cell.toLowerCase() === needle){
-              ok = true;
+
+            if (cell && cell.toLowerCase() === needle) {
+              isValid = true;
               break;
             }
           }
 
-          postResult(ok, code);
-        } catch(_){
+          postResult(isValid, code);
+
+        } catch (error) {
+          console.error("Validation error:", error);
           postResult(false, code);
         }
       }
 
+      // Run validation
       validate();
     })();
   </script>
 </body>
 </html>
-
