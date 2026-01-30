@@ -1,4 +1,4 @@
-<!-- ui.html - UPDATED WITH EMBEDDED ACCESS MODULE -->
+<!-- ui.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -19,7 +19,6 @@
       --carbyne-blue-2: #0A3D6F;
       --radius: 18px;
       --shadow: 0 28px 56px rgba(0, 0, 0, 0.30);
-      --danger: #b91c1c;
     }
 
     body {
@@ -124,6 +123,18 @@
       justify-content: center;
     }
 
+    .load-error {
+      width: min(760px, 92%);
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: #111827;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
+    }
+
     .bottom-section {
       padding: 18px 30px;
       border-top: 1px solid #e6e6e6;
@@ -191,134 +202,6 @@
       z-index: 10;
     }
 
-    /* Access Module Styles */
-    .access-shell {
-      width: min(740px, 92%);
-      padding: 2px;
-      border-radius: 22px;
-      background: linear-gradient(135deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 50%, var(--carbyne-blue) 100%);
-      box-shadow: 0 28px 64px rgba(0, 0, 0, 0.28);
-    }
-
-    .access-card {
-      background: rgba(255, 255, 255, 0.92);
-      border: 1px solid rgba(0, 0, 0, 0.06);
-      border-radius: 20px;
-      padding: 30px 30px 26px 30px;
-    }
-
-    .access-title {
-      font-size: 18px;
-      font-weight: 800;
-      color: #111827;
-      margin: 0 0 14px 0;
-      text-align: left;
-    }
-
-    .access-label {
-      font-size: 13px;
-      font-weight: 800;
-      color: #334155;
-      margin: 0 0 8px 0;
-      text-align: left;
-      letter-spacing: 0.2px;
-    }
-
-    .access-input {
-      width: 100%;
-      padding: 14px 16px;
-      font-size: 15px;
-      border: 1px solid rgba(0, 0, 0, 0.18);
-      border-radius: 12px;
-      outline: none;
-      margin: 0 0 16px 0;
-      background: #ffffff;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .access-input:focus {
-      border-color: rgba(0, 48, 91, 0.75);
-      box-shadow: 0 0 0 3px rgba(0, 48, 91, 0.18);
-    }
-
-    .access-input.error {
-      border-color: var(--danger);
-    }
-
-    .access-row {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: flex-start;
-      flex-wrap: wrap;
-    }
-
-    .access-submit {
-      padding: 11px 22px;
-      font-size: 14px;
-      font-weight: 800;
-      border-radius: 10px;
-      border: 1px solid rgba(0, 0, 0, 0.10);
-      background: linear-gradient(90deg, var(--carbyne-blue) 0%, var(--carbyne-blue-2) 100%);
-      color: #ffffff;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 132px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.14);
-      transition: opacity 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .access-submit:hover:not(:disabled) {
-      opacity: 0.95;
-    }
-
-    .access-submit:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-
-    .inline-msg {
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.2px;
-      display: none;
-      white-space: nowrap;
-      color: var(--danger);
-    }
-
-    .inline-msg.show {
-      display: inline;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: #ffffff;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     /* Page 2+ styling */
     .page-content {
       width: min(740px, 92%);
@@ -384,9 +267,9 @@
   <script>
     // Configuration
     const TOTAL_PAGES = 5;
+    const ACCESS_URL = "access.html";
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
-    const VALIDATOR_URL = "validate.html";
 
     // State
     let currentPage = 1;
@@ -467,141 +350,74 @@
       }
     }
 
-    function loadPage(pageNum) {
+    async function loadPage(pageNum) {
       pageMount.innerHTML = "";
       updateUI();
 
-      if (pageNum === 1) {
-        // Load access module (embedded)
-        loadAccessModule();
-      } else {
-        // Check if access is validated
-        if (!isAccessValidated) {
-          currentPage = 1;
-          loadAccessModule();
-          return;
-        }
+      try {
+        if (pageNum === 1) {
+          // Load access module
+          await loadAccessModule();
+        } else {
+          // Check if access is validated
+          if (!isAccessValidated) {
+            currentPage = 1;
+            await loadAccessModule();
+            return;
+          }
 
-        // Load page content
-        loadPageContent(pageNum);
+          // Load page content
+          loadPageContent(pageNum);
+        }
+      } catch (error) {
+        showError(`Failed to load page: ${error.message}`);
       }
     }
 
-    function loadAccessModule() {
-      const accessHTML = `
-        <div class="access-shell">
-          <div class="access-card">
-            <div class="access-title">Enter Access Code</div>
+    async function loadAccessModule() {
+      try {
+        const res = await fetch(ACCESS_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-            <div class="access-label">Unique Identifier</div>
-            <input
-              type="text"
-              class="access-input"
-              id="accessCode"
-              placeholder="Enter your Unique Identifier"
-              autocomplete="off"
-              aria-label="Unique Identifier"
-            >
+        const html = await res.text();
+        const doc = new DOMParser().parseFromString(html, "text/html");
 
-            <div class="access-row">
-              <button type="button" class="access-submit" id="submitCode">
-                <span id="btnText">Submit</span>
-              </button>
-              <span class="inline-msg" id="inlineMsg">Invalid Access Code</span>
-            </div>
+        // Extract styles
+        const styleTags = Array.from(doc.querySelectorAll("style"));
+        const linkTags = Array.from(doc.querySelectorAll('link[rel="stylesheet"]'));
 
-            <iframe id="validatorFrame" class="sr-only" title="validator" aria-hidden="true"></iframe>
-          </div>
-        </div>
-      `;
+        // Add stylesheets
+        linkTags.forEach(l => {
+          const href = l.getAttribute("href");
+          if (!href) return;
+          const already = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
+            .some(x => x.getAttribute("href") === href);
+          if (!already) {
+            const nl = document.createElement("link");
+            nl.rel = "stylesheet";
+            nl.href = href;
+            document.head.appendChild(nl);
+          }
+        });
 
-      pageMount.innerHTML = accessHTML;
-      initAccessModule();
-    }
+        // Add inline styles
+        styleTags.forEach(st => {
+          const ns = document.createElement("style");
+          ns.textContent = st.textContent || "";
+          document.head.appendChild(ns);
+        });
 
-    function initAccessModule() {
-      const input = document.getElementById("accessCode");
-      const btn = document.getElementById("submitCode");
-      const btnText = document.getElementById("btnText");
-      const msg = document.getElementById("inlineMsg");
-      const frame = document.getElementById("validatorFrame");
-
-      function normalize(v) {
-        return (v ?? "").toString().trim();
-      }
-
-      function showInvalid(show) {
-        if (show) {
-          msg.classList.add("show");
-          input.classList.add("error");
+        // Extract and mount module
+        const fragmentRoot = doc.querySelector("#accessModule");
+        if (fragmentRoot) {
+          pageMount.appendChild(fragmentRoot);
         } else {
-          msg.classList.remove("show");
-          input.classList.remove("error");
-        }
-      }
-
-      function setBusy(isBusy) {
-        btn.disabled = !!isBusy;
-        if (isBusy) {
-          btnText.innerHTML = '<span class="spinner"></span>';
-        } else {
-          btnText.textContent = "Submit";
-        }
-      }
-
-      function submit() {
-        showInvalid(false);
-
-        const code = normalize(input.value);
-        input.value = code;
-
-        if (!code) {
-          showInvalid(true);
-          msg.textContent = "Please enter a code";
-          return;
+          throw new Error("Access module not found");
         }
 
-        setBusy(true);
-        msg.textContent = "Invalid Access Code";
-
-        // Load validator with code
-        const src = VALIDATOR_URL + "#code=" + encodeURIComponent(code) + "&t=" + Date.now();
-        frame.src = src;
+      } catch (error) {
+        showError(`Failed to load access module: ${error.message}`);
       }
-
-      // Listen for validation response
-      window.addEventListener("message", (ev) => {
-        const d = ev.data;
-        if (!d || d.type !== "carbyne-validate") return;
-
-        setBusy(false);
-
-        if (d.valid === true) {
-          const finalCode = normalize(d.code || input.value);
-          localStorage.setItem(STORAGE_KEY, finalCode);
-          showInvalid(false);
-          isAccessValidated = true;
-          goToNextPage();
-          return;
-        }
-
-        showInvalid(true);
-      });
-
-      // Event listeners
-      btn.addEventListener("click", submit);
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submit();
-      });
-
-      // Initialize
-      const existing = localStorage.getItem(STORAGE_KEY);
-      if (existing) {
-        input.value = normalize(existing);
-      }
-
-      showInvalid(false);
-      input.focus();
     }
 
     function loadPageContent(pageNum) {
@@ -645,6 +461,15 @@
       }
 
       pageMount.appendChild(content);
+    }
+
+    function showError(message) {
+      pageMount.innerHTML = `
+        <div class="load-error">
+          <strong>Error:</strong><br>
+          ${message}
+        </div>
+      `;
     }
 
     // Start the application
