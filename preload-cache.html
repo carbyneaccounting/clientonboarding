@@ -1,1 +1,137 @@
+<!-- preload-cache.html - RUN THIS ONCE TO CACHE DATA -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Preload Cache</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    .status {
+      padding: 15px;
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    .loading { background: #e0f2fe; color: #075985; }
+    .success { background: #dcfce7; color: #166534; }
+    .error { background: #fee2e2; color: #991b1b; }
+  </style>
+</head>
+<body>
+  <h1>Preload Validation Cache</h1>
+  <div id="status" class="status loading">Loading...</div>
+  <div id="details"></div>
 
+  <script>
+    const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
+    const TARGET_HEADER = "Unique Identifier";
+    const CACHE_KEY = "carbyne_valid_codes";
+    const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
+
+    const statusEl = document.getElementById("status");
+    const detailsEl = document.getElementById("details");
+
+    function normalize(v) {
+      return (v ?? "").toString().trim();
+    }
+
+    function findHeaderIndex(headers) {
+      const lower = headers.map(h => normalize(h).toLowerCase());
+      const target = TARGET_HEADER.toLowerCase();
+      
+      for (let i = 0; i < lower.length; i++) {
+        if (lower[i] === target) return i;
+      }
+      
+      return -1;
+    }
+
+    async function preloadCache() {
+      try {
+        statusEl.textContent = "Fetching data from SharePoint...";
+        statusEl.className = "status loading";
+
+        const res = await fetch(FILE_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        statusEl.textContent = "Parsing Excel file...";
+
+        const ab = await res.arrayBuffer();
+        const wb = XLSX.read(ab, { type: "array" });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {
+          header: 1,
+          raw: false,
+          defval: ""
+        });
+
+        if (!rows || rows.length < 2) {
+          throw new Error("No data found in spreadsheet");
+        }
+
+        const headers = rows[0].map(v => normalize(v));
+        const col = findHeaderIndex(headers);
+
+        if (col < 0) {
+          throw new Error(`Column "${TARGET_HEADER}" not found`);
+        }
+
+        statusEl.textContent = "Extracting unique identifiers...";
+
+        const validCodes = [];
+        for (let r = 1; r < rows.length; r++) {
+          const row = rows[r] || [];
+          const cell = normalize(row[col] ?? "");
+          if (cell) {
+            validCodes.push(cell.toLowerCase());
+          }
+        }
+
+        if (validCodes.length === 0) {
+          throw new Error("No valid codes found");
+        }
+
+        statusEl.textContent = "Caching data...";
+
+        localStorage.setItem(CACHE_KEY, JSON.stringify(validCodes));
+        localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+
+        statusEl.textContent = `✓ Success! Cached ${validCodes.length} unique identifiers`;
+        statusEl.className = "status success";
+
+        detailsEl.innerHTML = `
+          <p><strong>Cache Details:</strong></p>
+          <ul>
+            <li>Total codes cached: ${validCodes.length}</li>
+            <li>Column found: "${headers[col]}"</li>
+            <li>Timestamp: ${new Date().toLocaleString()}</li>
+            <li>Cache will expire in 24 hours</li>
+          </ul>
+          <p>You can now close this page. Validation will be instant!</p>
+        `;
+
+      } catch (error) {
+        statusEl.textContent = `✗ Error: ${error.message}`;
+        statusEl.className = "status error";
+        
+        detailsEl.innerHTML = `
+          <p><strong>Troubleshooting:</strong></p>
+          <ul>
+            <li>Check that the SharePoint link is accessible</li>
+            <li>Verify the column is named exactly "Unique Identifier"</li>
+            <li>Check browser console for detailed errors (F12)</li>
+          </ul>
+        `;
+      }
+    }
+
+    preloadCache();
+  </script>
+</body>
+</html>
