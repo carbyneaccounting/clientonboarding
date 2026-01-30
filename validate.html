@@ -1,4 +1,4 @@
-<!-- validate.html - OPTIMIZED WITH CACHING -->
+<!-- validate.html -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,7 +12,7 @@
     (function() {
       const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
       const TARGET_HEADER = "Unique Identifier";
-      const CACHE_KEY = "carbyne_valid_codes";
+      const CACHE_KEY = "carbyne_valid_codes_cache";
       const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
       const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -52,7 +52,6 @@
           const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
           const now = Date.now();
 
-          // Check if cache exists and is not expired
           if (timestamp && (now - parseInt(timestamp)) < CACHE_DURATION) {
             const cached = localStorage.getItem(CACHE_KEY);
             if (cached) {
@@ -112,7 +111,6 @@
             throw new Error("Column 'Unique Identifier' not found");
           }
 
-          // Extract all non-blank values from the column
           const validCodes = [];
           for (let r = 1; r < rows.length; r++) {
             const row = rows[r] || [];
@@ -140,39 +138,28 @@
 
         const needle = code.toLowerCase();
 
-        // Try cache first for instant validation
-        let validCodes = getCachedCodes();
+        // Try cache first for INSTANT validation
+        let codes = getCachedCodes();
 
-        if (validCodes && Array.isArray(validCodes)) {
-          // Use cached data - instant validation!
-          const isValid = validCodes.includes(needle);
+        if (codes && Array.isArray(codes)) {
+          // INSTANT validation from cache!
+          const isValid = codes.includes(needle);
           postResult(isValid, code);
 
-          // Refresh cache in background (don't wait)
+          // Refresh cache in background
           fetchValidCodes().then(setCachedCodes).catch(() => {});
           return;
         }
 
-        // No cache - fetch from SharePoint
+        // No cache - fetch from SharePoint (first time only)
         try {
-          validCodes = await fetchValidCodes();
-          setCachedCodes(validCodes);
+          codes = await fetchValidCodes();
+          setCachedCodes(codes);
 
-          const isValid = validCodes.includes(needle);
+          const isValid = codes.includes(needle);
           postResult(isValid, code);
 
         } catch (error) {
-          // If fetch fails, still try to validate with stale cache
-          const staleCache = localStorage.getItem(CACHE_KEY);
-          if (staleCache) {
-            try {
-              validCodes = JSON.parse(staleCache);
-              const isValid = validCodes.includes(needle);
-              postResult(isValid, code);
-              return;
-            } catch (e) {}
-          }
-
           postResult(false, code);
         }
       }
