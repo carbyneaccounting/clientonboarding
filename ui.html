@@ -1,4 +1,4 @@
-<!-- ui.html - WITH BUILT-IN INSTANT VALIDATION -->
+<!-- ui.html - WITH BUILT-IN INSTANT VALIDATION (15 PAGES) -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -380,7 +380,7 @@
       <div class="bottom-section">
         <div class="navigation">
           <button class="nav-button previous" id="prevBtn">Previous</button>
-          <span class="page-indicator" id="pageIndicator">Step 1 of 5</span>
+          <span class="page-indicator" id="pageIndicator">Step 1 of 15</span>
           <button class="nav-button next" id="nextBtn">Next</button>
         </div>
       </div>
@@ -393,7 +393,7 @@
     // ============================================
     // CONFIGURATION
     // ============================================
-    const TOTAL_PAGES = 5;
+    const TOTAL_PAGES = 15;
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
     const CACHE_KEY = "carbyne_valid_codes_cache";
@@ -459,17 +459,16 @@
     function findHeaderIndex(headers) {
       const lower = headers.map(h => normalize(h).toLowerCase());
       const target = TARGET_HEADER.toLowerCase();
-      
+
       for (let i = 0; i < lower.length; i++) {
         if (lower[i] === target) return i;
       }
-      
+
       return -1;
     }
 
     async function fetchValidCodes() {
       if (isFetchingCodes) {
-        // Wait for existing fetch
         while (isFetchingCodes) {
           await new Promise(resolve => setTimeout(resolve, 100));
         }
@@ -525,20 +524,14 @@
     async function validateCode(code) {
       const needle = code.toLowerCase();
 
-      // Check cache first
       let codes = getCachedCodes();
 
       if (codes && Array.isArray(codes)) {
-        // INSTANT validation from cache!
         const isValid = codes.includes(needle);
-        
-        // Refresh cache in background
         fetchValidCodes().catch(() => {});
-        
         return isValid;
       }
 
-      // No cache - fetch from SharePoint
       try {
         codes = await fetchValidCodes();
         return codes.includes(needle);
@@ -557,7 +550,6 @@
       const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY)) || 1;
       currentPage = isAccessValidated ? savedPage : 1;
 
-      // Pre-load valid codes in background
       if (!getCachedCodes()) {
         fetchValidCodes().catch(() => {});
       }
@@ -574,14 +566,12 @@
 
       pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
 
-      // Hide page indicator on page 1
       if (currentPage === 1) {
-        pageIndicator.style.visibility = 'hidden';
+        pageIndicator.style.visibility = "hidden";
       } else {
-        pageIndicator.style.visibility = 'visible';
+        pageIndicator.style.visibility = "visible";
       }
 
-      // Disable both buttons on page 1
       prevBtn.disabled = currentPage === 1;
       nextBtn.disabled = currentPage === TOTAL_PAGES || currentPage === 1;
 
@@ -711,65 +701,36 @@
         if (e.key === "Enter") submit();
       });
 
-      // DO NOT prepopulate input field for security
       showInvalid(false);
       input.focus();
     }
 
     // ============================================
-    // PAGE CONTENT
+    // PAGE CONTENT (2 - 15)
     // ============================================
     function loadPageContent(pageNum) {
       const content = document.createElement("div");
       content.className = "page-content";
 
-      // Add scroll for pages 3+
       if (pageNum >= 3) {
         content.classList.add("scrollable");
       }
 
-      // Get secure access code
       const secureCode = localStorage.getItem(STORAGE_KEY) || "";
 
-      switch (pageNum) {
-        case 2:
-          content.innerHTML = `
-            <div class="reference-number">Reference Number: ${secureCode}</div>
-            <h2>Welcome to Step 2</h2>
-            <p>This is the second step of the onboarding process.</p>
-            <p>Add your content here for page 2.</p>
-          `;
-          break;
-        case 3:
-          content.innerHTML = `
-            <div class="reference-number">Reference Number: ${secureCode}</div>
-            <h2>Welcome to Step 3</h2>
-            <p>This is the third step of the onboarding process.</p>
-            <p>Add your content here for page 3.</p>
-          `;
-          break;
-        case 4:
-          content.innerHTML = `
-            <div class="reference-number">Reference Number: ${secureCode}</div>
-            <h2>Welcome to Step 4</h2>
-            <p>This is the fourth step of the onboarding process.</p>
-            <p>Add your content here for page 4.</p>
-          `;
-          break;
-        case 5:
-          content.innerHTML = `
-            <div class="reference-number">Reference Number: ${secureCode}</div>
-            <h2>Welcome to Step 5</h2>
-            <p>This is the final step of the onboarding process.</p>
-            <p>Add your content here for page 5.</p>
-          `;
-          break;
-        default:
-          content.innerHTML = `
-            <div class="reference-number">Reference Number: ${secureCode}</div>
-            <h2>Page ${pageNum}</h2>
-            <p>Content for page ${pageNum} goes here.</p>
-          `;
+      if (pageNum >= 2 && pageNum <= 15) {
+        content.innerHTML = `
+          <div class="reference-number">Reference Number: ${secureCode}</div>
+          <h2>Welcome to Step ${pageNum}</h2>
+          <p>This is step ${pageNum} of the onboarding process.</p>
+          <p>Add your content here for page ${pageNum}.</p>
+        `;
+      } else {
+        content.innerHTML = `
+          <div class="reference-number">Reference Number: ${secureCode}</div>
+          <h2>Page ${pageNum}</h2>
+          <p>Content for page ${pageNum} goes here.</p>
+        `;
       }
 
       pageMount.appendChild(content);
