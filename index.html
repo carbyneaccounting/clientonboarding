@@ -4,179 +4,207 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Carbyne Table</title>
+  <title>Carbyne Client Data Table</title>
 
   <style>
-    :root{
-      --ink:#0f172a;
-      --muted:#475569;
-      --border:#00305B;
-      --panel:#d7d7d7;
-      --accent:#00305B;
-      --radius:10px;
-      --shadow:0 12px 30px rgba(2,6,23,.08);
-      --bg:#f8fafc;
+    :root {
+      --ink: #0f172a;
+      --muted: #475569;
+      --border: #00305B;
+      --panel: #d7d7d7;
+      --accent: #00305B;
+      --radius: 10px;
+      --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+      --bg: #f8fafc;
     }
 
-    *{box-sizing:border-box}
-    body{
-      margin:0;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--ink);
-      background:var(--bg);
+      color: var(--ink);
+      background: var(--bg);
     }
 
-    .wrap{
-      max-width:1100px;
-      margin:40px auto;
-      padding:0 16px;
+    .wrap {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 16px;
     }
 
-    .card{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
 
-    header{
-      padding:18px 20px;
-      border-bottom:1px solid var(--border);
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      background:#fff;
+    header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      background: #fff;
     }
 
-    header h1{
-      margin:0;
-      font-size:18px;
-      letter-spacing:.2px;
+    header h1 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
     }
 
-    header .meta{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:13px;
+    header .meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    .tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:#fff;
-      color:var(--muted);
-      font-size:12px;
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
     }
 
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:var(--accent);
-      display:inline-block;
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: inline-block;
     }
 
-    .muted{ color:var(--muted); }
-
-    .controls{
-      padding:14px 20px;
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      flex-wrap:wrap;
-      border-bottom:1px solid var(--border);
-      background:#fff;
+    .muted {
+      color: var(--muted);
     }
 
-    .controls .left{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
+    .controls {
+      padding: 14px 20px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
     }
 
-    input[type="search"]{
-      width:min(420px, 84vw);
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      font-size:14px;
-      outline:none;
+    .controls .left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
-    input[type="search"]:focus{
-      border-color:var(--accent);
+    input[type="search"] {
+      width: min(420px, 84vw);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
     }
 
-    button{
-      padding:10px 12px;
-      border:1px solid var(--border);
-      border-radius:10px;
-      background:#fff;
-      cursor:pointer;
-      font-size:14px;
+    input[type="search"]:focus {
+      border-color: var(--accent);
     }
 
-    button:hover{
-      border-color:#cbd5e1;
+    button {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: border-color 0.2s ease;
     }
 
-    .status{
-      color:var(--muted);
-      font-size:13px;
-      max-width:100%;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
+    button:hover {
+      border-color: #cbd5e1;
     }
 
-    .table-wrap{
-      overflow:auto;
-      max-height:70vh;
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      min-width:720px;
+    .table-wrap {
+      overflow: auto;
+      max-height: 70vh;
     }
 
-    thead th{
-      position:sticky;
-      top:0;
-      background:#fff;
-      z-index:2;
-      text-align:left;
-      font-size:13px;
-      color:#0f172a;
-      padding:12px 12px;
-      border-bottom:1px solid var(--border);
-      white-space:nowrap;
-      cursor:pointer;
-      user-select:none;
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 720px;
     }
 
-    tbody td{
-      padding:10px 12px;
-      border-bottom:1px solid var(--border);
-      font-size:14px;
-      white-space:nowrap;
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 2;
+      text-align: left;
+      font-size: 13px;
+      color: #0f172a;
+      padding: 12px 12px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
     }
 
-    tbody tr:hover td{
-      background:#f1f5f9;
+    thead th:hover {
+      background: #f8fafc;
+    }
+
+    thead th.sorted {
+      background: #e0f2fe;
+    }
+
+    tbody td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover td {
+      background: #f1f5f9;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--muted);
+    }
+
+    .error-message {
+      padding: 20px;
+      background: #fee2e2;
+      color: #991b1b;
+      border-radius: 8px;
+      margin: 20px;
     }
   </style>
 
@@ -187,9 +215,9 @@
   <div class="wrap">
     <div class="card">
       <header>
-        <h1>Table from Excel (SharePoint)</h1>
+        <h1>Client Data Table</h1>
         <div class="meta">
-          <span class="tag"><span class="dot"></span> GitHub Pages</span>
+          <span class="tag"><span class="dot"></span> Live Data</span>
           <span id="updated" class="muted"></span>
         </div>
       </header>
@@ -199,7 +227,7 @@
           <input id="search" type="search" placeholder="Search..." autocomplete="off" />
           <button id="reload" type="button">Reload</button>
         </div>
-        <div class="status" id="status">Idle</div>
+        <div class="status" id="status">Loading...</div>
       </div>
 
       <div class="table-wrap">
@@ -212,44 +240,61 @@
   </div>
 
   <script>
+    // Configuration
     const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
 
+    // Elements
     const statusEl = document.getElementById("status");
     const updatedEl = document.getElementById("updated");
     const searchEl = document.getElementById("search");
     const reloadBtn = document.getElementById("reload");
-
     const table = document.getElementById("table");
     const thead = table.querySelector("thead");
     const tbody = table.querySelector("tbody");
 
+    // State
     let headers = [];
     let rawRows = [];
     let sortState = { col: -1, dir: 1 };
 
-    function setStatus(msg){ statusEl.textContent = msg; }
+    // Helper functions
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
 
-    function normalizeToWidth(rows, width){
+    function normalizeToWidth(rows, width) {
       return rows.map(r => {
         const out = new Array(width).fill("");
-        for (let i = 0; i < width; i++) out[i] = (r[i] ?? "").toString();
+        for (let i = 0; i < width; i++) {
+          out[i] = (r[i] ?? "").toString();
+        }
         return out;
       });
     }
 
-    function renderTable(filteredRows){
+    function renderTable(filteredRows) {
       thead.innerHTML = "";
       tbody.innerHTML = "";
 
+      if (!filteredRows.length) {
+        tbody.innerHTML = '<tr><td colspan="100" style="text-align:center;padding:40px;color:#94a3b8;">No data found</td></tr>';
+        return;
+      }
+
+      // Render header
       const trh = document.createElement("tr");
       headers.forEach((h, idx) => {
         const th = document.createElement("th");
         th.textContent = (h && h.trim()) ? h : `Column ${idx + 1}`;
         th.addEventListener("click", () => sortBy(idx));
+        if (sortState.col === idx) {
+          th.classList.add("sorted");
+        }
         trh.appendChild(th);
       });
       thead.appendChild(trh);
 
+      // Render rows
       const frag = document.createDocumentFragment();
       filteredRows.forEach(r => {
         const tr = document.createElement("tr");
@@ -265,27 +310,33 @@
       setStatus(`Rows: ${filteredRows.length.toLocaleString()}`);
     }
 
-    function applySearch(){
+    function applySearch() {
       const q = (searchEl.value || "").trim().toLowerCase();
-      if (!q){
+      if (!q) {
         renderTable(rawRows);
         return;
       }
-      const filtered = rawRows.filter(r => r.some(v => (v ?? "").toString().toLowerCase().includes(q)));
+      const filtered = rawRows.filter(r =>
+        r.some(v => (v ?? "").toString().toLowerCase().includes(q))
+      );
       renderTable(filtered);
     }
 
-    function sortBy(colIndex){
-      if (sortState.col === colIndex) sortState.dir *= -1;
-      else { sortState.col = colIndex; sortState.dir = 1; }
+    function sortBy(colIndex) {
+      if (sortState.col === colIndex) {
+        sortState.dir *= -1;
+      } else {
+        sortState.col = colIndex;
+        sortState.dir = 1;
+      }
 
       const dir = sortState.dir;
       rawRows.sort((a, b) => {
         const av = (a[colIndex] ?? "").toString();
         const bv = (b[colIndex] ?? "").toString();
 
-        const an = Number(av.replace(/[$,%\s]/g,""));
-        const bn = Number(bv.replace(/[$,%\s]/g,""));
+        const an = Number(av.replace(/[$,%\s]/g, ""));
+        const bn = Number(bv.replace(/[$,%\s]/g, ""));
         const bothNum =
           av.trim() !== "" &&
           bv.trim() !== "" &&
@@ -303,9 +354,11 @@
       applySearch();
     }
 
-    async function loadWorkbook(){
+    async function loadWorkbook() {
       setStatus("Loading...");
-      try{
+      tbody.innerHTML = '<tr><td colspan="100" class="loading">Loading data from SharePoint...</td></tr>';
+
+      try {
         const res = await fetch(FILE_URL, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
@@ -313,9 +366,13 @@
         const wb = XLSX.read(ab, { type: "array" });
 
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
+        const rows = XLSX.utils.sheet_to_json(ws, {
+          header: 1,
+          raw: false,
+          defval: ""
+        });
 
-        if (!rows.length){
+        if (!rows.length) {
           headers = [];
           rawRows = [];
           renderTable([]);
@@ -335,17 +392,33 @@
         sortState = { col: -1, dir: 1 };
         updatedEl.textContent = `Last loaded: ${new Date().toLocaleString()}`;
         applySearch();
-      } catch (e){
+
+      } catch (e) {
         headers = [];
         rawRows = [];
-        renderTable([]);
-        setStatus(`Load failed: ${e.message}`);
+        tbody.innerHTML = `<tr><td colspan="100" class="error-message">Failed to load data: ${e.message}</td></tr>`;
+        setStatus(`Load failed`);
       }
     }
 
+    // Event listeners
     searchEl.addEventListener("input", applySearch);
     reloadBtn.addEventListener("click", loadWorkbook);
 
+    // Global access for validation (if needed)
+    window.CARBYNE_TABLE_DATA = {
+      get headers() { return headers; },
+      get rows() { return rawRows; },
+      getColumn: function(columnName) {
+        const colIndex = headers.findIndex(h =>
+          h.toLowerCase().trim() === columnName.toLowerCase().trim()
+        );
+        if (colIndex === -1) return [];
+        return rawRows.map(row => (row[colIndex] ?? "").toString().trim());
+      }
+    };
+
+    // Initialize
     loadWorkbook();
   </script>
 </body>
