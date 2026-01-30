@@ -44,8 +44,10 @@
 
       function validate() {
         const code = getCode();
+        console.log("Validating code:", code);
 
         if (!code) {
+          console.log("No code provided");
           postResult(false, "");
           return;
         }
@@ -53,6 +55,7 @@
         // Read ONLY from cache created by index.html
         try {
           const cached = localStorage.getItem(CACHE_KEY);
+          console.log("Cache exists:", !!cached);
           
           if (!cached) {
             console.error("No cache found - index.html must be opened first");
@@ -61,6 +64,7 @@
           }
 
           const codes = JSON.parse(cached);
+          console.log("Codes in cache:", codes.length);
           
           if (!Array.isArray(codes)) {
             console.error("Invalid cache format");
@@ -71,6 +75,7 @@
           // INSTANT validation from cache
           const needle = code.toLowerCase();
           const isValid = codes.includes(needle);
+          console.log("Is valid:", isValid);
           postResult(isValid, code);
 
         } catch (error) {
