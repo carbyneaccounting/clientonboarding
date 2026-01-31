@@ -1,603 +1,525 @@
-<!-- clientintakeform.html -->
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Client Intake Form</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
 
-<template id="carbyne_client_intake">
   <style>
-    .ci-wrap{
-      width:100%;
-      max-width:980px;
+    :root{
+      --ink:#0f172a;
+      --muted:#475569;
+      --border:rgba(15,23,42,.14);
+      --panel:rgba(255,255,255,.92);
+      --panel-solid:#ffffff;
+      --accent:#00305B;
+      --accent-2:#2596be;
+      --radius:14px;
+      --shadow:0 18px 44px rgba(2,6,23,.18);
+      --shadow-soft:0 12px 30px rgba(2,6,23,.10);
+      --bg-tint:rgba(248,250,252,.78);
+      --focus:rgba(37,150,190,.35);
+      --danger:#b91c1c;
+      --ok:#166534;
     }
 
-    .ci-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      padding:4px 2px 0;
-    }
+    *{box-sizing:border-box}
 
-    .ci-h2{
+    body{
       margin:0;
-      font-size:28px;
-      font-weight:950;
-      color:#0b2f4e;
-      letter-spacing:.2px;
+      min-height:100vh;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--ink);
+      overflow-x:hidden;
+      background:
+        radial-gradient(1200px 700px at 18% 18%, rgba(255,255,255,.40), rgba(255,255,255,0) 55%),
+        radial-gradient(900px 600px at 82% 20%, rgba(37,150,190,.22), rgba(37,150,190,0) 60%),
+        radial-gradient(900px 700px at 60% 90%, rgba(0,48,91,.18), rgba(0,48,91,0) 62%),
+        linear-gradient(180deg, #eef2f7, #f8fafc 60%, #eef2f7);
     }
 
-    .ci-section{
-      margin-top:12px;
-      font-size:14px;
-      font-weight:950;
-      color:#0f172a;
-      letter-spacing:.2px;
+    /* subtle “winter scenic” texture */
+    body:before{
+      content:"";
+      position:fixed;
+      inset:-30px;
+      background:
+        radial-gradient(2px 2px at 10% 20%, rgba(255,255,255,.55), rgba(255,255,255,0) 60%),
+        radial-gradient(2px 2px at 35% 15%, rgba(255,255,255,.35), rgba(255,255,255,0) 60%),
+        radial-gradient(2px 2px at 68% 22%, rgba(255,255,255,.45), rgba(255,255,255,0) 60%),
+        radial-gradient(2px 2px at 82% 12%, rgba(255,255,255,.30), rgba(255,255,255,0) 60%),
+        radial-gradient(2px 2px at 15% 55%, rgba(255,255,255,.25), rgba(255,255,255,0) 60%),
+        radial-gradient(2px 2px at 52% 62%, rgba(255,255,255,.28), rgba(255,255,255,0) 60%),
+        radial-gradient(2px 2px at 78% 70%, rgba(255,255,255,.24), rgba(255,255,255,0) 60%),
+        radial-gradient(2px 2px at 92% 58%, rgba(255,255,255,.20), rgba(255,255,255,0) 60%);
+      opacity:.55;
+      pointer-events:none;
+      filter:blur(.2px);
     }
 
-    .ci-spacer{height:10px}
-
-    .ci-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
+    .wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:26px 18px;
+      position:relative;
+      z-index:1;
     }
 
-    .ci-grid.three{
-      grid-template-columns:repeat(3, minmax(0,1fr));
+    .card{
+      width:min(1040px, 96vw);
+      background:var(--panel);
+      border:1px solid rgba(255,255,255,.55);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      overflow:hidden;
     }
 
-    .ci-field{width:100%}
-
-    .ci-labelrow{
+    .card-header{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
-      margin:0 0 8px;
-    }
-
-    .ci-label{
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.92;
-    }
-
-    .ci-inline{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size:12px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.85;
-      white-space:nowrap;
-    }
-
-    .ci-check{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
-    }
-
-    .ci-input, .ci-select{
-      width:100%;
-      border:1px solid rgba(0,0,0,.14);
-      border-radius:14px;
-      padding:14px 16px;
-      font-size:14px;
-      font-weight:900;
-      outline:none;
-      background:#fff;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
-      transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
-      color:#0f172a;
-    }
-
-    .ci-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
-
-    .ci-input:focus, .ci-select:focus{
-      border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
-    }
-
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      opacity: 0.6;
-    }
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
-    }
-
-    .ci-input:disabled{
-      background:#f1f5f9;
-      color:#64748b;
-      box-shadow:none;
-      opacity:.95;
-      cursor:not-allowed;
-    }
-
-    .ci-wide{grid-column:1 / -1}
-
-    /* Basis of Accounting */
-    .ci-basis-row{
-      display:flex;
-      align-items:center;
       gap:14px;
-      flex-wrap:nowrap;
-      margin-top:10px;
-      padding:2px 2px 0;
-      width:100%;
+      padding:18px 20px;
+      background:linear-gradient(90deg, rgba(0,48,91,.10), rgba(37,150,190,.08));
+      border-bottom:1px solid rgba(15,23,42,.10);
     }
 
-    .ci-radio{
-      display:inline-flex;
+    .brand{
+      display:flex;
       align-items:center;
-      gap:8px;
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.92;
+      gap:12px;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:38px;
+      height:38px;
+      border-radius:12px;
+      background:
+        radial-gradient(16px 16px at 28% 28%, rgba(255,255,255,.65), rgba(255,255,255,0) 65%),
+        linear-gradient(135deg, var(--accent), rgba(37,150,190,.92));
+      box-shadow:0 10px 22px rgba(0,48,91,.22);
+      flex:0 0 auto;
+    }
+
+    .brand-title{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+      line-height:1.1;
+    }
+
+    .brand-title strong{
+      font-size:14px;
+      letter-spacing:.2px;
       white-space:nowrap;
-      user-select:none;
-      flex:0 0 auto;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    .ci-radio input[type="radio"]{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
-      flex:0 0 auto;
+    .brand-title span{
+      font-size:12px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
 
-    .ci-other-wrap{
+    .header-actions{
       display:flex;
       align-items:center;
       gap:10px;
-      flex:1 1 auto;
-      min-width:220px;
+      flex:0 0 auto;
     }
 
-    .ci-other-input{
-      flex:1 1 auto;
+    .pill{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,.70);
+      border:1px solid rgba(15,23,42,.10);
+      color:rgba(15,23,42,.78);
+    }
+
+    .content{
+      padding:20px;
+    }
+
+    .section{
+      background:rgba(255,255,255,.72);
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:16px;
+      box-shadow:var(--shadow-soft);
+      padding:18px 18px 16px;
+    }
+
+    h2{
+      margin:0 0 14px 0;
+      font-size:18px;
+      letter-spacing:.2px;
+      color:var(--accent);
+    }
+
+    .grid{
+      display:grid;
+      gap:14px;
+    }
+
+    .grid.two{
+      grid-template-columns:1fr 1fr;
+    }
+
+    .grid.three{
+      grid-template-columns:1fr 1fr 1fr;
+    }
+
+    @media (max-width: 900px){
+      .grid.two, .grid.three{
+        grid-template-columns:1fr;
+      }
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+
+    label{
+      font-size:13px;
+      font-weight:600;
+      color:rgba(15,23,42,.86);
+    }
+
+    .hint{
+      font-size:12px;
+      color:rgba(71,85,105,.92);
+      margin-top:-2px;
+    }
+
+    input, select, textarea{
       width:100%;
       min-width:0;
       padding:12px 14px;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.14);
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:rgba(255,255,255,.92);
+      color:var(--ink);
       font-size:14px;
-      font-weight:900;
       outline:none;
+      transition:border-color .12s ease, box-shadow .12s ease, background .12s ease;
+    }
+
+    textarea{
+      min-height:92px;
+      resize:vertical;
+    }
+
+    input::placeholder, textarea::placeholder{
+      color:rgba(15,23,42,.45);
+    }
+
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(37,150,190,.55);
+      box-shadow:0 0 0 4px var(--focus);
       background:#fff;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
-      transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
-      color:#0f172a;
     }
 
-    .ci-other-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
-
-    .ci-other-input:focus{
-      border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
-    }
-
-    .ci-other-input:disabled{
-      background:#f1f5f9;
-      color:#64748b;
-      box-shadow:none;
-      opacity:.95;
+    input[readonly]{
+      background:rgba(248,250,252,.92);
+      color:rgba(15,23,42,.78);
       cursor:not-allowed;
     }
 
-    @media (max-width:820px){
-      .ci-grid, .ci-grid.three{grid-template-columns:1fr}
-      .ci-basis-row{flex-wrap:wrap}
-      .ci-other-wrap{flex:1 1 100%}
+    .row-actions{
+      margin-top:16px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:12px 16px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.10);
+      background:rgba(255,255,255,.78);
+      color:rgba(15,23,42,.86);
+      font-weight:700;
+      font-size:14px;
+      cursor:pointer;
+      transition:transform .08s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+
+    .btn:hover{
+      background:#fff;
+      border-color:rgba(15,23,42,.16);
+      box-shadow:0 14px 26px rgba(2,6,23,.10);
+      transform:translateY(-1px);
+    }
+
+    .btn.primary{
+      background:linear-gradient(135deg, var(--accent), rgba(37,150,190,.95));
+      border-color:rgba(0,48,91,.22);
+      color:#fff;
+      box-shadow:0 14px 26px rgba(0,48,91,.22);
+    }
+
+    .btn.primary:hover{
+      box-shadow:0 18px 34px rgba(0,48,91,.28);
+    }
+
+    .status{
+      flex:1 1 auto;
+      min-width:220px;
+      font-size:13px;
+      color:rgba(71,85,105,.92);
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:flex-start;
+    }
+
+    .status .dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:rgba(71,85,105,.35);
+      flex:0 0 auto;
+    }
+
+    .status.ok{color:var(--ok)}
+    .status.ok .dot{background:rgba(22,101,52,.65)}
+    .status.bad{color:var(--danger)}
+    .status.bad .dot{background:rgba(185,28,28,.65)}
+
+    /* === KEY: widths driven by label/title text (matches your request) === */
+    .title-width-row{
+      display:grid;
+      grid-auto-flow:column;
+      grid-auto-columns:max-content;
+      gap:16px;
+      align-items:end;
+      width:100%;
+      overflow:hidden;
+    }
+
+    .title-width-row .field{
+      min-width:0;
+    }
+
+    .title-width-row label{
+      white-space:nowrap; /* label width drives the column width */
+    }
+
+    .title-width-row input,
+    .title-width-row select{
+      width:100%;
+    }
+
+    @media (max-width: 900px){
+      .title-width-row{
+        grid-auto-flow:row;
+        grid-auto-columns:unset;
+      }
+      .title-width-row label{
+        white-space:normal;
+      }
     }
   </style>
+</head>
 
-  <div class="ci-wrap" id="ciRoot">
-    <div class="ci-top">
-      <h2 class="ci-h2">Client Intake Form</h2>
-      <div></div>
-    </div>
-
-    <div class="ci-spacer"></div>
-
-    <div class="ci-section">Business Information</div>
-
-    <div class="ci-grid">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Name of Business</div>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="card-header">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true"></div>
+          <div class="brand-title">
+            <strong>Carbyne Accounting</strong>
+            <span>Client Onboarding</span>
+          </div>
         </div>
-        <input class="ci-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
+        <div class="header-actions">
+          <div class="pill">Client Intake Form</div>
+        </div>
       </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Employer Identification Number (EIN)</div>
-          <label class="ci-inline">
-            <input class="ci-check" id="bi_no_fein" type="checkbox">
-            No EIN
-          </label>
-        </div>
-        <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10">
-      </div>
-    </div>
+      <div class="content">
+        <form id="clientIntakeForm" class="section" autocomplete="on">
+          <h2>Client Intake Form</h2>
 
-    <div class="ci-grid three" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Formation Date</div>
-        </div>
-        <input class="ci-input" id="bi_formation_date" type="date" autocomplete="off">
-      </div>
+          <!-- === ROW (label-driven widths) === -->
+          <div class="title-width-row" style="margin-bottom:14px;">
+            <div class="field">
+              <label for="businessFormationDate">Business Formation Date</label>
+              <input id="businessFormationDate" name="businessFormationDate" type="date" />
+            </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Full Name of Person Completing this Agreement</div>
-        </div>
-        <input class="ci-input" id="bi_fullname" type="text" placeholder="Full Name" autocomplete="name">
-      </div>
+            <div class="field">
+              <label for="signatoryFullName">Full Name of Signatory</label>
+              <input id="signatoryFullName" name="signatoryFullName" type="text" placeholder="Full Name" />
+            </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Title</div>
-        </div>
-        <input class="ci-input" id="bi_title" type="text" placeholder="Title" autocomplete="organization-title">
-      </div>
-    </div>
+            <div class="field">
+              <label for="signatoryTitle">Title</label>
+              <input id="signatoryTitle" name="signatoryTitle" type="text" placeholder="Title" />
+            </div>
+          </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field ci-wide">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Address</div>
-        </div>
-        <input class="ci-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
-      </div>
-    </div>
+          <!-- === Business Information (as previously discussed) === -->
+          <div class="grid two">
+            <div class="field">
+              <label for="businessName">Name of Business</label>
+              <input id="businessName" name="businessName" type="text" placeholder="Business Name" />
+            </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Suite / Unit Number</div>
-        </div>
-        <input class="ci-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
-      </div>
+            <div class="field">
+              <label for="businessPhone">Business Phone Number</label>
+              <input id="businessPhone" name="businessPhone" type="tel" placeholder="(###) ###-####" inputmode="tel" />
+            </div>
+          </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">City</div>
-        </div>
-        <input class="ci-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
-      </div>
-    </div>
+          <div class="grid two" style="margin-top:14px;">
+            <div class="field">
+              <label for="businessEmail">Business Email Address</label>
+              <input id="businessEmail" name="businessEmail" type="email" placeholder="name@business.com" inputmode="email" />
+            </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">State</div>
-        </div>
-        <select class="ci-select" id="bi_state" autocomplete="address-level1">
-          <option value="" selected>Select</option>
-          <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option>
-          <option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option>
-          <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
-          <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option>
-          <option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
-          <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
-          <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option>
-          <option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
-          <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
-          <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option>
-          <option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
-          <option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
-          <option value="WI">WI</option><option value="WY">WY</option>
-        </select>
-      </div>
+            <div class="field">
+              <label for="businessPOC">Business Point of Contact</label>
+              <input id="businessPOC" name="businessPOC" type="text" placeholder="Full Name" />
+            </div>
+          </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Zip Code</div>
-        </div>
-        <input class="ci-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10">
-      </div>
-    </div>
+          <div class="grid two" style="margin-top:14px;">
+            <div class="field">
+              <label for="businessAddress">Business Address</label>
+              <input id="businessAddress" name="businessAddress" type="text" placeholder="Street Address" />
+            </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Phone Number</div>
-        </div>
-        <input class="ci-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14">
-      </div>
+            <div class="field">
+              <label for="suiteUnit">Suite/Unit Number</label>
+              <input id="suiteUnit" name="suiteUnit" type="text" placeholder="Suite / Unit" />
+            </div>
+          </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Email Address</div>
-        </div>
-        <input class="ci-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
-      </div>
-    </div>
+          <div class="grid three" style="margin-top:14px;">
+            <div class="field">
+              <label for="city">City</label>
+              <input id="city" name="city" type="text" placeholder="City" />
+            </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field ci-wide">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Point of Contact</div>
-        </div>
-        <input class="ci-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
-      </div>
-    </div>
+            <div class="field">
+              <label for="state">State</label>
+              <input id="state" name="state" type="text" value="KY" readonly />
+              <div class="hint">State is fixed to Kentucky.</div>
+            </div>
 
-    <div class="ci-section" style="margin-top:18px;">Basis of Accounting</div>
+            <div class="field">
+              <label for="zip">Zip Code</label>
+              <input id="zip" name="zip" type="text" placeholder="Kentucky Zip Code" inputmode="numeric" />
+            </div>
+          </div>
 
-    <div class="ci-basis-row" role="group" aria-label="Basis of Accounting">
-      <label class="ci-radio">
-        <input type="radio" name="boa_basis" id="boa_accrual" value="Accrual Basis">
-        Accrual Basis
-      </label>
-
-      <label class="ci-radio">
-        <input type="radio" name="boa_basis" id="boa_cash" value="Cash Basis">
-        Cash Basis
-      </label>
-
-      <label class="ci-radio">
-        <input type="radio" name="boa_basis" id="boa_mixed" value="Mixed Method">
-        Mixed Method
-      </label>
-
-      <div class="ci-other-wrap">
-        <label class="ci-radio">
-          <input type="radio" name="boa_basis" id="boa_other" value="Other">
-          Other
-        </label>
-        <input class="ci-other-input" id="boa_other_text" type="text" placeholder="Specify" autocomplete="off" disabled>
+          <div class="row-actions">
+            <div id="status" class="status">
+              <span class="dot" aria-hidden="true"></span>
+              <span id="statusText">Not saved.</span>
+            </div>
+            <button type="button" class="btn" id="btnClear">Clear</button>
+            <button type="submit" class="btn primary" id="btnSave">Save</button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-</template>
 
-<script>
-  (function(){
-    const STORAGE_KEY_INTAKE = "carbyne_intake_business_info";
+  <script>
+    (function(){
+      const form = document.getElementById("clientIntakeForm");
+      const status = document.getElementById("status");
+      const statusText = document.getElementById("statusText");
+      const btnClear = document.getElementById("btnClear");
 
-    function onlyDigits(s){ return (s || "").replace(/\D/g,""); }
+      const STORAGE_KEY = "carbyne_client_intake_form_v1";
 
-    function formatPhone(raw){
-      const d = onlyDigits(raw).slice(0,10);
-      const a = d.slice(0,3);
-      const b = d.slice(3,6);
-      const c = d.slice(6,10);
-      if (!d) return "";
-      if (d.length <= 3) return "(" + a;
-      if (d.length <= 6) return "(" + a + ") " + b;
-      return "(" + a + ") " + b + "-" + c;
-    }
+      function setStatus(mode, text){
+        status.classList.remove("ok","bad");
+        if(mode === "ok") status.classList.add("ok");
+        if(mode === "bad") status.classList.add("bad");
+        statusText.textContent = text;
+      }
 
-    function formatFein(raw){
-      const d = onlyDigits(raw).slice(0,9);
-      if (!d) return "";
-      if (d.length <= 2) return d;
-      return d.slice(0,2) + "-" + d.slice(2);
-    }
+      function getFormData(){
+        const fd = new FormData(form);
+        const obj = {};
+        for(const [k,v] of fd.entries()){
+          obj[k] = v;
+        }
+        return obj;
+      }
 
-    function formatZip(raw){
-      const d = onlyDigits(raw).slice(0,9);
-      if (!d) return "";
-      if (d.length <= 5) return d;
-      return d.slice(0,5) + "-" + d.slice(5);
-    }
-
-    function loadSaved(root){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY_INTAKE);
-        if (!raw) return;
-        const data = JSON.parse(raw);
-
-        const ids = [
-          "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
-          "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
-          "boa_other_text"
-        ];
-
-        ids.forEach(id=>{
-          const el = root.querySelector("#"+id);
-          if (!el) return;
-          if (el.tagName.toLowerCase() === "select"){
-            el.value = (data[id] ?? "");
-          } else {
-            el.value = (data[id] ?? "");
-          }
+      function setFormData(obj){
+        if(!obj || typeof obj !== "object") return;
+        Object.keys(obj).forEach((k) => {
+          const el = form.elements.namedItem(k);
+          if(!el) return;
+          el.value = obj[k];
         });
+      }
 
-        const cb = root.querySelector("#bi_no_fein");
-        if (cb){
-          cb.checked = !!data["bi_no_fein"];
+      function load(){
+        try{
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if(!raw) return;
+          const obj = JSON.parse(raw);
+          setFormData(obj);
+          setStatus("ok", "Loaded saved values.");
+        }catch(e){
+          setStatus("bad", "Could not load saved values.");
         }
+      }
 
-        const savedBasis = (data["boa_basis"] ?? "");
-        if (savedBasis){
-          const radios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
-          radios.forEach(r=>{
-            r.checked = (r.value === savedBasis);
-          });
+      function save(){
+        try{
+          const obj = getFormData();
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(obj));
+          setStatus("ok", "Saved.");
+        }catch(e){
+          setStatus("bad", "Could not save.");
         }
-      } catch {}
-    }
+      }
 
-    function save(root){
-      const out = {};
-      const ids = [
-        "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
-        "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc"
-      ];
-      ids.forEach(id=>{
-        const el = root.querySelector("#"+id);
-        if (!el) return;
-        out[id] = el.value || "";
+      function clearAll(){
+        form.reset();
+        document.getElementById("state").value = "KY";
+        localStorage.removeItem(STORAGE_KEY);
+        setStatus("", "Cleared.");
+      }
+
+      form.addEventListener("submit", function(e){
+        e.preventDefault();
+        save();
       });
 
-      const cb = root.querySelector("#bi_no_fein");
-      out["bi_no_fein"] = cb ? !!cb.checked : false;
-
-      const selected = root.querySelector('input[type="radio"][name="boa_basis"]:checked');
-      out["boa_basis"] = selected ? (selected.value || "") : "";
-
-      const otherText = root.querySelector("#boa_other_text");
-      out["boa_other_text"] = otherText ? (otherText.value || "") : "";
-
-      try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
-    }
-
-    window.carbyne_client_intake_mount = function(args){
-      const root = args && args.root ? args.root : document;
-      const fein = root.querySelector("#bi_fein");
-      const noFein = root.querySelector("#bi_no_fein");
-      const phone = root.querySelector("#bi_phone");
-      const zip = root.querySelector("#bi_zip");
-
-      const boaOtherRadio = root.querySelector("#boa_other");
-      const boaOtherText = root.querySelector("#boa_other_text");
-      const boaRadios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
-
-      loadSaved(root);
-
-      const onFeinInput = () => {
-        if (!fein) return;
-        if (noFein && noFein.checked) return;
-        const formatted = formatFein(fein.value);
-        fein.value = formatted;
-        save(root);
-      };
-
-      const onNoFeinToggle = () => {
-        if (!fein || !noFein) return;
-        if (noFein.checked){
-          fein.value = "Unavailable";
-          fein.setAttribute("readonly","readonly");
-        } else {
-          fein.removeAttribute("readonly");
-          fein.value = "";
-        }
-        save(root);
-      };
-
-      const onPhoneInput = () => {
-        if (!phone) return;
-        phone.value = formatPhone(phone.value);
-        save(root);
-      };
-
-      const onZipInput = () => {
-        if (!zip) return;
-        zip.value = formatZip(zip.value);
-        save(root);
-      };
-
-      const onAnyChange = () => save(root);
-
-      function syncOtherState(){
-        if (!boaOtherText) return;
-        const active = !!(boaOtherRadio && boaOtherRadio.checked);
-        if (active){
-          boaOtherText.disabled = false;
-        } else {
-          boaOtherText.disabled = true;
-          boaOtherText.value = "";
-        }
-        save(root);
-      }
-
-      const onBasisChange = () => syncOtherState();
-
-      const onOtherTextInput = () => {
-        if (!boaOtherText) return;
-        save(root);
-      };
-
-      if (fein){
-        fein.addEventListener("input", onFeinInput);
-        fein.addEventListener("blur", onFeinInput);
-      }
-      if (noFein){
-        noFein.addEventListener("change", onNoFeinToggle);
-        onNoFeinToggle();
-      }
-      if (phone){
-        phone.addEventListener("input", onPhoneInput);
-        phone.addEventListener("blur", onPhoneInput);
-      }
-      if (zip){
-        zip.addEventListener("input", onZipInput);
-        zip.addEventListener("blur", onZipInput);
-      }
-
-      boaRadios.forEach(r=>{
-        r.addEventListener("change", onBasisChange);
+      btnClear.addEventListener("click", function(){
+        clearAll();
       });
 
-      if (boaOtherText){
-        boaOtherText.addEventListener("input", onOtherTextInput);
-        boaOtherText.addEventListener("change", onOtherTextInput);
-        boaOtherText.addEventListener("blur", onOtherTextInput);
-      }
-
-      syncOtherState();
-
-      const allInputs = Array.from(root.querySelectorAll("input,select"));
-      allInputs.forEach(el=>{
-        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
-        if (el.name === "boa_basis" || el.id === "boa_other_text") return;
-
-        el.addEventListener("input", onAnyChange);
-        el.addEventListener("change", onAnyChange);
-        el.addEventListener("blur", onAnyChange);
-      });
-
-      return function unmount(){
-        if (fein){
-          fein.removeEventListener("input", onFeinInput);
-          fein.removeEventListener("blur", onFeinInput);
-        }
-        if (noFein){
-          noFein.removeEventListener("change", onNoFeinToggle);
-        }
-        if (phone){
-          phone.removeEventListener("input", onPhoneInput);
-          phone.removeEventListener("blur", onPhoneInput);
-        }
-        if (zip){
-          zip.removeEventListener("input", onZipInput);
-          zip.removeEventListener("blur", onZipInput);
-        }
-
-        boaRadios.forEach(r=>{
-          r.removeEventListener("change", onBasisChange);
-        });
-
-        if (boaOtherText){
-          boaOtherText.removeEventListener("input", onOtherTextInput);
-          boaOtherText.removeEventListener("change", onOtherTextInput);
-          boaOtherText.removeEventListener("blur", onOtherTextInput);
-        }
-
-        allInputs.forEach(el=>{
-          el.removeEventListener("input", onAnyChange);
-          el.removeEventListener("change", onAnyChange);
-          el.removeEventListener("blur", onAnyChange);
-        });
-      };
-    };
-  })();
-</script>
-
+      load();
+    })();
+  </script>
 </body>
 </html>
