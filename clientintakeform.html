@@ -1,0 +1,375 @@
+<!-- clientintakeform.html -->
+<div id="intakeFormRoot" class="carbyne-intake-root">
+
+  <h2>Client Intake Form</h2>
+
+  <div class="intake-section-title">Business Information</div>
+
+  <div class="intake-grid">
+    <div class="intake-field">
+      <div class="intake-label">Name of Business</div>
+      <input class="intake-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label intake-label-row">
+        <span>Federal Employer Identification Number (FEIN)</span>
+        <label class="fein-check"><input type="checkbox" id="bi_no_fein"> <span>No FEIN</span></label>
+      </div>
+      <input class="intake-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" maxlength="10" autocomplete="off">
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label">Full Name of Person Completing this Agreement</div>
+      <input class="intake-input" id="bi_signer_name" type="text" placeholder="Full Name" autocomplete="name">
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label">Title</div>
+      <input class="intake-input" id="bi_signer_title" type="text" placeholder="Title">
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label">Business Address</div>
+      <input class="intake-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label">Suite / Unit Number</div>
+      <input class="intake-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
+    </div>
+  </div>
+
+  <div class="intake-grid three" style="margin-top:12px;">
+    <div class="intake-field">
+      <div class="intake-label">City</div>
+      <input class="intake-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label">State</div>
+      <select class="intake-input" id="bi_state" autocomplete="address-level1">
+        <option value="">Select State</option>
+        <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+        <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+        <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
+        <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
+        <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
+        <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
+        <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
+        <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
+        <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
+        <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
+        <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
+        <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
+        <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
+        <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
+        <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
+        <option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
+        <option value="WI">WI</option><option value="WY">WY</option>
+      </select>
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label">Zip Code</div>
+      <input class="intake-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code">
+    </div>
+  </div>
+
+  <div class="intake-grid" style="margin-top:12px;">
+    <div class="intake-field">
+      <div class="intake-label">Business Phone Number</div>
+      <input class="intake-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" maxlength="14" autocomplete="tel">
+    </div>
+
+    <div class="intake-field">
+      <div class="intake-label">Business Email Address</div>
+      <input class="intake-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
+    </div>
+
+    <div class="intake-field" style="grid-column:1 / -1;">
+      <div class="intake-label">Business Point of Contact</div>
+      <input class="intake-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
+    </div>
+  </div>
+</div>
+
+<style>
+  .carbyne-intake-root{
+    width:100%;
+    max-width:900px;
+  }
+
+  .carbyne-intake-root h2{
+    font-size:22px;
+    font-weight:900;
+    margin:0 0 10px 0;
+    color:#00305B;
+    letter-spacing:.15px;
+  }
+
+  .carbyne-intake-root .intake-section-title{
+    font-size:13px;
+    font-weight:950;
+    color:#0f172a;
+    letter-spacing:.2px;
+    margin:14px 0 12px 0;
+  }
+
+  .carbyne-intake-root .intake-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px 14px;
+  }
+
+  .carbyne-intake-root .intake-grid.three{
+    grid-template-columns:1fr 220px 220px;
+  }
+
+  .carbyne-intake-root .intake-field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .carbyne-intake-root .intake-label{
+    font-size:12px;
+    font-weight:900;
+    color:#0f172a;
+    letter-spacing:.15px;
+  }
+
+  .carbyne-intake-root .intake-label-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+  }
+
+  .carbyne-intake-root .fein-check{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:12px;
+    font-weight:900;
+    color:#334155;
+    letter-spacing:.15px;
+    user-select:none;
+    white-space:nowrap;
+  }
+
+  .carbyne-intake-root .fein-check input{
+    width:14px;
+    height:14px;
+    accent-color:#00305B;
+  }
+
+  .carbyne-intake-root .intake-input{
+    width:100%;
+    padding:12px 14px;
+    font-size:14px;
+    border:1px solid rgba(0,0,0,.16);
+    border-radius:12px;
+    outline:none;
+    background:#ffffff;
+    transition:border-color .2s ease, box-shadow .2s ease;
+    font-weight:700;
+    color:#0f172a;
+  }
+
+  .carbyne-intake-root .intake-input:focus{
+    border-color:rgba(0,48,91,.75);
+    box-shadow:0 0 0 3px rgba(0,48,91,.16);
+  }
+
+  .carbyne-intake-root select.intake-input{
+    appearance:none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, rgba(0,48,91,.65) 50%),
+      linear-gradient(135deg, rgba(0,48,91,.65) 50%, transparent 50%),
+      linear-gradient(to right, transparent, transparent);
+    background-position:
+      calc(100% - 18px) calc(1em + 2px),
+      calc(100% - 13px) calc(1em + 2px),
+      calc(100% - 2.2em) 0.5em;
+    background-size:
+      5px 5px,
+      5px 5px,
+      1px 1.9em;
+    background-repeat:no-repeat;
+    padding-right:42px;
+  }
+
+  @media (max-width:980px){
+    .carbyne-intake-root{max-width:100%}
+    .carbyne-intake-root .intake-grid.three{grid-template-columns:1fr 1fr 1fr}
+  }
+
+  @media (max-width:720px){
+    .carbyne-intake-root .intake-grid{grid-template-columns:1fr}
+    .carbyne-intake-root .intake-grid.three{grid-template-columns:1fr}
+  }
+</style>
+
+<script>
+  (function(){
+    const INTAKE_KEY = "carbyne_client_intake_v1";
+
+    function normalize(v){
+      return (v ?? "").toString().trim();
+    }
+
+    function readIntake(){
+      try{
+        const raw = localStorage.getItem(INTAKE_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        if (!parsed || typeof parsed !== "object") return {};
+        return parsed;
+      }catch(e){
+        return {};
+      }
+    }
+
+    function writeIntake(obj){
+      try{
+        localStorage.setItem(INTAKE_KEY, JSON.stringify(obj || {}));
+      }catch(e){}
+    }
+
+    function formatPhoneUS(raw){
+      const digits = (raw || "").replace(/\D/g, "").slice(0,10);
+      if (!digits) return "";
+      if (digits.length <= 3) return "(" + digits;
+      if (digits.length <= 6) return "(" + digits.slice(0,3) + ") " + digits.slice(3);
+      return "(" + digits.slice(0,3) + ") " + digits.slice(3,6) + "-" + digits.slice(6);
+    }
+
+    function formatFeinUS(raw){
+      const digits = (raw || "").replace(/\D/g, "").slice(0,9);
+      if (!digits) return "";
+      if (digits.length <= 2) return digits;
+      return digits.slice(0,2) + "-" + digits.slice(2);
+    }
+
+    function getEl(id){
+      return document.getElementById(id);
+    }
+
+    function init(){
+      const root = getEl("intakeFormRoot");
+      if (!root) return;
+
+      const el = {
+        name: getEl("bi_name"),
+        fein: getEl("bi_fein"),
+        no_fein: getEl("bi_no_fein"),
+        signer_name: getEl("bi_signer_name"),
+        signer_title: getEl("bi_signer_title"),
+        address: getEl("bi_address"),
+        suite: getEl("bi_suite"),
+        city: getEl("bi_city"),
+        state: getEl("bi_state"),
+        zip: getEl("bi_zip"),
+        phone: getEl("bi_phone"),
+        email: getEl("bi_email"),
+        poc: getEl("bi_poc")
+      };
+
+      const intake = readIntake();
+
+      if (el.name) el.name.value = intake.name || "";
+      if (el.fein) el.fein.value = intake.fein || "";
+      if (el.no_fein) el.no_fein.checked = !!intake.no_fein;
+      if (el.signer_name) el.signer_name.value = intake.signer_name || "";
+      if (el.signer_title) el.signer_title.value = intake.signer_title || "";
+      if (el.address) el.address.value = intake.address || "";
+      if (el.suite) el.suite.value = intake.suite || "";
+      if (el.city) el.city.value = intake.city || "";
+      if (el.state) el.state.value = intake.state || "";
+      if (el.zip) el.zip.value = intake.zip || "";
+      if (el.phone) el.phone.value = intake.phone || "";
+      if (el.email) el.email.value = intake.email || "";
+      if (el.poc) el.poc.value = intake.poc || "";
+
+      function applyNoFeinState(){
+        if (!el.fein || !el.no_fein) return;
+        if (el.no_fein.checked){
+          el.fein.value = "Unavailable";
+          el.fein.setAttribute("disabled","disabled");
+        }else{
+          el.fein.removeAttribute("disabled");
+          if (normalize(el.fein.value).toLowerCase() === "unavailable") el.fein.value = "";
+        }
+      }
+
+      function persist(){
+        const next = {
+          name: el.name ? normalize(el.name.value) : "",
+          fein: (el.no_fein && el.no_fein.checked) ? "Unavailable" : (el.fein ? normalize(el.fein.value) : ""),
+          no_fein: el.no_fein ? !!el.no_fein.checked : false,
+          signer_name: el.signer_name ? normalize(el.signer_name.value) : "",
+          signer_title: el.signer_title ? normalize(el.signer_title.value) : "",
+          address: el.address ? normalize(el.address.value) : "",
+          suite: el.suite ? normalize(el.suite.value) : "",
+          city: el.city ? normalize(el.city.value) : "",
+          state: el.state ? normalize(el.state.value) : "",
+          zip: el.zip ? normalize(el.zip.value) : "",
+          phone: el.phone ? normalize(el.phone.value) : "",
+          email: el.email ? normalize(el.email.value) : "",
+          poc: el.poc ? normalize(el.poc.value) : ""
+        };
+        writeIntake(next);
+      }
+
+      function onPhoneInput(){
+        if (!el.phone) return;
+        el.phone.value = formatPhoneUS(el.phone.value);
+        persist();
+      }
+
+      function onFeinInput(){
+        if (!el.fein) return;
+        if (el.no_fein && el.no_fein.checked){
+          el.fein.value = "Unavailable";
+        }else{
+          el.fein.value = formatFeinUS(el.fein.value);
+        }
+        persist();
+      }
+
+      function onNoFeinToggle(){
+        applyNoFeinState();
+        persist();
+      }
+
+      applyNoFeinState();
+
+      if (el.phone){
+        el.phone.addEventListener("input", onPhoneInput);
+        el.phone.addEventListener("change", onPhoneInput);
+      }
+
+      if (el.fein){
+        el.fein.addEventListener("input", onFeinInput);
+        el.fein.addEventListener("change", onFeinInput);
+      }
+
+      if (el.no_fein){
+        el.no_fein.addEventListener("change", onNoFeinToggle);
+      }
+
+      Object.values(el).forEach((node) => {
+        if (!node) return;
+        node.addEventListener("input", persist);
+        node.addEventListener("change", persist);
+      });
+    }
+
+    if (document.readyState === "loading"){
+      document.addEventListener("DOMContentLoaded", init);
+    }else{
+      init();
+    }
+  })();
+</script>
