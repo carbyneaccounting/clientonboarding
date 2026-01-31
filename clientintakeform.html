@@ -230,6 +230,21 @@
       cursor:not-allowed;
     }
 
+    /* Payment notice */
+    .ci-note{
+      width:100%;
+      border:1px solid rgba(0,48,91,.18);
+      background:rgba(0,48,91,.06);
+      border-radius:14px;
+      padding:12px 14px;
+      color:#0f172a;
+      font-size:13px;
+      font-weight:900;
+      line-height:1.35;
+      box-shadow:0 10px 20px rgba(2,6,23,.06);
+      margin-top:2px;
+    }
+
     @media (max-width:820px){
       .ci-grid, .ci-grid.three{grid-template-columns:1fr}
       .ci-grid.titlefit{
@@ -479,7 +494,6 @@
       </div>
     </div>
 
-    <!-- NEW: Accounting software (Yes/No) + Specify (always visible; disabled unless Yes) -->
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
@@ -505,7 +519,6 @@
       </div>
     </div>
 
-    <!-- NEW: Accounting records availability (Yes/No) -->
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
@@ -524,6 +537,14 @@
           </label>
         </div>
       </div>
+    </div>
+
+    <!-- NEW: Payment Section -->
+    <div class="ci-section" style="margin-top:18px;">Payment</div>
+    <div class="ci-sectionline"></div>
+
+    <div class="ci-note" id="pay_notice">
+      Payment will not be charged at this time. Payment information is required for payment-related onboarding agreements.
     </div>
 
   </div>
