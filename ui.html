@@ -3,389 +3,328 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Client Onboarding - Carbyne Accounting</title>
+  <title>Client Onboarding</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.cdnfonts.com/css/baron" rel="stylesheet">
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
+    *{box-sizing:border-box}
 
     :root{
-      --carbyne-blue:#00305B;
-      --carbyne-blue-2:#0A3D6F;
-      --radius:18px;
-      --shadow:0 28px 56px rgba(0,0,0,.30);
-      --danger:#b91c1c;
+      --ink:#0f172a;
+      --muted:#475569;
+      --border:#e5e7eb;
       --panel:#ffffff;
+      --accent:#00305B;
+      --radius:18px;
+      --shadow:0 12px 30px rgba(2,6,23,.10);
+      --bgTop:#083a66;
+      --bgBottom:#062f56;
     }
 
     body{
+      margin:0;
       min-height:100vh;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:40px 20px;
-      background:linear-gradient(135deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 50%,var(--carbyne-blue) 100%);
-      position:relative;
+      padding:38px 22px 70px;
+      color:var(--ink);
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:linear-gradient(135deg,var(--bgTop),var(--bgBottom));
+      position:relative;
     }
 
-    .top-left-info{
+    .brand{
       position:absolute;
-      top:20px;
-      left:20px;
+      top:18px;
+      left:18px;
       color:#fff;
-      z-index:10;
-    }
-    .company-name{font-size:16px;font-weight:700;margin-bottom:2px}
-    .address{
+      z-index:5;
+      font-weight:700;
       font-size:13px;
-      font-weight:600;
-      letter-spacing:.2px;
       line-height:1.35;
-      opacity:.98;
+      opacity:.95;
     }
+    .brand .name{font-size:15px; font-weight:900; margin-bottom:2px;}
 
-    .container{
-      width:min(1200px,95vw);
-      display:flex;
-      flex-direction:column;
-    }
-
-    h1{
-      font-family:'Baron',sans-serif;
-      font-size:22px;
+    .footer{
+      position:absolute;
+      left:18px;
+      bottom:16px;
       color:#fff;
-      font-weight:normal;
-      margin-bottom:14px;
+      font-size:13px;
+      font-weight:700;
+      opacity:.9;
+      z-index:5;
+    }
+
+    .wrap{width:min(1200px,95vw);}
+
+    .title{
+      color:#fff;
+      font-weight:900;
+      font-size:22px;
+      margin:0 0 12px 0;
     }
 
     .card{
       width:100%;
-      height:clamp(520px,72vh,860px);
-      background:#fff;
+      height:clamp(560px,74vh,880px);
+      background:var(--panel);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
+      overflow:hidden;
       display:flex;
       flex-direction:column;
-      overflow:hidden;
-      position:relative;
     }
 
-    .top-section{
-      padding:18px 30px;
-      border-bottom:1px solid #e6e6e6;
+    .topbar{
+      padding:18px 26px;
+      border-bottom:1px solid var(--border);
       background:#fff;
-      z-index:2;
     }
 
-    .progress-bar-container{
-      width:100%;
+    .progress-track{
       height:8px;
-      background:#dedede;
       border-radius:999px;
+      background:#dedede;
       overflow:hidden;
     }
-    .progress-bar-fill{
+    .progress-fill{
       height:100%;
       width:0%;
-      background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
       border-radius:999px;
+      background:linear-gradient(90deg,#00305B,#0A3D6F);
       transition:width .25s ease;
     }
 
-    .middle-section{
+    .stage{
       flex:1;
-      padding:26px 30px;
-      overflow:auto;
+      position:relative;
+      overflow:hidden;
+      padding:22px 26px;
       background:
-        linear-gradient(180deg,rgba(0,0,0,.52) 0%,rgba(0,0,0,.42) 45%,rgba(0,0,0,.52) 100%),
+        linear-gradient(180deg,rgba(0,0,0,.22) 0%,rgba(0,0,0,.18) 55%,rgba(0,0,0,.22) 100%),
         url("https://images.unsplash.com/photo-1725759675905-ffefc70268e3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
       background-size:cover;
       background-position:center;
       background-repeat:no-repeat;
-      position:relative;
-    }
-
-    #pageMount{
-      width:100%;
-      min-height:100%;
       display:flex;
       align-items:center;
       justify-content:center;
     }
 
-    .bottom-section{
-      padding:18px 30px;
-      border-top:1px solid #e6e6e6;
-      background:#fff;
-      z-index:2;
-    }
-
-    .navigation{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-    }
-
-    .nav-button{
-      padding:10px 24px;
-      border:none;
-      border-radius:8px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-      transition:opacity .15s ease,transform .15s ease;
-    }
-    .nav-button.previous{background:#f0f0f0;color:#333}
-    .nav-button.previous:hover:not(:disabled){opacity:.95;transform:translateY(-1px)}
-    .nav-button.next{background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);color:#fff}
-    .nav-button.next:hover:not(:disabled){opacity:.95;transform:translateY(-1px)}
-    .nav-button:disabled{opacity:.45;cursor:not-allowed;transform:none}
-
-    .page-indicator{
-      font-size:14px;
-      color:#666;
-      font-weight:600;
-    }
-
-    .footer{
-      position:absolute;
-      bottom:20px;
-      left:20px;
-      color:#fff;
-      font-size:13px;
-      font-weight:600;
-      opacity:.95;
-      z-index:10;
-    }
-
-    /* ---------- PAGE WRAPPER (white, 100% opacity) ---------- */
-    .page-content{
-      width:min(980px,92%);
-      background:#ffffff;
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:16px;
-      padding:34px 34px;
-      color:#111827;
-      box-shadow:0 18px 34px rgba(0,0,0,.18);
+    .shell{
+      width:min(980px,96%);
+      height:min(520px,100%);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 18px 40px rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.74);
       position:relative;
-      overflow:hidden;
     }
 
-    /* page-content scrolling handled by inner scroll frame (keeps scrollbar inside rounded frame) */
-    .scroll-frame{
-      border-radius:14px;
+    .shell-inner{
+      height:100%;
+      border-radius:18px;
       overflow:hidden;
-      border:1px solid rgba(0,0,0,.10);
-      background:#ffffff;
+      position:relative;
+      background:rgba(255,255,255,.68);
     }
-    .scroll-inner{
-      max-height:420px;
+
+    .scroll{
+      height:100%;
       overflow:auto;
-      padding:26px 26px 22px 26px;
-      position:relative;
-      background:#ffffff;
+      padding:18px 18px 22px 18px;
+      scrollbar-gutter:stable;
     }
 
-    .scroll-inner::-webkit-scrollbar{width:12px}
-    .scroll-inner::-webkit-scrollbar-track{background:transparent}
-    .scroll-inner::-webkit-scrollbar-thumb{
-      background:rgba(15,23,42,.28);
-      border-radius:999px;
-      border:3px solid rgba(255,255,255,1);
-    }
-    .scroll-inner::-webkit-scrollbar-thumb:hover{background:rgba(15,23,42,.38)}
-    .scroll-inner{scrollbar-color:rgba(15,23,42,.28) rgba(255,255,255,1);scrollbar-width:thin}
+    /* scrollbar INSIDE rounded frame (not overlapping the outside) */
+    .scroll::-webkit-scrollbar{width:12px}
+    .scroll::-webkit-scrollbar-track{background:rgba(0,0,0,.10)}
+    .scroll::-webkit-scrollbar-thumb{background:rgba(0,48,91,.45);border-radius:999px;border:3px solid rgba(255,255,255,.60)}
+    .scroll{scrollbar-width:auto;scrollbar-color:rgba(0,48,91,.45) rgba(0,0,0,.10)}
 
-    .page-content h2{
-      font-size:20px;
-      font-weight:800;
-      margin-bottom:10px;
-      color:var(--carbyne-blue);
-    }
-    .page-content p{
-      font-size:14px;
-      line-height:1.65;
-      margin-bottom:12px;
-    }
-
-    /* Reference number (fixed within the scroll-inner, and hides while scrolling) */
-    .reference-sticky{
+    .sticky-ref{
       position:sticky;
       top:0;
-      z-index:5;
+      z-index:10;
       display:flex;
       justify-content:flex-end;
-      padding:0 0 10px 0;
-      background:#ffffff;
+      padding:6px 2px 10px;
+      background:linear-gradient(180deg,rgba(255,255,255,.92) 0%,rgba(255,255,255,.72) 70%,rgba(255,255,255,0) 100%);
+      backdrop-filter:blur(2px);
       transition:opacity .15s ease;
     }
-    .reference-sticky.hide{opacity:0;pointer-events:none}
-    .reference-pill{
+    .sticky-ref.hidden{opacity:0;pointer-events:none}
+
+    .reference-number{
       font-size:12px;
-      font-weight:700;
-      color:#0f172a;
-      letter-spacing:.2px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid rgba(0,0,0,.10);
-      background:#ffffff;
-    }
-
-    /* ---------- ACCESS PAGE (centered group, left-aligned inside) ---------- */
-    .access-panel{
-      width:min(980px,92%);
-      background:#ffffff;
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:16px;
-      box-shadow:0 18px 34px rgba(0,0,0,.18);
-      overflow:hidden;
-      position:relative;
-    }
-    .access-panel-inner{
-      padding:34px 34px 40px 34px;
-      min-height:420px;
-      display:flex;
-      align-items:flex-start;
-      justify-content:center;
-    }
-    .access-center{
-      width:min(820px,100%);
-      display:flex;
-      flex-direction:column;
-      align-items:flex-start;
-      margin-top:42px; /* not too high, not too low */
-    }
-
-    .access-header{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-bottom:16px;
-    }
-    .access-icon{
-      width:44px;height:44px;
-      border-radius:12px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:rgba(0,48,91,.08);
-      border:1px solid rgba(0,0,0,.08);
-      color:var(--carbyne-blue);
-    }
-    .access-title{
-      font-size:18px;
       font-weight:900;
       color:#0f172a;
-      line-height:1.1;
+      opacity:.70;
+      letter-spacing:.2px;
     }
-    .access-sub{
-      font-size:12px;
-      font-weight:700;
-      color:#334155;
-      margin-top:2px;
-      opacity:.95;
+
+    .content{padding:0 2px 2px}
+
+    .bottombar{
+      padding:18px 26px;
+      border-top:1px solid var(--border);
+      background:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
     }
+
+    .btn{
+      border:0;
+      border-radius:8px;
+      padding:10px 22px;
+      font-weight:900;
+      cursor:pointer;
+      transition:transform .15s ease, opacity .15s ease;
+      font-size:14px;
+    }
+    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .btn.prev{background:#f0f0f0;color:#111}
+    .btn.next{background:linear-gradient(90deg,#00305B,#0A3D6F);color:#fff}
+    .btn:hover:not(:disabled){transform:translateY(-1px);opacity:.97}
+
+    .steptext{
+      font-size:14px;
+      font-weight:800;
+      color:#666;
+    }
+
+    /* Access code page (Page 1 only) */
+    .access-wrap{
+      width:min(980px,96%);
+      height:min(520px,100%);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 18px 40px rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.78);
+      position:relative;
+      display:flex;
+      align-items:center;
+      padding:36px 40px;
+    }
+    .access-wrap::before,
+    .access-wrap::after{
+      content:"";
+      position:absolute;
+      width:420px;height:420px;border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, rgba(0,48,91,.14) 0%, rgba(0,48,91,0) 70%);
+      pointer-events:none;
+    }
+    .access-wrap::before{left:-160px;bottom:-190px}
+    .access-wrap::after{right:-220px;top:-220px}
+
+    .access-stack{position:relative; width:min(640px,100%); margin-left:16px; padding-top:0;}
+    .access-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    .access-icon{
+      width:46px;height:46px;border-radius:14px;
+      background:rgba(0,48,91,.08);
+      border:1px solid rgba(0,0,0,.06);
+      display:flex;align-items:center;justify-content:center;
+      color:#00305B;
+      box-shadow:0 10px 18px rgba(0,0,0,.08);
+      flex:0 0 auto;
+    }
+    .access-title{font-size:18px;font-weight:950;color:#0f172a;line-height:1.1}
+    .access-sub{font-size:12px;font-weight:900;color:#334155;opacity:.90;margin-top:4px}
 
     .access-input{
-      width:min(720px,100%);
+      width:100%;
       padding:14px 16px;
       font-size:15px;
-      border:1px solid rgba(0,0,0,.18);
+      font-weight:900;
+      border:1px solid rgba(0,0,0,.14);
       border-radius:12px;
       outline:none;
-      background:#ffffff;
-      transition:border-color .2s ease,box-shadow .2s ease;
-      margin-bottom:14px;
+      background:#fff;
+      transition:border-color .2s ease, box-shadow .2s ease;
+      box-shadow:0 8px 18px rgba(0,0,0,.06);
     }
     .access-input:focus{
-      border-color:rgba(0,48,91,.75);
-      box-shadow:0 0 0 3px rgba(0,48,91,.18);
+      border-color:rgba(0,48,91,.70);
+      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 10px 22px rgba(0,0,0,.08);
     }
-    .access-input.error{border-color:var(--danger)}
+    .access-input.error{border-color:#b91c1c}
 
-    .access-row{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:flex-start;
-      flex-wrap:wrap;
-      margin-top:2px;
-    }
+    .access-row{display:flex;gap:14px;align-items:center;margin-top:14px;flex-wrap:wrap}
     .access-submit{
       padding:11px 22px;
       font-size:14px;
-      font-weight:900;
+      font-weight:950;
       border-radius:10px;
       border:1px solid rgba(0,0,0,.10);
-      background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
-      color:#ffffff;
+      background:linear-gradient(90deg,#00305B,#0A3D6F);
+      color:#fff;
       cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
       min-width:150px;
       box-shadow:0 10px 20px rgba(0,0,0,.14);
-      transition:opacity .2s ease,box-shadow .2s ease;
+      transition:opacity .2s ease, transform .15s ease;
     }
-    .access-submit:hover:not(:disabled){opacity:.95}
-    .access-submit:disabled{opacity:.6;cursor:not-allowed;box-shadow:none}
-
+    .access-submit:hover:not(:disabled){opacity:.96;transform:translateY(-1px)}
+    .access-submit:disabled{opacity:.60;cursor:not-allowed;transform:none}
     .inline-msg{
       font-size:13px;
-      font-weight:900;
+      font-weight:950;
       letter-spacing:.2px;
       display:none;
       white-space:nowrap;
-      color:var(--danger);
+      color:#b91c1c;
     }
     .inline-msg.show{display:inline}
-
     .spinner{
-      display:inline-block;
-      width:14px;height:14px;
-      border:2px solid rgba(255,255,255,.3);
+      display:inline-block;width:14px;height:14px;
+      border:2px solid rgba(255,255,255,.30);
       border-radius:50%;
-      border-top-color:#ffffff;
+      border-top-color:#fff;
       animation:spin .6s linear infinite;
     }
     @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Welcome */
+    .welcome-title{font-size:26px;font-weight:950;color:#00305B;margin:6px 0 12px;letter-spacing:.2px}
+    .welcome-p{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.65;margin:0 0 14px}
+    .welcome-h{font-size:13px;font-weight:950;color:#0f172a;margin:16px 0 6px;letter-spacing:.2px}
+    .welcome-list{padding-left:18px;margin:6px 0 0}
+    .welcome-li{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.6;margin:0 0 8px}
   </style>
 </head>
 
 <body>
-  <div class="top-left-info">
-    <div class="company-name">Carbyne Accounting</div>
-    <div class="address">
-      734 West Main Street, Suite 106<br>
-      Louisville, Kentucky 40202<br>
-      (502) 632-9444 | Client@CarbyneAccounting.com
-    </div>
+  <div class="brand">
+    <div class="name">Carbyne Accounting</div>
+    734 West Main Street, Suite 106<br>
+    Louisville, Kentucky 40202<br>
+    (502) 632-9444 | Client@CarbyneAccounting.com
   </div>
 
-  <div class="container">
-    <h1>Client Onboarding</h1>
+  <div class="wrap">
+    <div class="title">Client Onboarding</div>
 
     <div class="card">
-      <div class="top-section">
-        <div class="progress-bar-container">
-          <div class="progress-bar-fill" id="progressBar"></div>
+      <div class="topbar">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
         </div>
       </div>
 
-      <div class="middle-section">
-        <div id="pageMount"></div>
-      </div>
+      <div class="stage" id="stage"></div>
 
-      <div class="bottom-section">
-        <div class="navigation">
-          <button class="nav-button previous" id="prevBtn">Previous</button>
-          <span class="page-indicator" id="pageIndicator">Step 1 of 15</span>
-          <button class="nav-button next" id="nextBtn">Next</button>
-        </div>
+      <div class="bottombar">
+        <button class="btn prev" id="prevBtn">Previous</button>
+        <div class="steptext" id="stepText"></div>
+        <button class="btn next" id="nextBtn">Next</button>
       </div>
     </div>
   </div>
@@ -393,61 +332,65 @@
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
   <script>
-    // ============================================================
-    // CONFIG
-    // ============================================================
-    const TOTAL_STEPS = 15;                 // Steps start on page 2
-    const ACCESS_PAGE = 1;                  // Access page
-    const FIRST_STEP_PAGE = 2;              // Step 1 of 15
-    const LAST_PAGE = TOTAL_STEPS + 1;      // 16
-    const STORAGE_KEY = "carbyne_access_code";
-    const CURRENT_PAGE_KEY = "carbyne_current_page";
-    const CACHE_KEY = "carbyne_valid_codes_cache";
-    const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
+    // ==========================================================
+    // Pages:
+    // Page 1 = Access Code (no step)
+    // Page 2 = Step 1 of 15 (Welcome)  <-- numbering starts here
+    // Page 3 = Step 2 of 15 (Client Intake Form)
+    // Page 4 = Step 3 of 15 (Electronic Signature)
+    // Page 5..16 = Step 4..15 placeholders
+    // ==========================================================
 
-    // SharePoint Excel (access code validation)
-    const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
+    const TOTAL_PAGES = 16;
+    const TOTAL_STEPS = 15;
+
+    const STORAGE_KEY_CODE = "carbyne_access_code";
+    const STORAGE_KEY_PAGE = "carbyne_current_page";
+
+    const EXCEL_FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
     const TARGET_HEADER = "Unique Identifier";
+    const CACHE_KEY = "carbyne_valid_codes_cache";
+    const CACHE_TS_KEY = "carbyne_valid_codes_timestamp";
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    // External module import (Client Intake Form)
-    const CLIENT_INTAKE_URL = "clientintakeform.html"; // same folder as ui.html
+    // IMPORTANT: Same-origin first for Wix
+    const CLIENT_INTAKE_URLS = [
+      "./clientintakeform.html",
+      "clientintakeform.html"
+    ];
 
-    // ============================================================
-    // STATE
-    // ============================================================
-    let currentPage = ACCESS_PAGE;
+    const SIGNATURE_URLS = [
+      "./electronicsignature.html",
+      "electronicsignature.html"
+    ];
+
+    let currentPage = 1;
     let isAccessValidated = false;
     let validCodesCache = null;
-    let isFetchingCodes = false;
+    let isFetching = false;
+    let activeUnmount = null;
 
-    // ============================================================
-    // ELEMENTS
-    // ============================================================
-    const pageMount = document.getElementById("pageMount");
-    const progressBar = document.getElementById("progressBar");
-    const pageIndicator = document.getElementById("pageIndicator");
+    const stage = document.getElementById("stage");
+    const progressFill = document.getElementById("progressFill");
+    const stepText = document.getElementById("stepText");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // ============================================================
-    // ACCESS CODE VALIDATION
-    // ============================================================
     function normalize(v){ return (v ?? "").toString().trim(); }
+    function now(){ return Date.now(); }
 
     function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
       try{
-        const ts = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-        const now = Date.now();
-        if (ts && (now - parseInt(ts,10)) < CACHE_DURATION){
-          const cached = localStorage.getItem(CACHE_KEY);
-          if (cached){
-            validCodesCache = JSON.parse(cached);
+        const ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || "0",10);
+        if (ts && (now() - ts) < CACHE_DURATION){
+          const raw = localStorage.getItem(CACHE_KEY);
+          if (raw){
+            validCodesCache = JSON.parse(raw);
             return validCodesCache;
           }
         }
-      }catch(e){}
+      } catch {}
       return null;
     }
 
@@ -455,459 +398,412 @@
       validCodesCache = codes;
       try{
         localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
-        localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-      }catch(e){}
+        localStorage.setItem(CACHE_TS_KEY, String(now()));
+      } catch {}
     }
 
     function findHeaderIndex(headers){
-      const lower = headers.map(h => normalize(h).toLowerCase());
       const target = TARGET_HEADER.toLowerCase();
-      for (let i=0;i<lower.length;i++){
-        if (lower[i] === target) return i;
+      for (let i=0;i<headers.length;i++){
+        if (normalize(headers[i]).toLowerCase() === target) return i;
       }
       return -1;
     }
 
     async function fetchValidCodes(){
-      if (isFetchingCodes){
-        while (isFetchingCodes){ await new Promise(r => setTimeout(r,100)); }
-        return validCodesCache;
+      if (isFetching){
+        while (isFetching) await new Promise(r=>setTimeout(r,100));
+        return validCodesCache || [];
       }
-      isFetchingCodes = true;
+      isFetching = true;
       try{
-        const res = await fetch(FILE_URL, { cache:"no-store" });
+        const res = await fetch(EXCEL_FILE_URL, { cache:"no-store" });
         if (!res.ok) throw new Error("HTTP " + res.status);
         const ab = await res.arrayBuffer();
         const wb = XLSX.read(ab, { type:"array" });
         const ws = wb.Sheets[wb.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:"" });
-        if (!rows || rows.length < 2) throw new Error("No data");
-        const headers = rows[0].map(v => normalize(v));
-        const col = findHeaderIndex(headers);
-        if (col < 0) throw new Error("Unique Identifier column not found");
+
+        if (!rows || rows.length < 2) throw new Error("No rows");
+        const headers = rows[0] || [];
+        const idx = findHeaderIndex(headers);
+        if (idx < 0) throw new Error("Missing header");
+
         const codes = [];
         for (let r=1;r<rows.length;r++){
-          const row = rows[r] || [];
-          const cell = normalize(row[col] ?? "");
+          const cell = normalize((rows[r] || [])[idx] || "");
           if (cell) codes.push(cell.toLowerCase());
         }
         setCachedCodes(codes);
         return codes;
-      }finally{
-        isFetchingCodes = false;
+      } finally {
+        isFetching = false;
       }
     }
 
     async function validateCode(code){
-      const needle = code.toLowerCase();
-      let codes = getCachedCodes();
-      if (codes && Array.isArray(codes)){
-        const ok = codes.includes(needle);
+      const needle = normalize(code).toLowerCase();
+      const cached = getCachedCodes();
+      if (cached && Array.isArray(cached)){
         fetchValidCodes().catch(()=>{});
-        return ok;
+        return cached.includes(needle);
       }
       try{
-        codes = await fetchValidCodes();
+        const codes = await fetchValidCodes();
         return codes.includes(needle);
-      }catch(e){
+      } catch {
         return false;
       }
     }
 
-    // ============================================================
-    // EXTERNAL HTML IMPORTER (templates + styles + scripts)
-    // ============================================================
-    const _importCache = new Map();
-
-    function _absUrl(url){
-      try{ return new URL(url, window.location.href).toString(); }catch(e){ return url; }
-    }
-
-    async function importHtmlModule(url){
-      const abs = _absUrl(url);
-      if (_importCache.has(abs)) return _importCache.get(abs);
-
-      const p = (async () => {
-        const res = await fetch(abs, { cache:"no-store" });
-        if (!res.ok) throw new Error("Unable to load: " + abs);
-        const txt = await res.text();
-
-        const doc = new DOMParser().parseFromString(txt, "text/html");
-
-        // styles (append once per id)
-        const styles = Array.from(doc.querySelectorAll("style[id]"));
-        for (const st of styles){
-          if (!document.getElementById(st.id)){
-            const clone = document.createElement("style");
-            clone.id = st.id;
-            clone.textContent = st.textContent || "";
-            document.head.appendChild(clone);
-          }
-        }
-
-        // scripts (execute once per id)
-        const scripts = Array.from(doc.querySelectorAll("script"));
-        for (const sc of scripts){
-          const sid = sc.getAttribute("id");
-          if (sid && document.getElementById(sid)) continue;
-
-          const s = document.createElement("script");
-          if (sid) s.id = sid;
-
-          const src = sc.getAttribute("src");
-          if (src){
-            s.src = _absUrl(src);
-            s.async = false;
-            await new Promise((resolve, reject) => {
-              s.onload = resolve;
-              s.onerror = reject;
-              document.body.appendChild(s);
-            });
-          }else{
-            s.textContent = sc.textContent || "";
-            document.body.appendChild(s);
-          }
-        }
-
-        // templates (returnable)
-        const templates = {};
-        for (const t of Array.from(doc.querySelectorAll("template[id]"))){
-          templates[t.id] = t;
-        }
-
-        return { templates };
-      })();
-
-      _importCache.set(abs, p);
-      return p;
-    }
-
-    // ============================================================
-    // NAVIGATION / UI
-    // ============================================================
-    function getStepIndex(){
-      if (currentPage < FIRST_STEP_PAGE) return 0;
+    function getStepNumber(){
+      if (currentPage <= 1) return 0;
       return currentPage - 1; // page 2 => step 1
     }
 
-    function updateUI(){
-      const step = getStepIndex();
-      const progress = (step / TOTAL_STEPS) * 100;
-      progressBar.style.width = progress + "%";
-
-      if (currentPage === ACCESS_PAGE){
-        pageIndicator.style.visibility = "hidden";
-      }else{
-        pageIndicator.style.visibility = "visible";
-        pageIndicator.textContent = "Step " + step + " of " + TOTAL_STEPS;
+    function updateNav(){
+      const step = getStepNumber();
+      if (step === 0){
+        progressFill.style.width = "0%";
+        stepText.textContent = "";
+      } else {
+        progressFill.style.width = ((step / TOTAL_STEPS) * 100) + "%";
+        stepText.textContent = "Step " + step + " of " + TOTAL_STEPS;
       }
 
-      prevBtn.disabled = currentPage === ACCESS_PAGE;
-      nextBtn.disabled = currentPage === LAST_PAGE || currentPage === ACCESS_PAGE;
+      prevBtn.disabled = currentPage === 1;
+      nextBtn.disabled = currentPage === TOTAL_PAGES;
+      if (currentPage === 1) nextBtn.disabled = true;
 
-      localStorage.setItem(CURRENT_PAGE_KEY, currentPage.toString());
+      localStorage.setItem(STORAGE_KEY_PAGE, String(currentPage));
     }
 
-    function goToPreviousPage(){
-      if (currentPage > ACCESS_PAGE){
-        currentPage--;
-        loadPage(currentPage);
+    function unmountActive(){
+      if (typeof activeUnmount === "function"){
+        try{ activeUnmount(); } catch {}
       }
+      activeUnmount = null;
     }
 
-    function goToNextPage(){
-      if (currentPage < LAST_PAGE){
-        currentPage++;
-        loadPage(currentPage);
-      }
-    }
+    function attachRefHideOnScroll(shell){
+      const scrollEl = shell.querySelector(".scroll");
+      const sticky = shell.querySelector(".sticky-ref");
+      if (!scrollEl || !sticky) return;
 
-    function loadPage(pageNum){
-      pageMount.innerHTML = "";
-      updateUI();
-
-      if (pageNum === ACCESS_PAGE){
-        loadAccessPage();
-        return;
-      }
-
-      if (!isAccessValidated){
-        currentPage = ACCESS_PAGE;
-        loadAccessPage();
-        updateUI();
-        return;
-      }
-
-      if (pageNum === 2){
-        loadWelcomeStep();
-      }else if (pageNum === 3){
-        loadClientIntakeStep();
-      }else{
-        loadPlaceholderStep(pageNum);
-      }
-    }
-
-    // ============================================================
-    // PAGE 1: ACCESS
-    // ============================================================
-    function loadAccessPage(){
-      const html = `
-        <div class="access-panel">
-          <div class="access-panel-inner">
-            <div class="access-center">
-              <div class="access-header">
-                <div class="access-icon" aria-hidden="true">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                    <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M6.5 10h11A2.5 2.5 0 0 1 20 12.5v6A2.5 2.5 0 0 1 17.5 21h-11A2.5 2.5 0 0 1 4 18.5v-6A2.5 2.5 0 0 1 6.5 10Z" stroke="currentColor" stroke-width="2"/>
-                  </svg>
-                </div>
-                <div>
-                  <div class="access-title">Enter Access Code</div>
-                  <div class="access-sub">Use the code provided to start onboarding.</div>
-                </div>
-              </div>
-
-              <input
-                type="text"
-                class="access-input"
-                id="accessCode"
-                placeholder="Enter Access Code"
-                autocomplete="off"
-              >
-
-              <div class="access-row">
-                <button type="button" class="access-submit" id="submitCode">
-                  <span id="btnText">Continue</span>
-                </button>
-                <span class="inline-msg" id="inlineMsg">Invalid Access Code</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      pageMount.innerHTML = html;
-      initAccessPage();
-    }
-
-    function initAccessPage(){
-      const input = document.getElementById("accessCode");
-      const btn = document.getElementById("submitCode");
-      const btnText = document.getElementById("btnText");
-      const msg = document.getElementById("inlineMsg");
-
-      function showInvalid(show, text){
-        if (show){
-          msg.classList.add("show");
-          msg.textContent = text || "Invalid Access Code";
-          input.classList.add("error");
-        }else{
-          msg.classList.remove("show");
-          input.classList.remove("error");
-        }
-      }
-
-      function setBusy(b){
-        btn.disabled = !!b;
-        if (b){
-          btnText.innerHTML = '<span class="spinner"></span>';
-        }else{
-          btnText.textContent = "Continue";
-        }
-      }
-
-      async function submit(){
-        showInvalid(false);
-        const code = normalize(input.value);
-        input.value = code;
-
-        if (!code){
-          showInvalid(true, "Please enter an access code");
-          return;
-        }
-
-        setBusy(true);
-        try{
-          const ok = await validateCode(code);
-          if (ok){
-            localStorage.setItem(STORAGE_KEY, code);
-            isAccessValidated = true;
-            currentPage = FIRST_STEP_PAGE; // go to Step 1 of 15
-            loadPage(currentPage);
-          }else{
-            showInvalid(true, "Invalid Access Code");
-          }
-        }catch(e){
-          showInvalid(true, "Validation error");
-        }finally{
-          setBusy(false);
-        }
-      }
-
-      btn.addEventListener("click", submit);
-      input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
-
-      showInvalid(false);
-      input.focus();
-
-      if (!getCachedCodes()){
-        fetchValidCodes().catch(()=>{});
-      }
-    }
-
-    // ============================================================
-    // PAGE 2: STEP 1 of 15 (WELCOME)
-    // ============================================================
-    function loadWelcomeStep(){
-      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
-      const wrap = document.createElement("div");
-      wrap.className = "page-content";
-
-      wrap.innerHTML = `
-        <div class="scroll-frame">
-          <div class="scroll-inner" id="welcomeScroll">
-            <div class="reference-sticky" id="welcomeRef">
-              <div class="reference-pill">Reference Number: ${escapeHtml(secureCode)}</div>
-            </div>
-
-            <h2>Welcome to Carbyne Accounting</h2>
-            <p>We're excited to have you on board! To complete your onboarding, please review and electronically sign the client onboarding agreements in the following steps.</p>
-
-            <p><strong>Next Steps</strong><br>
-              Please review each agreement carefully and provide your electronic signature where indicated.<br>
-              Once all agreements have been electronically signed, we will send finalized service schedules via email.
-            </p>
-
-            <p><strong>Questions</strong><br>
-              If you have any questions during this process, please contact Client Services at (502) 632-9444 or Client@CarbyneAccounting.com.
-            </p>
-          </div>
-        </div>
-      `;
-
-      pageMount.appendChild(wrap);
-
-      const sc = document.getElementById("welcomeScroll");
-      const ref = document.getElementById("welcomeRef");
-      attachHideOnScroll(sc, ref);
-    }
-
-    // ============================================================
-    // PAGE 3: STEP 2 of 15 (CLIENT INTAKE FORM - IMPORTED)
-    // ============================================================
-    async function loadClientIntakeStep(){
-      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
-      const wrap = document.createElement("div");
-      wrap.className = "page-content";
-      wrap.innerHTML = `
-        <div class="scroll-frame">
-          <div class="scroll-inner" id="intakeScroll">
-            <div class="reference-sticky" id="intakeRef">
-              <div class="reference-pill">Reference Number: ${escapeHtml(secureCode)}</div>
-            </div>
-            <div id="intakeMount"></div>
-          </div>
-        </div>
-      `;
-      pageMount.appendChild(wrap);
-
-      const sc = document.getElementById("intakeScroll");
-      const ref = document.getElementById("intakeRef");
-      attachHideOnScroll(sc, ref);
-
-      try{
-        const mod = await importHtmlModule(CLIENT_INTAKE_URL);
-        if (!mod.templates || !mod.templates["client-intake-form-template"]){
-          throw new Error("Template missing");
-        }
-
-        const tpl = mod.templates["client-intake-form-template"];
-        const node = tpl.content.cloneNode(true);
-        document.getElementById("intakeMount").appendChild(node);
-
-        if (window.CarbyneClientIntakeForm && typeof window.CarbyneClientIntakeForm.init === "function"){
-          window.CarbyneClientIntakeForm.init({
-            rootId: "clientIntakeRoot",
-            reference: secureCode
-          });
-        }
-      }catch(e){
-        document.getElementById("intakeMount").innerHTML = `<div style="font-weight:800;color:#0f172a;">Unable to load intake form.</div>`;
-      }
-    }
-
-    // ============================================================
-    // OTHER PAGES (PLACEHOLDER)
-    // ============================================================
-    function loadPlaceholderStep(pageNum){
-      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
-      const step = getStepIndex();
-
-      const wrap = document.createElement("div");
-      wrap.className = "page-content";
-
-      wrap.innerHTML = `
-        <div class="scroll-frame">
-          <div class="scroll-inner" id="phScroll">
-            <div class="reference-sticky" id="phRef">
-              <div class="reference-pill">Reference Number: ${escapeHtml(secureCode)}</div>
-            </div>
-
-            <h2>Step ${step}</h2>
-            <p>Agreement content will be placed on this page.</p>
-          </div>
-        </div>
-      `;
-
-      pageMount.appendChild(wrap);
-
-      const sc = document.getElementById("phScroll");
-      const ref = document.getElementById("phRef");
-      attachHideOnScroll(sc, ref);
-    }
-
-    // ============================================================
-    // UTIL: reference hides when user scrolls down, visible at top
-    // ============================================================
-    function attachHideOnScroll(scrollEl, refEl){
-      if (!scrollEl || !refEl) return;
       const onScroll = () => {
         if (scrollEl.scrollTop > 6){
-          refEl.classList.add("hide");
-        }else{
-          refEl.classList.remove("hide");
+          sticky.classList.add("hidden");
+        } else {
+          sticky.classList.remove("hidden");
         }
       };
       scrollEl.addEventListener("scroll", onScroll, { passive:true });
       onScroll();
     }
 
-    function escapeHtml(s){
-      return (s ?? "").toString()
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#39;");
+    function buildShell(secureCode){
+      const shell = document.createElement("div");
+      shell.className = "shell";
+      shell.innerHTML = `
+        <div class="shell-inner">
+          <div class="scroll">
+            <div class="sticky-ref">
+              <div class="reference-number">Reference Number: ${secureCode || ""}</div>
+            </div>
+            <div class="content" id="content"></div>
+          </div>
+        </div>
+      `;
+      attachRefHideOnScroll(shell);
+      return shell;
     }
 
-    // ============================================================
-    // INIT APP
-    // ============================================================
-    function init(){
-      const accessCode = localStorage.getItem(STORAGE_KEY);
-      isAccessValidated = !!accessCode;
-
-      const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY) || "1", 10);
-      currentPage = (isAccessValidated ? Math.min(Math.max(savedPage, ACCESS_PAGE), LAST_PAGE) : ACCESS_PAGE);
-
-      prevBtn.addEventListener("click", goToPreviousPage);
-      nextBtn.addEventListener("click", goToNextPage);
-
-      // preload codes
-      if (!getCachedCodes()){
-        fetchValidCodes().catch(()=>{});
+    async function fetchFirstWorking(urls){
+      let lastErr = null;
+      for (const u of urls){
+        try{
+          const res = await fetch(u, { cache:"no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return { text: await res.text(), baseUrl: u };
+        } catch(e){
+          lastErr = e;
+        }
       }
+      throw lastErr || new Error("All fetch attempts failed");
+    }
+
+    function absolutizeUrl(src, baseUrl){
+      try{
+        return new URL(src, baseUrl).toString();
+      } catch {
+        return src;
+      }
+    }
+
+    function isSameScriptAlreadyLoaded(key){
+      return !!document.querySelector('script[data-carbyne-loaded="' + key.replaceAll('"','') + '"]');
+    }
+
+    async function loadScriptAndWait(s){
+      return new Promise((resolve, reject) => {
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("Script load error"));
+        document.body.appendChild(s);
+      });
+    }
+
+    async function loadExternalTemplate(urls, templateId, mountFnName, hostEl, mountArgs){
+      // IMPORTANT: do NOT inject any <style> into <head> (keeps your ui formatting intact)
+      // We only execute scripts from the fetched file so mount function exists.
+
+      const fetched = await fetchFirstWorking(urls);
+      const html = fetched.text;
+      const baseUrl = fetched.baseUrl;
+
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      // Execute scripts (so window[mountFnName] is defined)
+      const scripts = Array.from(doc.querySelectorAll("script"));
+      for (let i=0;i<scripts.length;i++){
+        const sc = scripts[i];
+
+        if (sc.src){
+          const absSrc = absolutizeUrl(sc.getAttribute("src"), baseUrl);
+          const key = absSrc;
+
+          if (isSameScriptAlreadyLoaded(key)) continue;
+
+          const s = document.createElement("script");
+          s.src = absSrc;
+          s.async = false;
+          s.setAttribute("data-carbyne-loaded", key);
+
+          await loadScriptAndWait(s);
+        } else {
+          const inlineKey = baseUrl + "::inline::" + i;
+          if (isSameScriptAlreadyLoaded(inlineKey)) continue;
+
+          const s = document.createElement("script");
+          s.async = false;
+          s.textContent = sc.textContent || "";
+          s.setAttribute("data-carbyne-loaded", inlineKey);
+
+          document.body.appendChild(s);
+        }
+      }
+
+      const tpl = doc.getElementById(templateId);
+      if (!tpl || tpl.tagName.toLowerCase() !== "template"){
+        throw new Error("Template not found: " + templateId);
+      }
+
+      hostEl.innerHTML = "";
+      hostEl.appendChild(document.importNode(tpl.content, true));
+
+      const fn = window[mountFnName];
+      if (typeof fn !== "function"){
+        throw new Error("Mount function not found: " + mountFnName);
+      }
+
+      const unmount = fn(mountArgs);
+      if (typeof unmount === "function") activeUnmount = unmount;
+    }
+
+    function loadAccessPage(){
+      unmountActive();
+      stage.innerHTML = `
+        <div class="access-wrap">
+          <div class="access-stack">
+            <div class="access-head">
+              <div class="access-icon" aria-hidden="true">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                  <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M6 10h12a2 2 0 0 1 2 2v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <div class="access-title">Enter Access Code</div>
+                <div class="access-sub">Use the code provided to start onboarding.</div>
+              </div>
+            </div>
+
+            <input class="access-input" id="accessCode" type="text" placeholder="Enter Access Code" autocomplete="off">
+
+            <div class="access-row">
+              <button class="access-submit" id="submitBtn" type="button"><span id="btnText">Continue</span></button>
+              <span class="inline-msg" id="msg">Invalid Access Code</span>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const input = document.getElementById("accessCode");
+      const btn = document.getElementById("submitBtn");
+      const btnText = document.getElementById("btnText");
+      const msg = document.getElementById("msg");
+
+      function showError(on, text){
+        if (on){
+          msg.classList.add("show");
+          msg.textContent = text || "Invalid Access Code";
+          input.classList.add("error");
+        } else {
+          msg.classList.remove("show");
+          input.classList.remove("error");
+        }
+      }
+
+      function setBusy(busy){
+        btn.disabled = !!busy;
+        btnText.innerHTML = busy ? '<span class="spinner"></span>' : "Continue";
+      }
+
+      async function submit(){
+        showError(false);
+        const code = normalize(input.value);
+        input.value = code;
+        if (!code){
+          showError(true,"Please enter a code");
+          return;
+        }
+        setBusy(true);
+        try{
+          const ok = await validateCode(code);
+          if (ok){
+            localStorage.setItem(STORAGE_KEY_CODE, code);
+            isAccessValidated = true;
+            currentPage = 2;
+            loadPage(currentPage);
+          } else {
+            showError(true,"Invalid Access Code");
+          }
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      btn.addEventListener("click", submit);
+      input.addEventListener("keydown", (e)=>{ if (e.key === "Enter") submit(); });
+      input.focus();
+    }
+
+    function loadWelcomePage(secureCode){
+      unmountActive();
+      const shell = buildShell(secureCode);
+      shell.querySelector("#content").innerHTML = `
+        <div class="welcome-title">Welcome to Carbyne Accounting</div>
+        <div class="welcome-p">We're excited to have you on board! To complete your onboarding, please review and electronically sign the client onboarding agreements in the following steps.</div>
+
+        <div class="welcome-h">Next Steps</div>
+        <ul class="welcome-list">
+          <li class="welcome-li">Please review each agreement carefully and provide your electronic signature where indicated.</li>
+          <li class="welcome-li">Once all agreements have been electronically signed, we will send finalized service schedules via email.</li>
+        </ul>
+
+        <div class="welcome-h">Questions</div>
+        <div class="welcome-p">If you have any questions during this process, please contact Client Services at (502) 632-9444 or Client@CarbyneAccounting.com.</div>
+      `;
+      stage.innerHTML = "";
+      stage.appendChild(shell);
+    }
+
+    async function loadClientIntake(secureCode){
+      unmountActive();
+      const shell = buildShell(secureCode);
+      const content = shell.querySelector("#content");
+      content.innerHTML = `<div id="intakeHost"></div>`;
+      stage.innerHTML = "";
+      stage.appendChild(shell);
+
+      const host = content.querySelector("#intakeHost");
+
+      try{
+        await loadExternalTemplate(
+          CLIENT_INTAKE_URLS,
+          "carbyne_client_intake",
+          "carbyne_client_intake_mount",
+          host,
+          { root: host, referenceNumber: secureCode }
+        );
+      } catch(e){
+        host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load intake form.</div>`;
+        console.error(e);
+      }
+    }
+
+    async function loadSignature(secureCode){
+      unmountActive();
+      const shell = buildShell(secureCode);
+      const content = shell.querySelector("#content");
+      content.innerHTML = `<div id="sigHost"></div>`;
+      stage.innerHTML = "";
+      stage.appendChild(shell);
+
+      const host = content.querySelector("#sigHost");
+
+      try{
+        await loadExternalTemplate(
+          SIGNATURE_URLS,
+          "carbyne_electronic_signature",
+          "carbyne_electronic_signature_mount",
+          host,
+          { root: host, referenceNumber: secureCode }
+        );
+      } catch(e){
+        host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load signature.</div>`;
+        console.error(e);
+      }
+    }
+
+    function loadPlaceholder(secureCode){
+      unmountActive();
+      const shell = buildShell(secureCode);
+      const step = getStepNumber();
+      shell.querySelector("#content").innerHTML = `
+        <div style="font-size:22px;font-weight:950;color:#00305B;margin:6px 0 10px;">Step ${step}</div>
+        <div style="font-size:14px;font-weight:800;color:#0f172a;opacity:.80;">Agreement content will be placed on this page.</div>
+      `;
+      stage.innerHTML = "";
+      stage.appendChild(shell);
+    }
+
+    async function loadPage(n){
+      updateNav();
+
+      if (n === 1){
+        loadAccessPage();
+        return;
+      }
+
+      if (!isAccessValidated){
+        currentPage = 1;
+        updateNav();
+        loadAccessPage();
+        return;
+      }
+
+      const code = localStorage.getItem(STORAGE_KEY_CODE) || "";
+
+      if (n === 2){ loadWelcomePage(code); return; }
+      if (n === 3){ await loadClientIntake(code); return; }
+      if (n === 4){ await loadSignature(code); return; }
+
+      loadPlaceholder(code);
+    }
+
+    function prev(){ if (currentPage > 1){ currentPage--; loadPage(currentPage); } }
+    function next(){ if (currentPage < TOTAL_PAGES){ currentPage++; loadPage(currentPage); } }
+
+    function init(){
+      isAccessValidated = !!localStorage.getItem(STORAGE_KEY_CODE);
+
+      const saved = parseInt(localStorage.getItem(STORAGE_KEY_PAGE) || "1", 10) || 1;
+      currentPage = isAccessValidated ? Math.max(2, Math.min(TOTAL_PAGES, saved)) : 1;
+
+      if (!getCachedCodes()) fetchValidCodes().catch(()=>{});
+
+      prevBtn.addEventListener("click", prev);
+      nextBtn.addEventListener("click", next);
 
       loadPage(currentPage);
     }
