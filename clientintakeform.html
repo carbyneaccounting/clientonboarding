@@ -51,18 +51,20 @@
 
     .ci-grid.three{
       grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
+      margin-top:10px;
       width:100%;
     }
 
-    /* === CHANGE: title-driven widths + FULL WIDTH + EQUAL SPACING BETWEEN ALL FIELDS === */
+    /* Title-driven widths row */
     .ci-grid.titlefit{
       grid-template-columns:none;
       grid-auto-flow:column;
       grid-auto-columns:max-content;
       align-items:end;
       width:100%;
-      justify-content:space-between; /* equal spacing across full width */
-      column-gap:0;                  /* prevent double-spacing */
+      justify-content:space-between;
+      column-gap:0;
     }
 
     .ci-grid.titlefit .ci-label{
@@ -74,6 +76,8 @@
     }
 
     .ci-field{width:100%}
+
+    .ci-wide{grid-column:1 / -1}
 
     .ci-labelrow{
       display:flex;
@@ -143,8 +147,6 @@
       opacity:.95;
       cursor:not-allowed;
     }
-
-    .ci-wide{grid-column:1 / -1}
 
     /* Basis of Accounting */
     .ci-basis-row{
@@ -285,32 +287,32 @@
       </div>
     </div>
 
+    <!-- Business Address + Suite/Unit on same line -->
     <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field ci-wide">
+      <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Business Address</div>
         </div>
         <input class="ci-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
       </div>
-    </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Suite / Unit Number</div>
         </div>
         <input class="ci-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
       </div>
+    </div>
 
+    <!-- City, State, Zip on one line -->
+    <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">City</div>
         </div>
         <input class="ci-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
       </div>
-    </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">State</div>
@@ -341,6 +343,7 @@
       </div>
     </div>
 
+    <!-- Business Phone + Business Email on same line -->
     <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
@@ -357,12 +360,27 @@
       </div>
     </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field ci-wide">
+    <!-- Point of Contact, POC Email, POC Phone on one line -->
+    <div class="ci-grid three" style="margin-top:14px;">
+      <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Business Point of Contact</div>
+          <div class="ci-label">Point of Contact (POC)</div>
         </div>
-        <input class="ci-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
+        <input class="ci-input" id="bi_poc" type="text" placeholder="Point of Contact" autocomplete="name">
+      </div>
+
+      <div class="ci-field">
+        <div class="ci-labelrow">
+          <div class="ci-label">POC Email</div>
+        </div>
+        <input class="ci-input" id="poc_email" type="email" placeholder="POC Email" autocomplete="email">
+      </div>
+
+      <div class="ci-field">
+        <div class="ci-labelrow">
+          <div class="ci-label">POC Phone Number</div>
+        </div>
+        <input class="ci-input" id="poc_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14">
       </div>
     </div>
 
@@ -435,17 +453,14 @@
         const ids = [
           "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
           "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
+          "poc_email","poc_phone",
           "boa_other_text"
         ];
 
         ids.forEach(id=>{
           const el = root.querySelector("#"+id);
           if (!el) return;
-          if (el.tagName.toLowerCase() === "select"){
-            el.value = (data[id] ?? "");
-          } else {
-            el.value = (data[id] ?? "");
-          }
+          el.value = (data[id] ?? "");
         });
 
         const cb = root.querySelector("#bi_no_fein");
@@ -467,7 +482,8 @@
       const out = {};
       const ids = [
         "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
-        "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc"
+        "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
+        "poc_email","poc_phone"
       ];
       ids.forEach(id=>{
         const el = root.querySelector("#"+id);
@@ -493,6 +509,8 @@
       const noFein = root.querySelector("#bi_no_fein");
       const phone = root.querySelector("#bi_phone");
       const zip = root.querySelector("#bi_zip");
+
+      const pocPhone = root.querySelector("#poc_phone");
 
       const boaOtherRadio = root.querySelector("#boa_other");
       const boaOtherText = root.querySelector("#boa_other_text");
@@ -523,6 +541,12 @@
       const onPhoneInput = () => {
         if (!phone) return;
         phone.value = formatPhone(phone.value);
+        save(root);
+      };
+
+      const onPocPhoneInput = () => {
+        if (!pocPhone) return;
+        pocPhone.value = formatPhone(pocPhone.value);
         save(root);
       };
 
@@ -565,6 +589,10 @@
         phone.addEventListener("input", onPhoneInput);
         phone.addEventListener("blur", onPhoneInput);
       }
+      if (pocPhone){
+        pocPhone.addEventListener("input", onPocPhoneInput);
+        pocPhone.addEventListener("blur", onPocPhoneInput);
+      }
       if (zip){
         zip.addEventListener("input", onZipInput);
         zip.addEventListener("blur", onZipInput);
@@ -584,7 +612,7 @@
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
-        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
+        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "poc_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
         if (el.name === "boa_basis" || el.id === "boa_other_text") return;
 
         el.addEventListener("input", onAnyChange);
@@ -603,6 +631,10 @@
         if (phone){
           phone.removeEventListener("input", onPhoneInput);
           phone.removeEventListener("blur", onPhoneInput);
+        }
+        if (pocPhone){
+          pocPhone.removeEventListener("input", onPocPhoneInput);
+          pocPhone.removeEventListener("blur", onPocPhoneInput);
         }
         if (zip){
           zip.removeEventListener("input", onZipInput);
