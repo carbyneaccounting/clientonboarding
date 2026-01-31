@@ -352,24 +352,15 @@
     const CACHE_TS_KEY = "carbyne_valid_codes_timestamp";
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    function dirOfCurrent(){
-      const p = location.pathname || "/";
-      if (p.endsWith("/")) return p;
-      return p.substring(0, p.lastIndexOf("/") + 1);
-    }
-
-    // Try same-dir and root-dir variants (Wix sometimes changes served path)
     const CLIENT_INTAKE_URLS = [
-      "./clientintakeform.html",
       "clientintakeform.html",
-      location.origin + dirOfCurrent() + "clientintakeform.html",
+      "./clientintakeform.html",
       location.origin + "/clientintakeform.html"
     ];
 
     const SIGNATURE_URLS = [
-      "./electronicsignature.html",
       "electronicsignature.html",
-      location.origin + dirOfCurrent() + "electronicsignature.html",
+      "./electronicsignature.html",
       location.origin + "/electronicsignature.html"
     ];
 
