@@ -54,15 +54,15 @@
       width:100%;
     }
 
-    /* === CHANGE: widths of fields driven by label/title widths with tighter spacing === */
+    /* === CHANGE: title-driven widths + FULL WIDTH + EQUAL SPACING BETWEEN ALL FIELDS === */
     .ci-grid.titlefit{
       grid-template-columns:none;
       grid-auto-flow:column;
       grid-auto-columns:max-content;
       align-items:end;
       width:100%;
-      justify-content:start;      /* removed space-between to eliminate large gaps */
-      column-gap:14px;            /* match normal grid spacing like City row */
+      justify-content:space-between; /* equal spacing across full width */
+      column-gap:0;                  /* prevent double-spacing */
     }
 
     .ci-grid.titlefit .ci-label{
