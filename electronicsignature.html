@@ -13,54 +13,47 @@
     .es-wrap{width:100%}
     .es-head{
       display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
-      padding:4px 2px 10px;
+      padding:0 2px 8px;
     }
     .es-title{
       margin:0;
-      font-size:24px;
+      font-size:20px;
       font-weight:950;
       color:#0b2f4e;
       letter-spacing:.2px;
-    }
-    .es-sub{
-      margin:6px 0 0;
-      font-size:12px;
-      font-weight:900;
-      color:#334155;
-      opacity:.88;
     }
 
     .es-bar{
       display:flex;align-items:center;justify-content:space-between;gap:10px;
       background:#fff;
       border:1px solid rgba(0,0,0,.10);
-      border-radius:14px;
-      padding:10px 12px;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
-      margin-top:8px;
+      border-radius:12px;
+      padding:8px 10px;
+      box-shadow:0 8px 16px rgba(2,6,23,.08);
+      margin-top:6px;
     }
 
     .es-bar-left{display:flex;align-items:center;gap:10px}
     .es-ico{
-      width:40px;height:40px;border-radius:12px;
+      width:36px;height:36px;border-radius:10px;
       background:rgba(0,48,91,.08);
       border:1px solid rgba(0,0,0,.06);
       display:flex;align-items:center;justify-content:center;
       color:#00305B;
-      box-shadow:0 10px 18px rgba(0,0,0,.08);
+      box-shadow:0 8px 14px rgba(0,0,0,.08);
       flex:0 0 auto;
     }
-    .es-bar-title{font-size:13px;font-weight:950;color:#0f172a;line-height:1.05}
-    .es-bar-sub{font-size:11px;font-weight:900;color:#334155;opacity:.85;margin-top:3px}
+    .es-bar-title{font-size:12px;font-weight:950;color:#0f172a;line-height:1.05}
+    .es-bar-sub{font-size:10px;font-weight:900;color:#334155;opacity:.85;margin-top:2px}
 
-    .es-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .es-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .es-pill{
       border:1px solid rgba(0,0,0,.12);
       background:#fff;
       color:#0f172a;
       font-weight:950;
-      font-size:12px;
-      padding:6px 10px;
+      font-size:11px;
+      padding:5px 9px;
       border-radius:999px;
       cursor:pointer;
       transition:transform .12s ease, opacity .12s ease, background .12s ease;
@@ -84,22 +77,22 @@
     .es-grid{
       display:grid;
       grid-template-columns: 1.2fr .8fr;
-      gap:14px;
-      margin-top:14px;
+      gap:12px;
+      margin-top:12px;
     }
 
     .es-card{
       background:#fff;
       border:1px solid rgba(0,0,0,.10);
-      border-radius:14px;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
+      border-radius:12px;
+      box-shadow:0 8px 16px rgba(2,6,23,.08);
       overflow:hidden;
     }
 
     .es-card-h{
-      padding:10px 12px;
+      padding:8px 10px;
       border-bottom:1px solid rgba(0,0,0,.08);
-      font-size:12px;
+      font-size:11px;
       font-weight:950;
       color:#0f172a;
       opacity:.90;
@@ -109,19 +102,19 @@
       gap:10px;
     }
 
-    .es-canvas-wrap{padding:12px}
+    .es-canvas-wrap{padding:10px}
     canvas{
       width:100%;
-      height:220px;
+      height:160px;
       border:1px solid rgba(0,0,0,.14);
-      border-radius:12px;
+      border-radius:10px;
       background:#fff;
       display:block;
       touch-action:none;
     }
 
     .es-controls{
-      padding:10px 12px 12px;
+      padding:8px 10px 10px;
       display:flex;
       align-items:center;
       justify-content:space-between;
@@ -129,12 +122,12 @@
       flex-wrap:wrap;
     }
 
-    .es-slider{display:flex;align-items:center;gap:10px}
-    .es-slider label{font-size:11px;font-weight:950;color:#0f172a;opacity:.82}
-    .es-slider input{width:120px}
+    .es-slider{display:flex;align-items:center;gap:8px}
+    .es-slider label{font-size:10px;font-weight:950;color:#0f172a;opacity:.82}
+    .es-slider input{width:100px}
 
     .es-status{
-      font-size:11px;
+      font-size:10px;
       font-weight:950;
       color:#0f172a;
       opacity:.75;
@@ -142,27 +135,27 @@
     .es-status.good{color:#0a7a3a;opacity:1}
     .es-status.bad{color:#b91c1c;opacity:1}
 
-    .es-type-wrap{padding:12px}
-    .es-type-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .es-type-wrap{padding:10px}
+    .es-type-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
     .es-type-input{
       flex:1;
-      min-width:220px;
+      min-width:200px;
       border:1px solid rgba(0,0,0,.14);
-      border-radius:12px;
-      padding:12px 14px;
-      font-size:14px;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:13px;
       font-weight:900;
       outline:none;
       background:#fff;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
+      box-shadow:0 8px 16px rgba(2,6,23,.08);
       color:#0f172a;
     }
     .es-type-preview{
-      margin-top:10px;
+      margin-top:8px;
       border:1px dashed rgba(0,0,0,.18);
-      border-radius:12px;
-      padding:14px;
-      min-height:64px;
+      border-radius:10px;
+      padding:12px;
+      min-height:50px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -170,7 +163,7 @@
     }
     .es-script{
       font-family: "Brush Script MT", "Segoe Script", "Snell Roundhand", "Apple Chancery", cursive;
-      font-size:36px;
+      font-size:30px;
       color:#0f172a;
       line-height:1;
       user-select:none;
@@ -180,42 +173,42 @@
     .es-side{
       display:flex;
       flex-direction:column;
-      gap:14px;
+      gap:12px;
     }
 
     .es-kv{
-      padding:12px;
+      padding:10px;
     }
     .es-kv-row{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top:10px;
+      gap:8px;
+      margin-top:8px;
     }
     .es-kv-item{
       border:1px solid rgba(0,0,0,.10);
-      border-radius:12px;
-      padding:10px;
+      border-radius:10px;
+      padding:8px;
       background:#fff;
     }
-    .es-k{font-size:10px;font-weight:950;color:#0f172a;opacity:.65}
-    .es-v{margin-top:4px;font-size:12px;font-weight:950;color:#0f172a}
+    .es-k{font-size:9px;font-weight:950;color:#0f172a;opacity:.65;text-transform:uppercase;letter-spacing:.3px}
+    .es-v{margin-top:3px;font-size:11px;font-weight:950;color:#0f172a}
 
     .es-adopted{
-      padding:12px;
+      padding:10px;
     }
     .es-adopted-box{
       border:1px dashed rgba(0,0,0,.18);
-      border-radius:12px;
+      border-radius:10px;
       background:rgba(0,0,0,.02);
-      min-height:96px;
+      min-height:70px;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:10px;
+      padding:8px;
       overflow:hidden;
     }
-    .es-adopted-img{max-width:100%;max-height:90px;display:block}
+    .es-adopted-img{max-width:100%;max-height:65px;display:block}
 
     @media (max-width:900px){
       .es-grid{grid-template-columns:1fr}
@@ -233,7 +226,7 @@
     <div class="es-bar">
       <div class="es-bar-left">
         <div class="es-ico" aria-hidden="true">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M4 20h6l10-10a2 2 0 0 0 0-3l-.5-.5a2 2 0 0 0-3 0L6 17v3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
             <path d="M13 7l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
@@ -254,7 +247,7 @@
       <div class="es-card">
         <div class="es-card-h">
           <div>Signature Input</div>
-          <div style="display:flex;gap:8px;align-items:center;">
+          <div style="display:flex;gap:6px;align-items:center;">
             <button class="es-pill active" id="esModeDraw" type="button">Draw</button>
             <button class="es-pill" id="esModeType" type="button">Type</button>
           </div>
@@ -270,9 +263,6 @@
             </div>
             <button class="es-pill danger" id="esClearDraw" type="button">Clear</button>
           </div>
-          <div style="padding:0 12px 12px;font-size:11px;font-weight:900;color:#334155;opacity:.78;">
-            Switching modes clears the other mode.
-          </div>
         </div>
 
         <div class="es-type-wrap" id="esTypeWrap" style="display:none;">
@@ -282,11 +272,8 @@
           <div class="es-type-preview">
             <div class="es-script" id="esTypePreview"></div>
           </div>
-          <div style="padding-top:10px;display:flex;justify-content:flex-end;">
+          <div style="padding-top:8px;display:flex;justify-content:flex-end;">
             <button class="es-pill danger" id="esClearType" type="button">Clear</button>
-          </div>
-          <div style="padding-top:10px;font-size:11px;font-weight:900;color:#334155;opacity:.78;">
-            Switching modes clears the other mode.
           </div>
         </div>
       </div>
@@ -320,7 +307,7 @@
           <div class="es-card-h">Adopted Signature</div>
           <div class="es-adopted">
             <div class="es-adopted-box" id="esAdoptedBox">
-              <div style="font-size:11px;font-weight:950;color:#334155;opacity:.80;" id="esAdoptedEmpty">No adopted signature</div>
+              <div style="font-size:10px;font-weight:950;color:#334155;opacity:.80;" id="esAdoptedEmpty">No adopted signature</div>
             </div>
           </div>
         </div>
@@ -388,7 +375,7 @@
       if (!dataUrl){
         const d = document.createElement("div");
         d.id = "esAdoptedEmpty";
-        d.style.fontSize = "11px";
+        d.style.fontSize = "10px";
         d.style.fontWeight = "950";
         d.style.color = "#334155";
         d.style.opacity = ".80";
