@@ -17,6 +17,8 @@
       --radius:18px;
       --shadow:0 28px 56px rgba(0,0,0,.30);
       --danger:#b91c1c;
+      --panel:#ffffff;
+      --muted:#475569;
     }
 
     body{
@@ -34,16 +36,10 @@
       position:absolute;
       top:20px;
       left:20px;
-      color:#ffffff;
+      color:#fff;
       z-index:10;
     }
-
-    .company-name{
-      font-size:16px;
-      font-weight:700;
-      margin-bottom:2px;
-    }
-
+    .company-name{font-size:16px;font-weight:700;margin-bottom:2px}
     .address{
       font-size:13px;
       font-weight:600;
@@ -61,7 +57,7 @@
     h1{
       font-family:'Baron',sans-serif;
       font-size:22px;
-      color:#ffffff;
+      color:#fff;
       font-weight:normal;
       margin-bottom:14px;
     }
@@ -69,7 +65,7 @@
     .card{
       width:100%;
       height:clamp(520px,72vh,860px);
-      background:#ffffff;
+      background:#fff;
       border-radius:var(--radius);
       box-shadow:var(--shadow);
       display:flex;
@@ -81,7 +77,7 @@
     .top-section{
       padding:18px 30px;
       border-bottom:1px solid #e6e6e6;
-      background:#ffffff;
+      background:#fff;
       z-index:2;
     }
 
@@ -92,7 +88,6 @@
       border-radius:999px;
       overflow:hidden;
     }
-
     .progress-bar-fill{
       height:100%;
       width:0%;
@@ -104,7 +99,7 @@
     .middle-section{
       flex:1;
       padding:26px 30px;
-      overflow:auto;
+      overflow:hidden;
       background:
         linear-gradient(180deg,rgba(0,0,0,.52) 0%,rgba(0,0,0,.42) 45%,rgba(0,0,0,.52) 100%),
         url("https://images.unsplash.com/photo-1725759675905-ffefc70268e3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
@@ -116,7 +111,7 @@
 
     #pageMount{
       width:100%;
-      min-height:100%;
+      height:100%;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -125,7 +120,7 @@
     .bottom-section{
       padding:18px 30px;
       border-top:1px solid #e6e6e6;
-      background:#ffffff;
+      background:#fff;
       z-index:2;
     }
 
@@ -145,161 +140,172 @@
       cursor:pointer;
       transition:opacity .15s ease,transform .15s ease;
     }
+    .nav-button.previous{background:#f0f0f0;color:#333}
+    .nav-button.previous:hover:not(:disabled){opacity:.95;transform:translateY(-1px)}
+    .nav-button.next{background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);color:#fff}
+    .nav-button.next:hover:not(:disabled){opacity:.95;transform:translateY(-1px)}
+    .nav-button:disabled{opacity:.45;cursor:not-allowed;transform:none}
 
-    .nav-button.previous{
-      background:#f0f0f0;
-      color:#333;
-    }
-
-    .nav-button.previous:hover:not(:disabled){
-      opacity:.95;
-      transform:translateY(-1px);
-    }
-
-    .nav-button.next{
-      background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
-      color:#ffffff;
-    }
-
-    .nav-button.next:hover:not(:disabled){
-      opacity:.95;
-      transform:translateY(-1px);
-    }
-
-    .nav-button:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-      transform:none;
-    }
-
-    .page-indicator{
-      font-size:14px;
-      color:#666;
-      font-weight:600;
-    }
+    .page-indicator{font-size:14px;color:#666;font-weight:600}
 
     .footer{
       position:absolute;
       bottom:20px;
       left:20px;
-      color:#ffffff;
+      color:#fff;
       font-size:13px;
       font-weight:600;
       opacity:.95;
       z-index:10;
     }
 
-    /* ACCESS MODULE */
-    .access-shell{
-      width:min(900px,92%);
-      padding:2px;
-      border-radius:22px;
-      background:linear-gradient(135deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 50%,var(--carbyne-blue) 100%);
-      box-shadow:0 28px 64px rgba(0,0,0,.28);
-      min-height:400px;
-    }
-
-    .access-card{
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(0,0,0,.06);
-      border-radius:20px;
-      padding:44px 40px;
-      min-height:396px;
+    /* Page shell used for steps 2..15 content */
+    .page-shell{
+      width:min(980px,96%);
+      height:min(520px,100%);
+      border-radius:18px;
       position:relative;
       overflow:hidden;
+      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.10);
+      backdrop-filter:blur(2px);
     }
 
-    .access-card::before,
-    .access-card::after{
+    /* Scrollbar INSIDE rounded frame */
+    .page-shell-inner{
+      width:100%;
+      height:100%;
+      border-radius:18px;
+      overflow:hidden;
+      background:rgba(255,255,255,.78);
+      position:relative;
+    }
+
+    .page-scroll{
+      height:100%;
+      overflow:auto;
+      padding:22px 22px 26px 22px;
+      scrollbar-gutter:stable;
+    }
+
+    .page-scroll::-webkit-scrollbar{width:12px}
+    .page-scroll::-webkit-scrollbar-track{background:rgba(0,0,0,.10)}
+    .page-scroll::-webkit-scrollbar-thumb{background:rgba(0,48,91,.45);border-radius:999px;border:3px solid rgba(255,255,255,.55)}
+    .page-scroll{scrollbar-width:auto;scrollbar-color:rgba(0,48,91,.45) rgba(0,0,0,.10)}
+
+    .sticky-ref{
+      position:sticky;
+      top:0;
+      z-index:5;
+      display:flex;
+      justify-content:flex-end;
+      padding:6px 2px 10px 2px;
+      background:linear-gradient(180deg,rgba(255,255,255,.86) 0%,rgba(255,255,255,.70) 70%,rgba(255,255,255,0) 100%);
+      backdrop-filter:blur(2px);
+    }
+
+    .reference-number{
+      font-size:12px;
+      font-weight:700;
+      color:#0f172a;
+      letter-spacing:.3px;
+      opacity:.70;
+    }
+
+    /* Access module (Page 1) */
+    .access-panel{
+      width:min(980px,96%);
+      min-height:420px;
+      border-radius:18px;
+      position:relative;
+      overflow:hidden;
+      box-shadow:0 18px 40px rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.78);
+    }
+
+    .access-panel::before,
+    .access-panel::after{
       content:"";
       position:absolute;
-      width:280px;
-      height:280px;
+      width:420px;
+      height:420px;
       border-radius:50%;
-      background:radial-gradient(circle at 30% 30%, rgba(0,48,91,.12), rgba(0,48,91,0));
+      background:radial-gradient(circle at 30% 30%, rgba(0,48,91,.14) 0%, rgba(0,48,91,0) 70%);
       pointer-events:none;
     }
+    .access-panel::before{left:-160px;bottom:-190px}
+    .access-panel::after{right:-220px;top:-220px}
 
-    .access-card::before{left:-120px;bottom:-140px}
-    .access-card::after{right:-140px;top:-150px;opacity:.85}
-
-    .access-center{
+    .access-inner{
       position:relative;
-      max-width:620px;
-      margin:0 auto;
+      height:100%;
+      padding:34px 40px;
       display:flex;
-      flex-direction:column;
-      gap:14px;
-      padding-top:74px;
+      align-items:center;
+    }
+
+    /* Bring access content slightly DOWN but not too far */
+    .access-stack{
+      width:min(640px,100%);
+      margin-left:18px;
+      padding-top:10px;
     }
 
     .access-header{
       display:flex;
       align-items:center;
       gap:14px;
-      margin-bottom:2px;
+      margin-bottom:18px;
     }
-
     .access-icon{
-      width:46px;
-      height:46px;
-      border-radius:14px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:linear-gradient(180deg, rgba(0,48,91,.10), rgba(0,48,91,.06));
+      width:46px;height:46px;border-radius:14px;
+      background:rgba(0,48,91,.08);
       border:1px solid rgba(0,0,0,.06);
-      box-shadow:0 10px 22px rgba(2,6,23,.10);
-    }
-
-    .access-icon svg{
-      width:22px;
-      height:22px;
+      display:flex;align-items:center;justify-content:center;
       color:var(--carbyne-blue);
+      box-shadow:0 10px 18px rgba(0,0,0,.08);
     }
-
     .access-title{
       font-size:18px;
       font-weight:900;
       color:#0f172a;
-      margin:0;
-      text-align:left;
-      letter-spacing:.15px;
+      line-height:1.1;
     }
-
-    .access-subtitle{
+    .access-sub{
       font-size:12px;
-      font-weight:700;
-      color:#475569;
-      margin:2px 0 0 0;
-      letter-spacing:.15px;
+      font-weight:800;
+      color:#334155;
+      opacity:.90;
+      margin-top:4px;
+      letter-spacing:.2px;
     }
 
     .access-input{
       width:100%;
       padding:14px 16px;
       font-size:15px;
-      border:1px solid rgba(0,0,0,.16);
+      font-weight:700;
+      border:1px solid rgba(0,0,0,.14);
       border-radius:12px;
       outline:none;
-      background:#ffffff;
+      background:#fff;
       transition:border-color .2s ease, box-shadow .2s ease;
+      box-shadow:0 8px 18px rgba(0,0,0,.06);
     }
-
     .access-input:focus{
-      border-color:rgba(0,48,91,.75);
-      box-shadow:0 0 0 3px rgba(0,48,91,.18);
+      border-color:rgba(0,48,91,.70);
+      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 10px 22px rgba(0,0,0,.08);
     }
-
     .access-input.error{border-color:var(--danger)}
 
     .access-row{
       display:flex;
       gap:14px;
       align-items:center;
-      justify-content:flex-start;
+      margin-top:14px;
       flex-wrap:wrap;
-      margin-top:2px;
     }
 
     .access-submit{
@@ -307,29 +313,19 @@
       font-size:14px;
       font-weight:900;
       border-radius:10px;
-      border:none;
+      border:1px solid rgba(0,0,0,.10);
       background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
-      color:#ffffff;
+      color:#fff;
       cursor:pointer;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:140px;
-      box-shadow:0 10px 22px rgba(0,0,0,.16);
-      transition:opacity .2s ease, transform .15s ease;
+      min-width:150px;
+      box-shadow:0 10px 20px rgba(0,0,0,.14);
+      transition:opacity .2s ease, box-shadow .2s ease, transform .15s ease;
     }
-
-    .access-submit:hover:not(:disabled){
-      opacity:.96;
-      transform:translateY(-1px);
-    }
-
-    .access-submit:disabled{
-      opacity:.6;
-      cursor:not-allowed;
-      box-shadow:none;
-      transform:none;
-    }
+    .access-submit:hover:not(:disabled){opacity:.95;transform:translateY(-1px)}
+    .access-submit:disabled{opacity:.60;cursor:not-allowed;box-shadow:none;transform:none}
 
     .inline-msg{
       font-size:13px;
@@ -339,168 +335,54 @@
       white-space:nowrap;
       color:var(--danger);
     }
-
     .inline-msg.show{display:inline}
 
     .spinner{
       display:inline-block;
       width:14px;
       height:14px;
-      border:2px solid rgba(255,255,255,.3);
+      border:2px solid rgba(255,255,255,.30);
       border-radius:50%;
-      border-top-color:#ffffff;
+      border-top-color:#fff;
       animation:spin .6s linear infinite;
     }
-
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* GENERAL PAGE CONTENT */
-    .page-content{
-      width:min(980px,96%);
-      background:rgba(255,255,255,.92);
-      border:1px solid rgba(0,0,0,.08);
-      border-radius:14px;
-      padding:50px 40px;
-      color:#111827;
-      box-shadow:0 16px 32px rgba(0,0,0,.18);
-      min-height:420px;
-      max-height:420px;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .page-content h2{
-      font-size:22px;
+    /* Welcome page (Step 1 of 15 == page 2) */
+    .welcome-title{
+      font-size:26px;
       font-weight:900;
-      margin-bottom:16px;
       color:var(--carbyne-blue);
-      letter-spacing:.15px;
-    }
-
-    .page-content p{
-      font-size:14px;
-      line-height:1.6;
+      letter-spacing:.2px;
       margin-bottom:12px;
-      color:#0f172a;
     }
-
-    .reference-number{
-      position:absolute;
-      top:18px;
-      right:26px;
-      font-size:12px;
-      font-weight:800;
-      color:#0f172a;
-      letter-spacing:.3px;
-      opacity:.85;
-      z-index:50;
-      pointer-events:none;
-    }
-
-    /* INTRO PAGE (STEP 2 OF 15) */
-    .intro-wrap{max-width:820px}
-
-    .intro-title{
-      font-size:24px;
-      font-weight:900;
-      margin:0 0 14px 0;
-      color:var(--carbyne-blue);
-      letter-spacing:.15px;
-    }
-
-    .intro-lead{
+    .welcome-p{
       font-size:14px;
+      font-weight:700;
       color:#0f172a;
-      line-height:1.7;
-      margin:0 0 18px 0;
-      font-weight:650;
+      opacity:.86;
+      line-height:1.65;
+      margin-bottom:14px;
     }
-
-    .intro-section{margin-top:16px}
-
-    .intro-section h3{
-      font-size:14px;
-      font-weight:900;
-      color:#0f172a;
-      margin:0 0 8px 0;
-      letter-spacing:.15px;
-    }
-
-    .intro-list{
-      margin:0;
-      padding-left:18px;
-      color:#0f172a;
-      font-size:14px;
-      line-height:1.75;
-      font-weight:650;
-    }
-
-    .intro-divider{
-      height:1px;
-      background:rgba(0,0,0,.10);
-      margin:18px 0 14px 0;
-    }
-
-    /* SCROLLABLE PAGES */
-    .page-content.scrollable{
-      padding:0;
-      height:420px;
-      display:flex;
-      flex-direction:column;
-    }
-
-    .page-scroll{
-      flex:1;
-      overflow:auto;
-      padding:36px 52px 44px 40px;
-      scrollbar-gutter:stable both-edges;
-    }
-
-    .page-scroll::-webkit-scrollbar{width:12px}
-    .page-scroll::-webkit-scrollbar-track{
-      background:rgba(15,23,42,.08);
-      border-radius:999px;
-      margin:12px 0;
-    }
-    .page-scroll::-webkit-scrollbar-thumb{
-      background:rgba(0,48,91,.38);
-      border-radius:999px;
-      border:3px solid rgba(255,255,255,.55);
-    }
-    .page-scroll::-webkit-scrollbar-thumb:hover{background:rgba(0,48,91,.48)}
-
-    /* PAGE 4: SIGNATURE WRAPPER */
-    .sig-page{
-      width:100%;
-      max-width:980px;
-      margin:0 auto;
-      transform:scale(.92);
-      transform-origin:top center;
-    }
-
-    .sig-grid{
-      display:grid;
-      grid-template-columns:1.25fr .75fr;
-      gap:14px;
-      margin-top:12px;
-    }
-
-    .sig-loading{
-      display:inline-block;
+    .welcome-h{
       font-size:13px;
-      font-weight:850;
+      font-weight:900;
       color:#0f172a;
-      opacity:.75;
+      margin:16px 0 6px 0;
+      letter-spacing:.2px;
+      text-transform:none;
     }
-
-    @media (max-width:980px){
-      .sig-page{transform:scale(.90)}
-      .sig-grid{grid-template-columns:1fr}
+    .welcome-li{
+      font-size:14px;
+      font-weight:700;
+      color:#0f172a;
+      opacity:.86;
+      line-height:1.6;
+      margin:0 0 8px 0;
     }
-
-    @media (max-width:720px){
-      .access-center{padding-top:64px}
-      .page-scroll{padding:34px 44px 40px 34px}
+    .welcome-list{
+      padding-left:18px;
+      margin-top:6px;
     }
   </style>
 </head>
@@ -532,7 +414,7 @@
       <div class="bottom-section">
         <div class="navigation">
           <button class="nav-button previous" id="prevBtn">Previous</button>
-          <span class="page-indicator" id="pageIndicator">Step 1 of 15</span>
+          <span class="page-indicator" id="pageIndicator"></span>
           <button class="nav-button next" id="nextBtn">Next</button>
         </div>
       </div>
@@ -542,11 +424,11 @@
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
   <script>
-    // ============================================
-    // CONFIGURATION
-    // ============================================
-    const TOTAL_PAGES = 15;
-
+    // ==========================================================
+    // CONFIG
+    // ==========================================================
+    const TOTAL_PAGES = 16;                 // Page 1 = Access Code, Pages 2..16 = Steps 1..15
+    const TOTAL_STEPS = 15;                 // Steps start at Page 2
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
     const CACHE_KEY = "carbyne_valid_codes_cache";
@@ -556,49 +438,50 @@
     const TARGET_HEADER = "Unique Identifier";
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    const SIG_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
-    const INTAKE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
+    // External modules (raw github)
+    const ELECTRONIC_SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
+    const CLIENT_INTAKE_URL        = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
 
-    // ============================================
+    // ==========================================================
     // STATE
-    // ============================================
+    // ==========================================================
     let currentPage = 1;
     let isAccessValidated = false;
     let validCodesCache = null;
     let isFetchingCodes = false;
 
-    // ============================================
+    // active module cleanup hook
+    let activeUnmount = null;
+
+    // ==========================================================
     // ELEMENTS
-    // ============================================
+    // ==========================================================
     const pageMount = document.getElementById("pageMount");
     const progressBar = document.getElementById("progressBar");
     const pageIndicator = document.getElementById("pageIndicator");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // ============================================
-    // HELPERS
-    // ============================================
-    function normalize(v){
-      return (v ?? "").toString().trim();
-    }
+    // ==========================================================
+    // VALIDATION HELPERS
+    // ==========================================================
+    function normalize(v){ return (v ?? "").toString().trim(); }
 
-    // ============================================
-    // VALIDATION FUNCTIONS
-    // ============================================
     function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
       try{
         const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
         const now = Date.now();
-        if (timestamp && (now - parseInt(timestamp)) < CACHE_DURATION){
+        if (timestamp && (now - parseInt(timestamp,10)) < CACHE_DURATION){
           const cached = localStorage.getItem(CACHE_KEY);
           if (cached){
             validCodesCache = JSON.parse(cached);
             return validCodesCache;
           }
         }
-      }catch(e){}
+      } catch(e){
+        console.error("Cache read error:", e);
+      }
       return null;
     }
 
@@ -607,13 +490,15 @@
       try{
         localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
         localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-      }catch(e){}
+      } catch(e){
+        console.error("Cache write error:", e);
+      }
     }
 
     function findHeaderIndex(headers){
       const lower = headers.map(h => normalize(h).toLowerCase());
       const target = TARGET_HEADER.toLowerCase();
-      for (let i = 0; i < lower.length; i++){
+      for (let i=0;i<lower.length;i++){
         if (lower[i] === target) return i;
       }
       return -1;
@@ -621,22 +506,20 @@
 
     async function fetchValidCodes(){
       if (isFetchingCodes){
-        while (isFetchingCodes){
-          await new Promise(resolve => setTimeout(resolve, 100));
-        }
+        while (isFetchingCodes) await new Promise(r => setTimeout(r, 100));
         return validCodesCache;
       }
 
       isFetchingCodes = true;
 
       try{
-        const res = await fetch(FILE_URL, { cache: "no-store" });
+        const res = await fetch(FILE_URL, { cache:"no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const ab = await res.arrayBuffer();
-        const wb = XLSX.read(ab, { type: "array" });
+        const wb = XLSX.read(ab, { type:"array" });
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
+        const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:"" });
 
         if (!rows || rows.length < 2) throw new Error("No data found");
 
@@ -645,7 +528,7 @@
         if (col < 0) throw new Error("Column 'Unique Identifier' not found");
 
         const validCodes = [];
-        for (let r = 1; r < rows.length; r++){
+        for (let r=1;r<rows.length;r++){
           const row = rows[r] || [];
           const cell = normalize(row[col] ?? "");
           if (cell) validCodes.push(cell.toLowerCase());
@@ -653,7 +536,8 @@
 
         setCachedCodes(validCodes);
         return validCodes;
-      }finally{
+
+      } finally {
         isFetchingCodes = false;
       }
     }
@@ -664,49 +548,48 @@
 
       if (codes && Array.isArray(codes)){
         const isValid = codes.includes(needle);
-        fetchValidCodes().catch(() => {});
+        fetchValidCodes().catch(()=>{});
         return isValid;
       }
 
       try{
         codes = await fetchValidCodes();
         return codes.includes(needle);
-      }catch(e){
+      } catch {
         return false;
       }
     }
 
-    // ============================================
-    // NAV + UI
-    // ============================================
-    function init(){
-      const accessCode = localStorage.getItem(STORAGE_KEY);
-      isAccessValidated = !!accessCode;
-
-      const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY)) || 1;
-      currentPage = isAccessValidated ? savedPage : 1;
-
-      if (!getCachedCodes()){
-        fetchValidCodes().catch(() => {});
-      }
-
-      loadPage(currentPage);
-
-      prevBtn.addEventListener("click", goToPreviousPage);
-      nextBtn.addEventListener("click", goToNextPage);
+    // ==========================================================
+    // UI: PROGRESS + INDICATOR
+    // ==========================================================
+    function getStepNumber(){
+      // Page 1 = Access Code (no step)
+      // Page 2 = Step 1 ... Page 16 = Step 15
+      if (currentPage <= 1) return 0;
+      return currentPage - 1;
     }
 
     function updateUI(){
-      const progress = (currentPage / TOTAL_PAGES) * 100;
-      progressBar.style.width = `${progress}%`;
+      const step = getStepNumber();
 
-      pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
-      pageIndicator.style.visibility = (currentPage === 1) ? "hidden" : "visible";
+      if (step === 0){
+        progressBar.style.width = `0%`;
+        pageIndicator.style.visibility = "hidden";
+      } else {
+        const progress = (step / TOTAL_STEPS) * 100;
+        progressBar.style.width = `${progress}%`;
+        pageIndicator.textContent = `Step ${step} of ${TOTAL_STEPS}`;
+        pageIndicator.style.visibility = "visible";
+      }
 
       prevBtn.disabled = currentPage === 1;
-      nextBtn.disabled = currentPage === TOTAL_PAGES || currentPage === 1;
+      nextBtn.disabled = currentPage === TOTAL_PAGES;
 
-      localStorage.setItem(CURRENT_PAGE_KEY, currentPage);
+      // Block next if on Access Code page and not validated
+      if (currentPage === 1) nextBtn.disabled = true;
+
+      localStorage.setItem(CURRENT_PAGE_KEY, String(currentPage));
     }
 
     function goToPreviousPage(){
@@ -723,40 +606,227 @@
       }
     }
 
+    // ==========================================================
+    // EXTERNAL MODULE LOADER
+    // ==========================================================
+    async function loadExternalModule(url, mountName, shellEl, secureCode){
+      // unmount previous
+      if (typeof activeUnmount === "function"){
+        try{ activeUnmount(); } catch(e){ console.warn("Unmount error:", e); }
+      }
+      activeUnmount = null;
+
+      const res = await fetch(url, { cache:"no-store" });
+      if (!res.ok) throw new Error(`Failed to fetch module: HTTP ${res.status}`);
+
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, "text/html");
+
+      // Append styles
+      const styles = Array.from(doc.querySelectorAll("style"));
+      styles.forEach(st => {
+        const s = document.createElement("style");
+        s.textContent = st.textContent || "";
+        document.head.appendChild(s);
+      });
+
+      // Append scripts (execute)
+      const scripts = Array.from(doc.querySelectorAll("script"));
+      for (const sc of scripts){
+        const s = document.createElement("script");
+        if (sc.src){
+          s.src = sc.src;
+          s.async = false;
+        } else {
+          s.textContent = sc.textContent || "";
+        }
+        document.body.appendChild(s);
+      }
+
+      // Find template by mountName
+      const tpl = doc.getElementById(mountName);
+      if (!tpl || tpl.tagName.toLowerCase() !== "template"){
+        throw new Error(`Template #${mountName} not found`);
+      }
+
+      // stamp template content into shellEl
+      shellEl.innerHTML = "";
+      const cloned = document.importNode(tpl.content, true);
+      shellEl.appendChild(cloned);
+
+      // call module mount function
+      const fn = window[mountName + "_mount"];
+      if (typeof fn !== "function"){
+        throw new Error(`Mount function ${mountName}_mount not found`);
+      }
+
+      const unmount = fn({
+        root: shellEl,
+        referenceNumber: secureCode,
+        storageKey: STORAGE_KEY
+      });
+
+      if (typeof unmount === "function") activeUnmount = unmount;
+    }
+
+    // ==========================================================
+    // PAGES
+    // ==========================================================
     function loadPage(pageNum){
       pageMount.innerHTML = "";
       updateUI();
 
       if (pageNum === 1){
-        loadAccessModule();
-      }else{
-        if (!isAccessValidated){
-          currentPage = 1;
-          loadAccessModule();
-          return;
-        }
-        loadPageContent(pageNum);
+        loadAccessPage();
+        return;
+      }
+
+      if (!isAccessValidated){
+        currentPage = 1;
+        updateUI();
+        loadAccessPage();
+        return;
+      }
+
+      if (pageNum === 2){
+        loadWelcomeStep();
+        return;
+      }
+
+      if (pageNum === 3){
+        // Client Intake Form (Step 2)
+        loadClientIntakeStep();
+        return;
+      }
+
+      if (pageNum === 4){
+        // Electronic Signature (Step 3) -> now Page 4 as requested
+        loadElectronicSignatureStep();
+        return;
+      }
+
+      loadPlaceholderStep(pageNum);
+    }
+
+    function createStepShell(){
+      const shell = document.createElement("div");
+      shell.className = "page-shell";
+      shell.innerHTML = `
+        <div class="page-shell-inner">
+          <div class="page-scroll" id="stepScroll">
+            <div class="sticky-ref"><div class="reference-number" id="refNumber"></div></div>
+            <div id="stepBody"></div>
+          </div>
+        </div>
+      `;
+      return shell;
+    }
+
+    function setReferenceNumber(shell, secureCode){
+      const ref = shell.querySelector("#refNumber");
+      if (ref) ref.textContent = `Reference Number: ${secureCode || ""}`;
+    }
+
+    function loadWelcomeStep(){
+      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
+      const shell = createStepShell();
+      setReferenceNumber(shell, secureCode);
+
+      const body = shell.querySelector("#stepBody");
+      body.innerHTML = `
+        <div class="welcome-title">Welcome to Carbyne Accounting</div>
+        <div class="welcome-p">We're excited to have you on board! To complete your onboarding, please review and electronically sign the client onboarding agreements in the following steps.</div>
+
+        <div class="welcome-h">Next Steps</div>
+        <ul class="welcome-list">
+          <li class="welcome-li">Please review each agreement carefully and provide your electronic signature where indicated.</li>
+          <li class="welcome-li">Once all agreements have been electronically signed, we will send finalized service schedules via email.</li>
+        </ul>
+
+        <div class="welcome-h">Questions</div>
+        <div class="welcome-p">If you have any questions during this process, please contact Client Services at (502) 632-9444 or Client@CarbyneAccounting.com.</div>
+      `;
+
+      pageMount.appendChild(shell);
+    }
+
+    async function loadClientIntakeStep(){
+      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
+      const shell = createStepShell();
+      setReferenceNumber(shell, secureCode);
+
+      const body = shell.querySelector("#stepBody");
+
+      // Mount external intake template directly into step body
+      body.innerHTML = `<div id="clientIntakeHost"></div>`;
+      pageMount.appendChild(shell);
+
+      const host = body.querySelector("#clientIntakeHost");
+      try{
+        await loadExternalModule(CLIENT_INTAKE_URL, "carbyne_client_intake", host, secureCode);
+      } catch(e){
+        host.innerHTML = `<div style="font-weight:900;color:#0f172a;opacity:.85;">Unable to load intake form.</div>`;
+        console.error(e);
       }
     }
 
-    // ============================================
-    // PAGE 1: ACCESS
-    // ============================================
-    function loadAccessModule(){
+    async function loadElectronicSignatureStep(){
+      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
+      const shell = createStepShell();
+      setReferenceNumber(shell, secureCode);
+
+      const body = shell.querySelector("#stepBody");
+      body.innerHTML = `<div id="sigHost"></div>`;
+      pageMount.appendChild(shell);
+
+      const host = body.querySelector("#sigHost");
+      try{
+        await loadExternalModule(ELECTRONIC_SIGNATURE_URL, "carbyne_electronic_signature", host, secureCode);
+      } catch(e){
+        host.innerHTML = `<div style="font-weight:900;color:#0f172a;opacity:.85;">Unable to load signature.</div>`;
+        console.error(e);
+      }
+    }
+
+    function loadPlaceholderStep(pageNum){
+      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
+      const shell = createStepShell();
+      setReferenceNumber(shell, secureCode);
+
+      const step = pageNum - 1; // step number (since page 2 = step 1)
+      const body = shell.querySelector("#stepBody");
+      body.innerHTML = `
+        <div style="font-size:22px;font-weight:900;color:var(--carbyne-blue);margin-bottom:10px;">Step ${step}</div>
+        <div style="font-size:14px;font-weight:800;color:#0f172a;opacity:.80;">Agreement content will be placed on this page.</div>
+      `;
+
+      pageMount.appendChild(shell);
+    }
+
+    // ==========================================================
+    // ACCESS PAGE (Page 1)
+    // ==========================================================
+    function loadAccessPage(){
+      // Unmount any module
+      if (typeof activeUnmount === "function"){
+        try{ activeUnmount(); } catch(e){ console.warn("Unmount error:", e); }
+      }
+      activeUnmount = null;
+
       const accessHTML = `
-        <div class="access-shell">
-          <div class="access-card">
-            <div class="access-center">
+        <div class="access-panel">
+          <div class="access-inner">
+            <div class="access-stack">
               <div class="access-header">
                 <div class="access-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" fill="none">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
                     <path d="M7 10V8a5 5 0 0 1 10 0v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    <path d="M6 10h12a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M6 10h12a2 2 0 0 1 2 2v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
                   </svg>
                 </div>
                 <div>
                   <div class="access-title">Enter Access Code</div>
-                  <div class="access-subtitle">Use the code provided to start onboarding.</div>
+                  <div class="access-sub">Use the code provided to start onboarding.</div>
                 </div>
               </div>
 
@@ -789,12 +859,12 @@
       const btnText = document.getElementById("btnText");
       const msg = document.getElementById("inlineMsg");
 
-      function showInvalid(show, message = "Invalid Access Code"){
+      function showInvalid(show, message="Invalid Access Code"){
         if (show){
           msg.classList.add("show");
           msg.textContent = message;
           input.classList.add("error");
-        }else{
+        } else {
           msg.classList.remove("show");
           input.classList.remove("error");
         }
@@ -804,7 +874,7 @@
         btn.disabled = !!isBusy;
         if (isBusy){
           btnText.innerHTML = '<span class="spinner"></span>';
-        }else{
+        } else {
           btnText.textContent = "Continue";
         }
       }
@@ -823,220 +893,55 @@
         setBusy(true);
 
         try{
-          const isValid = await validateCode(code);
-          if (isValid){
+          const ok = await validateCode(code);
+          if (ok){
             localStorage.setItem(STORAGE_KEY, code);
             isAccessValidated = true;
-            goToNextPage();
-          }else{
+            currentPage = 2; // go to Step 1
+            loadPage(currentPage);
+          } else {
             showInvalid(true);
           }
-        }catch(e){
+        } catch {
           showInvalid(true, "Validation error");
-        }finally{
+        } finally {
           setBusy(false);
         }
       }
 
       btn.addEventListener("click", submit);
-      input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
+      input.addEventListener("keydown", (e)=>{ if (e.key === "Enter") submit(); });
 
       showInvalid(false);
       input.focus();
     }
 
-    // ============================================
-    // IMPORT HELPERS (ELEMENT-LEVEL)
-    // ============================================
-    function injectStyleTag(cssText, id){
-      if (!cssText) return;
-      if (id && document.getElementById(id)) return;
-      const style = document.createElement("style");
-      if (id) style.id = id;
-      style.textContent = cssText;
-      document.head.appendChild(style);
+    // ==========================================================
+    // APP INIT
+    // ==========================================================
+    function init(){
+      const accessCode = localStorage.getItem(STORAGE_KEY);
+      isAccessValidated = !!accessCode;
+
+      const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY) || "1", 10) || 1;
+
+      if (!isAccessValidated){
+        currentPage = 1;
+      } else {
+        // never resume to page 1 if validated; resume to at least 2
+        currentPage = Math.max(2, Math.min(TOTAL_PAGES, savedPage));
+      }
+
+      if (!getCachedCodes()){
+        fetchValidCodes().catch(()=>{});
+      }
+
+      loadPage(currentPage);
+
+      prevBtn.addEventListener("click", goToPreviousPage);
+      nextBtn.addEventListener("click", goToNextPage);
     }
 
-    function injectScriptText(jsText){
-      if (!jsText) return;
-      const s = document.createElement("script");
-      s.textContent = jsText;
-      document.body.appendChild(s);
-    }
-
-    // ============================================
-    // SIGNATURE IMPORT (PAGE 4)
-    // ============================================
-    async function injectSignatureElements(root){
-      const doc = await fetch(SIG_URL, { cache: "no-store" }).then(r => r.text());
-      const tmp = document.createElement("div");
-      tmp.innerHTML = doc;
-
-      const header = tmp.querySelector("#sigHeader");
-      const input = tmp.querySelector("#sigInput");
-      const status = tmp.querySelector("#sigStatus");
-
-      const headerSlot = root.querySelector("#sigHeaderSlot");
-      const inputSlot = root.querySelector("#sigInputSlot");
-      const statusSlot = root.querySelector("#sigStatusSlot");
-
-      if (!header || !input || !status || !headerSlot || !inputSlot || !statusSlot){
-        throw new Error("Missing signature elements");
-      }
-
-      headerSlot.innerHTML = "";
-      inputSlot.innerHTML = "";
-      statusSlot.innerHTML = "";
-
-      headerSlot.appendChild(header);
-      inputSlot.appendChild(input);
-      statusSlot.appendChild(status);
-
-      const styleTags = Array.from(tmp.querySelectorAll("style"));
-      for (let i = 0; i < styleTags.length; i++){
-        injectStyleTag(styleTags[i].textContent || "", "sig_style_" + i);
-      }
-
-      const scripts = Array.from(tmp.querySelectorAll("script"));
-      for (const sc of scripts){
-        if (sc.src){
-          const s = document.createElement("script");
-          s.src = sc.src;
-          document.body.appendChild(s);
-        }else{
-          injectScriptText(sc.textContent || "");
-        }
-      }
-    }
-
-    // ============================================
-    // INTAKE IMPORT (PAGE 3)
-    // ============================================
-    async function injectClientIntake(root){
-      const html = await fetch(INTAKE_URL, { cache: "no-store" }).then(r => r.text());
-      const tmp = document.createElement("div");
-      tmp.innerHTML = html;
-
-      const intakeRoot = tmp.querySelector("#intakeFormRoot");
-      const slot = root.querySelector("#intakeSlot");
-      if (!intakeRoot || !slot) throw new Error("Missing intake root or slot");
-
-      slot.innerHTML = "";
-      slot.appendChild(intakeRoot);
-
-      const styleTags = Array.from(tmp.querySelectorAll("style"));
-      for (let i = 0; i < styleTags.length; i++){
-        injectStyleTag(styleTags[i].textContent || "", "intake_style_" + i);
-      }
-
-      const scripts = Array.from(tmp.querySelectorAll("script"));
-      for (const sc of scripts){
-        if (sc.src){
-          const s = document.createElement("script");
-          s.src = sc.src;
-          document.body.appendChild(s);
-        }else{
-          injectScriptText(sc.textContent || "");
-        }
-      }
-    }
-
-    // ============================================
-    // PAGE CONTENT 2..15
-    // ============================================
-    function loadPageContent(pageNum){
-      const secureCode = localStorage.getItem(STORAGE_KEY) || "";
-
-      if (pageNum === 2){
-        const content = document.createElement("div");
-        content.className = "page-content";
-        content.innerHTML = `
-          <div class="reference-number">Reference Number: ${secureCode}</div>
-          <div class="intro-wrap">
-            <div class="intro-title">Welcome to Carbyne Accounting</div>
-            <div class="intro-lead">
-              We're excited to have you on board! To complete your onboarding, please review and electronically sign the client onboarding agreements in the following steps.
-            </div>
-
-            <div class="intro-divider"></div>
-
-            <div class="intro-section">
-              <h3>Next Steps</h3>
-              <ul class="intro-list">
-                <li>Please review each agreement carefully and provide your electronic signature where indicated.</li>
-                <li>Once all agreements have been electronically signed, we will send finalized service schedules via email.</li>
-              </ul>
-            </div>
-
-            <div class="intro-section" style="margin-top:18px;">
-              <h3>Questions</h3>
-              <div class="intro-lead" style="margin:0;">
-                If you have any questions during this process, please contact Client Services at (502) 632-9444 or Client@CarbyneAccounting.com.
-              </div>
-            </div>
-          </div>
-        `;
-        pageMount.appendChild(content);
-        return;
-      }
-
-      if (pageNum === 3){
-        const content = document.createElement("div");
-        content.className = "page-content scrollable";
-        content.innerHTML = `
-          <div class="reference-number">Reference Number: ${secureCode}</div>
-          <div class="page-scroll">
-            <div id="intakeSlot"><span class="sig-loading">Loading client intake form...</span></div>
-          </div>
-        `;
-        pageMount.appendChild(content);
-
-        injectClientIntake(content).catch(() => {
-          const slot = content.querySelector("#intakeSlot");
-          if (slot) slot.innerHTML = '<span class="sig-loading">Unable to load client intake form.</span>';
-        });
-
-        return;
-      }
-
-      if (pageNum === 4){
-        const content = document.createElement("div");
-        content.className = "page-content";
-        content.innerHTML = `
-          <div class="reference-number">Reference Number: ${secureCode}</div>
-          <h2>Electronic Signature</h2>
-
-          <div class="sig-page">
-            <div id="sigHeaderSlot"><span class="sig-loading">Loading signature...</span></div>
-            <div class="sig-grid">
-              <div id="sigInputSlot"></div>
-              <div id="sigStatusSlot"></div>
-            </div>
-          </div>
-        `;
-        pageMount.appendChild(content);
-
-        injectSignatureElements(content).catch(() => {
-          const h = content.querySelector("#sigHeaderSlot");
-          if (h) h.innerHTML = '<span class="sig-loading">Unable to load signature.</span>';
-        });
-
-        return;
-      }
-
-      const content = document.createElement("div");
-      content.className = "page-content";
-      content.innerHTML = `
-        <div class="reference-number">Reference Number: ${secureCode}</div>
-        <h2>Step ${pageNum}</h2>
-        <p>Agreement content will be placed on this page.</p>
-      `;
-      pageMount.appendChild(content);
-    }
-
-    // ============================================
-    // START
-    // ============================================
     init();
   </script>
 </body>
