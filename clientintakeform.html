@@ -95,6 +95,10 @@
       grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
     }
 
+    .ci-grid.paycard{
+      grid-template-columns: minmax(0,2.4fr) minmax(0,1fr) minmax(0,.55fr) minmax(0,.55fr);
+    }
+
     .ci-field{width:100%}
 
     .ci-wide{grid-column:1 / -1}
@@ -255,6 +259,7 @@
 
     @media (max-width:820px){
       .ci-grid, .ci-grid.three, .ci-grid.four{grid-template-columns:1fr}
+      .ci-grid.paycard{grid-template-columns:1fr}
       .ci-grid.titlefit{
         grid-auto-flow:row;
         grid-auto-columns:unset;
@@ -584,7 +589,7 @@
       </div>
     </div>
 
-    <div class="ci-grid four" style="margin-top:14px;">
+    <div class="ci-grid paycard" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Card Number</div>
@@ -813,7 +818,12 @@
       const onFeinInput = () => {
         if (!fein) return;
         if (noFein && noFein.checked) return;
-        fein.value = formatFein(fein.value);
+        fein.value = (function(raw){
+          const d = onlyDigits(raw).slice(0,9);
+          if (!d) return "";
+          if (d.length <= 2) return d;
+          return d.slice(0,2) + "-" + d.slice(2);
+        })(fein.value);
         save(root);
       };
 
@@ -948,7 +958,6 @@
       const onOtherAcctChange = () => syncOtherAccountantState();
       const onUseSwChange = () => syncAccountingSoftwareState();
       const onCardTypeChange = () => syncCardFormat();
-
       const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
 
       if (fein){
