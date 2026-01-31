@@ -65,6 +65,14 @@
       width:100%;
     }
 
+    .ci-grid.four{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:14px;
+      margin-top:10px;
+      width:100%;
+    }
+
     .ci-grid.titlefit{
       grid-template-columns:none;
       grid-auto-flow:column;
@@ -246,7 +254,7 @@
     }
 
     @media (max-width:820px){
-      .ci-grid, .ci-grid.three{grid-template-columns:1fr}
+      .ci-grid, .ci-grid.three, .ci-grid.four{grid-template-columns:1fr}
       .ci-grid.titlefit{
         grid-auto-flow:row;
         grid-auto-columns:unset;
@@ -546,6 +554,66 @@
       Payment not charged at this time. Payment information collected for payment-related onboarding agreements.
     </div>
 
+    <div class="ci-grid" style="margin-top:12px;">
+      <div class="ci-field ci-wide">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">We require all clients to keep a debit or credit card on file. Please fill out the following:</div>
+        </div>
+
+        <div class="ci-basis-row" role="group" aria-label="Card Type" style="margin-top:0;">
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_type" id="pay_card_mc" value="Mastercard">
+            Mastercard
+          </label>
+
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_type" id="pay_card_visa" value="Visa">
+            Visa
+          </label>
+
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_type" id="pay_card_amex" value="American Express">
+            American Express
+          </label>
+
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_type" id="pay_card_disc" value="Discover">
+            Discover
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="ci-grid four" style="margin-top:14px;">
+      <div class="ci-field">
+        <div class="ci-labelrow">
+          <div class="ci-label">Card Number</div>
+        </div>
+        <input class="ci-input" id="pay_card_number" type="text" placeholder="XXXX XXXX XXXX XXXX" inputmode="numeric" autocomplete="cc-number" maxlength="19">
+      </div>
+
+      <div class="ci-field">
+        <div class="ci-labelrow">
+          <div class="ci-label">Expiration Date</div>
+        </div>
+        <input class="ci-input" id="pay_card_exp" type="text" placeholder="MM/YY" inputmode="numeric" autocomplete="cc-exp" maxlength="5">
+      </div>
+
+      <div class="ci-field">
+        <div class="ci-labelrow">
+          <div class="ci-label">CVV</div>
+        </div>
+        <input class="ci-input" id="pay_card_cvv" type="text" placeholder="CVV" inputmode="numeric" autocomplete="cc-csc" maxlength="4">
+      </div>
+
+      <div class="ci-field">
+        <div class="ci-labelrow">
+          <div class="ci-label">Zip Code</div>
+        </div>
+        <input class="ci-input" id="pay_card_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10">
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -580,6 +648,43 @@
       return d.slice(0,5) + "-" + d.slice(5);
     }
 
+    function getSelectedValue(root, name){
+      const sel = root.querySelector('input[type="radio"][name="'+name+'"]:checked');
+      return sel ? (sel.value || "") : "";
+    }
+
+    function formatCardNumber(raw, cardType){
+      const d = onlyDigits(raw);
+      if (cardType === "American Express"){
+        const x = d.slice(0,15);
+        const p1 = x.slice(0,4);
+        const p2 = x.slice(4,10);
+        const p3 = x.slice(10,15);
+        if (!x) return "";
+        if (x.length <= 4) return p1;
+        if (x.length <= 10) return p1 + " " + p2;
+        return p1 + " " + p2 + " " + p3;
+      } else {
+        const x = d.slice(0,16);
+        const parts = [];
+        for (let i=0;i<x.length;i+=4){
+          parts.push(x.slice(i,i+4));
+        }
+        return parts.join(" ");
+      }
+    }
+
+    function formatExp(raw){
+      const d = onlyDigits(raw).slice(0,4);
+      if (!d) return "";
+      if (d.length <= 2) return d;
+      return d.slice(0,2) + "/" + d.slice(2);
+    }
+
+    function maxCvvLen(cardType){
+      return (cardType === "American Express") ? 4 : 3;
+    }
+
     function loadSaved(root){
       try{
         const raw = localStorage.getItem(STORAGE_KEY_INTAKE);
@@ -593,7 +698,8 @@
           "poc_email","poc_phone",
           "boa_other_text",
           "ai_accountant_name","ai_accountant_phone","ai_accountant_email",
-          "ai_sw_specify"
+          "ai_sw_specify",
+          "pay_card_number","pay_card_exp","pay_card_cvv","pay_card_zip"
         ];
 
         ids.forEach(id=>{
@@ -610,33 +716,31 @@
         const savedBasis = (data["boa_basis"] ?? "");
         if (savedBasis){
           const radios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
-          radios.forEach(r=>{
-            r.checked = (r.value === savedBasis);
-          });
+          radios.forEach(r=>{ r.checked = (r.value === savedBasis); });
         }
 
         const savedOtherAcct = (data["ai_other_accountant"] ?? "");
         if (savedOtherAcct){
           const radios2 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]'));
-          radios2.forEach(r=>{
-            r.checked = (r.value === savedOtherAcct);
-          });
+          radios2.forEach(r=>{ r.checked = (r.value === savedOtherAcct); });
         }
 
         const savedUseSw = (data["ai_use_accounting_software"] ?? "");
         if (savedUseSw){
           const radios3 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
-          radios3.forEach(r=>{
-            r.checked = (r.value === savedUseSw);
-          });
+          radios3.forEach(r=>{ r.checked = (r.value === savedUseSw); });
         }
 
         const savedRecords = (data["ai_records_full_history"] ?? "");
         if (savedRecords){
           const radios4 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_records_full_history"]'));
-          radios4.forEach(r=>{
-            r.checked = (r.value === savedRecords);
-          });
+          radios4.forEach(r=>{ r.checked = (r.value === savedRecords); });
+        }
+
+        const savedCardType = (data["pay_card_type"] ?? "");
+        if (savedCardType){
+          const radios5 = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_type"]'));
+          radios5.forEach(r=>{ r.checked = (r.value === savedCardType); });
         }
       } catch {}
     }
@@ -649,7 +753,8 @@
         "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
         "poc_email","poc_phone",
         "ai_accountant_name","ai_accountant_phone","ai_accountant_email",
-        "ai_sw_specify"
+        "ai_sw_specify",
+        "pay_card_number","pay_card_exp","pay_card_cvv","pay_card_zip"
       ];
       ids.forEach(id=>{
         const el = root.querySelector("#"+id);
@@ -660,20 +765,15 @@
       const cb = root.querySelector("#bi_no_fein");
       out["bi_no_fein"] = cb ? !!cb.checked : false;
 
-      const selected = root.querySelector('input[type="radio"][name="boa_basis"]:checked');
-      out["boa_basis"] = selected ? (selected.value || "") : "";
-
+      out["boa_basis"] = getSelectedValue(root, "boa_basis");
       const otherText = root.querySelector("#boa_other_text");
       out["boa_other_text"] = otherText ? (otherText.value || "") : "";
 
-      const selectedOtherAcct = root.querySelector('input[type="radio"][name="ai_other_accountant"]:checked');
-      out["ai_other_accountant"] = selectedOtherAcct ? (selectedOtherAcct.value || "") : "";
+      out["ai_other_accountant"] = getSelectedValue(root, "ai_other_accountant");
+      out["ai_use_accounting_software"] = getSelectedValue(root, "ai_use_accounting_software");
+      out["ai_records_full_history"] = getSelectedValue(root, "ai_records_full_history");
 
-      const selectedUseSw = root.querySelector('input[type="radio"][name="ai_use_accounting_software"]:checked');
-      out["ai_use_accounting_software"] = selectedUseSw ? (selectedUseSw.value || "") : "";
-
-      const selectedRecords = root.querySelector('input[type="radio"][name="ai_records_full_history"]:checked');
-      out["ai_records_full_history"] = selectedRecords ? (selectedRecords.value || "") : "";
+      out["pay_card_type"] = getSelectedValue(root, "pay_card_type");
 
       try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
     }
@@ -701,6 +801,12 @@
       const useSwRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
       const useSwYes = root.querySelector("#ai_sw_yes");
       const swSpecify = root.querySelector("#ai_sw_specify");
+
+      const payCardTypeRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_type"]'));
+      const payCardNumber = root.querySelector("#pay_card_number");
+      const payCardExp = root.querySelector("#pay_card_exp");
+      const payCardCvv = root.querySelector("#pay_card_cvv");
+      const payCardZip = root.querySelector("#pay_card_zip");
 
       loadSaved(root);
 
@@ -747,7 +853,11 @@
         save(root);
       };
 
-      const onAnyChange = () => save(root);
+      const onPayZipInput = () => {
+        if (!payCardZip) return;
+        payCardZip.value = formatZip(payCardZip.value);
+        save(root);
+      };
 
       function syncOtherState(){
         if (!boaOtherText) return;
@@ -788,10 +898,58 @@
         save(root);
       }
 
+      function syncCardFormat(){
+        const cardType = getSelectedValue(root, "pay_card_type");
+        if (payCardNumber){
+          if (cardType === "American Express"){
+            payCardNumber.setAttribute("maxlength","17");
+            payCardNumber.placeholder = "XXXX XXXXXX XXXXX";
+          } else {
+            payCardNumber.setAttribute("maxlength","19");
+            payCardNumber.placeholder = "XXXX XXXX XXXX XXXX";
+          }
+          payCardNumber.value = formatCardNumber(payCardNumber.value, cardType);
+        }
+
+        if (payCardCvv){
+          const maxLen = maxCvvLen(cardType);
+          payCardCvv.setAttribute("maxlength", String(maxLen));
+          payCardCvv.placeholder = (maxLen === 4) ? "4-digit CVV" : "3-digit CVV";
+          payCardCvv.value = onlyDigits(payCardCvv.value).slice(0, maxLen);
+        }
+
+        save(root);
+      }
+
+      const onPayCardNumberInput = () => {
+        if (!payCardNumber) return;
+        const cardType = getSelectedValue(root, "pay_card_type");
+        payCardNumber.value = formatCardNumber(payCardNumber.value, cardType);
+        save(root);
+      };
+
+      const onPayExpInput = () => {
+        if (!payCardExp) return;
+        payCardExp.value = formatExp(payCardExp.value);
+        save(root);
+      };
+
+      const onPayCvvInput = () => {
+        if (!payCardCvv) return;
+        const cardType = getSelectedValue(root, "pay_card_type");
+        const maxLen = maxCvvLen(cardType);
+        payCardCvv.value = onlyDigits(payCardCvv.value).slice(0, maxLen);
+        save(root);
+      };
+
+      const onAnyChange = () => save(root);
+
       const onBasisChange = () => syncOtherState();
-      const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
       const onOtherAcctChange = () => syncOtherAccountantState();
       const onUseSwChange = () => syncAccountingSoftwareState();
+      const onCardTypeChange = () => syncCardFormat();
+
+      const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
 
       if (fein){
         fein.addEventListener("input", onFeinInput);
@@ -818,9 +976,7 @@
         zip.addEventListener("blur", onZipInput);
       }
 
-      boaRadios.forEach(r=>{
-        r.addEventListener("change", onBasisChange);
-      });
+      boaRadios.forEach(r=>{ r.addEventListener("change", onBasisChange); });
 
       if (boaOtherText){
         boaOtherText.addEventListener("input", onOtherTextInput);
@@ -828,13 +984,8 @@
         boaOtherText.addEventListener("blur", onOtherTextInput);
       }
 
-      otherAcctRadios.forEach(r=>{
-        r.addEventListener("change", onOtherAcctChange);
-      });
-
-      useSwRadios.forEach(r=>{
-        r.addEventListener("change", onUseSwChange);
-      });
+      otherAcctRadios.forEach(r=>{ r.addEventListener("change", onOtherAcctChange); });
+      useSwRadios.forEach(r=>{ r.addEventListener("change", onUseSwChange); });
 
       if (swSpecify){
         swSpecify.addEventListener("input", onAnyChange);
@@ -842,9 +993,29 @@
         swSpecify.addEventListener("blur", onAnyChange);
       }
 
+      payCardTypeRadios.forEach(r=>{ r.addEventListener("change", onCardTypeChange); });
+
+      if (payCardNumber){
+        payCardNumber.addEventListener("input", onPayCardNumberInput);
+        payCardNumber.addEventListener("blur", onPayCardNumberInput);
+      }
+      if (payCardExp){
+        payCardExp.addEventListener("input", onPayExpInput);
+        payCardExp.addEventListener("blur", onPayExpInput);
+      }
+      if (payCardCvv){
+        payCardCvv.addEventListener("input", onPayCvvInput);
+        payCardCvv.addEventListener("blur", onPayCvvInput);
+      }
+      if (payCardZip){
+        payCardZip.addEventListener("input", onPayZipInput);
+        payCardZip.addEventListener("blur", onPayZipInput);
+      }
+
       syncOtherState();
       syncOtherAccountantState();
       syncAccountingSoftwareState();
+      syncCardFormat();
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
@@ -853,6 +1024,9 @@
         if (el.name === "ai_other_accountant") return;
         if (el.name === "ai_use_accounting_software") return;
         if (el.id === "ai_sw_specify") return;
+
+        if (el.name === "pay_card_type") return;
+        if (el.id === "pay_card_number" || el.id === "pay_card_exp" || el.id === "pay_card_cvv" || el.id === "pay_card_zip") return;
 
         el.addEventListener("input", onAnyChange);
         el.addEventListener("change", onAnyChange);
@@ -884,9 +1058,7 @@
           zip.removeEventListener("blur", onZipInput);
         }
 
-        boaRadios.forEach(r=>{
-          r.removeEventListener("change", onBasisChange);
-        });
+        boaRadios.forEach(r=>{ r.removeEventListener("change", onBasisChange); });
 
         if (boaOtherText){
           boaOtherText.removeEventListener("input", onOtherTextInput);
@@ -894,18 +1066,32 @@
           boaOtherText.removeEventListener("blur", onOtherTextInput);
         }
 
-        otherAcctRadios.forEach(r=>{
-          r.removeEventListener("change", onOtherAcctChange);
-        });
-
-        useSwRadios.forEach(r=>{
-          r.removeEventListener("change", onUseSwChange);
-        });
+        otherAcctRadios.forEach(r=>{ r.removeEventListener("change", onOtherAcctChange); });
+        useSwRadios.forEach(r=>{ r.removeEventListener("change", onUseSwChange); });
 
         if (swSpecify){
           swSpecify.removeEventListener("input", onAnyChange);
           swSpecify.removeEventListener("change", onAnyChange);
           swSpecify.removeEventListener("blur", onAnyChange);
+        }
+
+        payCardTypeRadios.forEach(r=>{ r.removeEventListener("change", onCardTypeChange); });
+
+        if (payCardNumber){
+          payCardNumber.removeEventListener("input", onPayCardNumberInput);
+          payCardNumber.removeEventListener("blur", onPayCardNumberInput);
+        }
+        if (payCardExp){
+          payCardExp.removeEventListener("input", onPayExpInput);
+          payCardExp.removeEventListener("blur", onPayExpInput);
+        }
+        if (payCardCvv){
+          payCardCvv.removeEventListener("input", onPayCvvInput);
+          payCardCvv.removeEventListener("blur", onPayCvvInput);
+        }
+        if (payCardZip){
+          payCardZip.removeEventListener("input", onPayZipInput);
+          payCardZip.removeEventListener("blur", onPayZipInput);
         }
 
         allInputs.forEach(el=>{
