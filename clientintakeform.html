@@ -100,13 +100,6 @@
       grid-template-columns: minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
     }
 
-    /* Payment: tighten gap between ownership & type */
-    .ci-grid.paymeta{
-      column-gap:10px;
-      row-gap:0px;
-      margin-top:14px;
-    }
-
     .ci-field{width:100%}
 
     .ci-wide{grid-column:1 / -1}
@@ -207,10 +200,6 @@
       margin-top:10px;
       padding:2px 2px 0;
       width:100%;
-    }
-
-    .ci-basis-row.tight{
-      gap:12px;
     }
 
     .ci-radio{
@@ -595,52 +584,8 @@
         <div class="ci-labelrow" style="margin-bottom:8px;">
           <div class="ci-label">We require all clients to keep a debit or credit card on file. Please fill out the following:</div>
         </div>
-      </div>
-    </div>
 
-    <!-- Ownership + Type ABOVE issuer -->
-    <div class="ci-grid paymeta" style="margin-top:10px;">
-      <div class="ci-field">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Ownership</div>
-        </div>
-        <div class="ci-basis-row tight" role="group" aria-label="Card Ownership" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_ownership" id="pay_own_personal" value="Personal">
-            Personal Card
-          </label>
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_ownership" id="pay_own_business" value="Business">
-            Business Card
-          </label>
-        </div>
-      </div>
-
-      <div class="ci-field">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Type</div>
-        </div>
-        <div class="ci-basis-row tight" role="group" aria-label="Card Type" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_type" id="pay_type_debit" value="Debit">
-            Debit
-          </label>
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_type" id="pay_type_credit" value="Credit">
-            Credit
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Issuer title + issuer radios -->
-    <div class="ci-grid" style="margin-top:12px;">
-      <div class="ci-field ci-wide">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Issuer</div>
-        </div>
-
-        <div class="ci-basis-row" role="group" aria-label="Card Issuer" style="margin-top:0;">
+        <div class="ci-basis-row" role="group" aria-label="Card Brand" style="margin-top:0;">
           <label class="ci-radio">
             <input type="radio" name="pay_card_brand" id="pay_card_mc" value="Mastercard">
             Mastercard
@@ -659,6 +604,40 @@
           <label class="ci-radio">
             <input type="radio" name="pay_card_brand" id="pay_card_disc" value="Discover">
             Discover
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="ci-grid" style="margin-top:14px;">
+      <div class="ci-field">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">Card Ownership</div>
+        </div>
+        <div class="ci-basis-row" role="group" aria-label="Card Ownership" style="margin-top:0;">
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_ownership" id="pay_own_personal" value="Personal">
+            Personal Card
+          </label>
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_ownership" id="pay_own_business" value="Business">
+            Business Card
+          </label>
+        </div>
+      </div>
+
+      <div class="ci-field">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">Card Type</div>
+        </div>
+        <div class="ci-basis-row" role="group" aria-label="Card Type" style="margin-top:0;">
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_type" id="pay_type_debit" value="Debit">
+            Debit
+          </label>
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_type" id="pay_type_credit" value="Credit">
+            Credit
           </label>
         </div>
       </div>
