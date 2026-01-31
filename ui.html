@@ -16,7 +16,6 @@
       --radius:18px;
       --shadow:0 28px 56px rgba(0,0,0,0.30);
       --danger:#b91c1c;
-
       --outer-pad-v:40px;
       --outer-pad-h:20px;
     }
@@ -105,7 +104,7 @@
       overflow:auto;
       background:
         linear-gradient(180deg, rgba(0,0,0,0.52) 0%, rgba(0,0,0,0.42) 45%, rgba(0,0,0,0.52) 100%),
-        url("https://images.unsplash.com/photo-1519681393784-d120267933ba");
+        url("https://images.unsplash.com/photo-1725759675905-ffefc70268e3?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
       background-size:cover;
       background-position:center;
       background-repeat:no-repeat;
@@ -209,16 +208,15 @@
       pointer-events:none;
     }
 
-    /* UPDATED: push the whole block downward */
     .access-center{
-      width:min(640px, 100%);
+      width:min(640px,100%);
       margin:0 auto;
       display:flex;
       flex-direction:column;
       align-items:stretch;
       position:relative;
       z-index:1;
-      padding-top:72px;
+      padding-top:88px;  /* moved UP (was 112px) */
     }
 
     .access-top{
@@ -269,10 +267,7 @@
       transition:border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .access-input::placeholder{
-      color:#94a3b8;
-      font-weight:700;
-    }
+    .access-input::placeholder{color:#94a3b8;font-weight:700}
 
     .access-input:focus{
       border-color:rgba(0,48,91,0.75);
@@ -350,11 +345,44 @@
       overflow:hidden;
     }
 
+    .page-content.scrollable{
+      padding:0;
+      height:400px;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .page-scroll{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      padding:50px 52px 50px 40px;
+      scrollbar-gutter:stable;
+    }
+
     .page-content h2{
       font-size:20px;
-      font-weight:800;
-      margin-bottom:16px;
+      font-weight:900;
+      margin-bottom:12px;
       color:var(--carbyne-blue);
+      letter-spacing:0.2px;
+    }
+
+    .page-content p{
+      font-size:14px;
+      line-height:1.65;
+      color:#0f172a;
+      margin-bottom:12px;
+      font-weight:600;
+    }
+
+    .page-subhead{
+      margin-top:14px;
+      font-size:14px;
+      font-weight:900;
+      color:#0f172a;
+      letter-spacing:0.2px;
+      margin-bottom:8px;
     }
 
     .reference-number{
@@ -362,21 +390,82 @@
       top:20px;
       right:30px;
       font-size:12px;
-      font-weight:600;
+      font-weight:700;
       color:#64748b;
       letter-spacing:0.3px;
+      z-index:5;
     }
 
-    /* PAGE 3: compact */
-    .page-content.page3{
+    /* Intake form */
+    .intake-section-title{
+      font-size:14px;
+      font-weight:900;
+      color:#0f172a;
+      letter-spacing:0.2px;
+      margin:2px 0 12px 0;
+    }
+
+    .intake-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px 14px;
+      margin-top:6px;
+    }
+
+    .intake-grid.three{
+      grid-template-columns:1.2fr 0.8fr 0.8fr;
+    }
+
+    .intake-field{display:flex;flex-direction:column;gap:6px}
+
+    .intake-label{
+      font-size:12px;
+      font-weight:900;
+      color:#334155;
+      letter-spacing:0.15px;
+    }
+
+    .intake-input{
+      width:100%;
+      padding:12px 12px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(0,0,0,0.14);
+      border-radius:12px;
+      outline:none;
+      background:#ffffff;
+      transition:border-color 0.2s ease, box-shadow 0.2s ease;
+      -webkit-appearance:none;
+      appearance:none;
+    }
+
+    .intake-input::placeholder{color:#94a3b8;font-weight:700}
+
+    .intake-input:focus{
+      border-color:rgba(0,48,91,0.75);
+      box-shadow:0 0 0 3px rgba(0,48,91,0.18);
+    }
+
+    @media (max-width:760px){
+      .access-center{width:100%;padding-top:74px}
+      .page-content{padding:40px 28px}
+      .page-content.scrollable{padding:0;height:400px}
+      .page-scroll{padding:40px 44px 40px 26px}
+      .intake-grid{grid-template-columns:1fr}
+      .intake-grid.three{grid-template-columns:1fr}
+    }
+
+    /* PAGE 4: compact signature page */
+    .page-content.page4{
       padding:36px 32px;
       min-height:400px;
       max-height:400px;
     }
 
-    .page-content.page3 h2{
+    .page-content.page4 h2{
       margin-bottom:10px;
       font-size:18px;
+      font-weight:900;
     }
 
     .sig-page3{
@@ -402,7 +491,7 @@
 
     .sig-loading{
       font-size:14px;
-      font-weight:800;
+      font-weight:900;
       color:#334155;
       padding:12px 14px;
       background:rgba(255,255,255,0.92);
@@ -440,8 +529,7 @@
 
     @media (max-width:760px){
       .sig-page3-grid{grid-template-columns:1fr}
-      .page-content.page3{padding:32px 26px}
-      .access-center{width:100%;padding-top:54px}
+      .page-content.page4{padding:32px 26px}
     }
   </style>
 </head>
@@ -483,16 +571,20 @@
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
   <script>
-    const TOTAL_PAGES = 15;
+    const TOTAL_STEPS = 15;
+    const TOTAL_PAGES_WITH_ACCESS = TOTAL_STEPS + 1;
+
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
     const CACHE_KEY = "carbyne_valid_codes_cache";
     const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
+
     const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
     const TARGET_HEADER = "Unique Identifier";
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
     const ELECTRONIC_SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
+    const INTAKE_KEY = "carbyne_intake_client_intake_form_v1";
 
     let currentPage = 1;
     let isAccessValidated = false;
@@ -506,6 +598,7 @@
     const nextBtn = document.getElementById("nextBtn");
 
     function normalize(v){ return (v ?? "").toString().trim(); }
+    function getStepNumberForPage(pageNum){ return Math.max(0, pageNum - 1); }
 
     function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
@@ -519,7 +612,7 @@
             return validCodesCache;
           }
         }
-      }catch(e){ console.error("Cache read error:", e); }
+      }catch(e){}
       return null;
     }
 
@@ -528,7 +621,7 @@
       try{
         localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
         localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-      }catch(e){ console.error("Cache write error:", e); }
+      }catch(e){}
     }
 
     function findHeaderIndex(headers){
@@ -560,7 +653,7 @@
 
         const headers = rows[0].map(v => normalize(v));
         const col = findHeaderIndex(headers);
-        if (col < 0) throw new Error("Column 'Unique Identifier' not found");
+        if (col < 0) throw new Error("Column not found");
 
         const validCodes = [];
         for (let r=1;r<rows.length;r++){
@@ -594,12 +687,31 @@
       }
     }
 
+    function updateUI(){
+      const stepNum = getStepNumberForPage(currentPage);
+      const progress = (currentPage <= 1) ? 0 : (stepNum / TOTAL_STEPS) * 100;
+      progressBar.style.width = `${progress}%`;
+
+      if (currentPage === 1){
+        pageIndicator.style.visibility = "hidden";
+      } else {
+        pageIndicator.style.visibility = "visible";
+        pageIndicator.textContent = `Step ${stepNum} of ${TOTAL_STEPS}`;
+      }
+
+      prevBtn.disabled = (currentPage === 1);
+      nextBtn.disabled = (currentPage === TOTAL_PAGES_WITH_ACCESS) || (currentPage === 1);
+
+      localStorage.setItem(CURRENT_PAGE_KEY, String(currentPage));
+    }
+
     function init(){
       const accessCode = localStorage.getItem(STORAGE_KEY);
       isAccessValidated = !!accessCode;
 
       const savedPage = parseInt(localStorage.getItem(CURRENT_PAGE_KEY),10) || 1;
-      currentPage = isAccessValidated ? Math.min(Math.max(savedPage,1), TOTAL_PAGES) : 1;
+      const bounded = Math.min(Math.max(savedPage,1), TOTAL_PAGES_WITH_ACCESS);
+      currentPage = isAccessValidated ? bounded : 1;
 
       if (!getCachedCodes()){
         fetchValidCodes().catch(() => {});
@@ -611,19 +723,6 @@
       nextBtn.addEventListener("click", goToNextPage);
     }
 
-    function updateUI(){
-      const progress = (currentPage / TOTAL_PAGES) * 100;
-      progressBar.style.width = `${progress}%`;
-
-      pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
-      pageIndicator.style.visibility = (currentPage === 1) ? "hidden" : "visible";
-
-      prevBtn.disabled = (currentPage === 1);
-      nextBtn.disabled = (currentPage === TOTAL_PAGES) || (currentPage === 1);
-
-      localStorage.setItem(CURRENT_PAGE_KEY, String(currentPage));
-    }
-
     function goToPreviousPage(){
       if (currentPage > 1){
         currentPage--;
@@ -632,7 +731,7 @@
     }
 
     function goToNextPage(){
-      if (currentPage < TOTAL_PAGES){
+      if (currentPage < TOTAL_PAGES_WITH_ACCESS){
         currentPage++;
         loadPage(currentPage);
       }
@@ -644,15 +743,17 @@
 
       if (pageNum === 1){
         loadAccessModule();
-      } else {
-        if (!isAccessValidated){
-          currentPage = 1;
-          loadAccessModule();
-          updateUI();
-          return;
-        }
-        loadPageContent(pageNum);
+        return;
       }
+
+      if (!isAccessValidated){
+        currentPage = 1;
+        loadAccessModule();
+        updateUI();
+        return;
+      }
+
+      loadPageContent(pageNum);
     }
 
     function loadAccessModule(){
@@ -720,7 +821,6 @@
 
       async function submit(){
         showInvalid(false);
-
         const code = normalize(input.value);
         input.value = code;
 
@@ -736,7 +836,8 @@
           if (isValid){
             localStorage.setItem(STORAGE_KEY, code);
             isAccessValidated = true;
-            goToNextPage();
+            currentPage = 2;
+            loadPage(currentPage);
           } else {
             showInvalid(true);
           }
@@ -754,7 +855,30 @@
       input.focus();
     }
 
-    // ====== Signature loader kept intact ======
+    function formatPhoneUS(raw){
+      const digits = (raw || "").replace(/\D/g, "").slice(0,10);
+      if (!digits) return "";
+      if (digits.length <= 3) return "(" + digits;
+      if (digits.length <= 6) return "(" + digits.slice(0,3) + ") " + digits.slice(3);
+      return "(" + digits.slice(0,3) + ") " + digits.slice(3,6) + "-" + digits.slice(6);
+    }
+
+    function readIntake(){
+      try{
+        const raw = localStorage.getItem(INTAKE_KEY);
+        if (!raw) return {};
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") return parsed;
+      }catch(e){}
+      return {};
+    }
+
+    function writeIntake(next){
+      try{
+        localStorage.setItem(INTAKE_KEY, JSON.stringify(next));
+      }catch(e){}
+    }
+
     let __sigKitLoaded = false;
     let __sigKitLoadingPromise = null;
 
@@ -788,17 +912,192 @@
       return __sigKitLoadingPromise;
     }
 
-    async function mountSignatureOnPage3(headerSlot, inputSlot, statusSlot){
+    async function mountSignatureOnPage4(headerSlot, inputSlot, statusSlot){
       await loadElectronicSignatureKit();
       window.CarbyneSignatureKit.mount(document, { header:headerSlot, input:inputSlot, status:statusSlot });
     }
 
     function loadPageContent(pageNum){
-      const content = document.createElement("div");
       const secureCode = localStorage.getItem(STORAGE_KEY) || "";
 
+      if (pageNum === 2){
+        const content = document.createElement("div");
+        content.className = "page-content";
+        content.innerHTML = `
+          <div class="reference-number">Reference Number: ${secureCode}</div>
+          <h2>Welcome to Carbyne Accounting</h2>
+
+          <p>We're (we are) excited to have you on board! To complete your onboarding, please review and electronically sign the client onboarding agreements in the following steps.</p>
+
+          <div class="page-subhead">Next Steps</div>
+          <p>Please review each agreement carefully and provide your electronic signature where indicated.</p>
+          <p>Once all agreements have been electronically signed, we will send finalized service schedules via email.</p>
+
+          <div class="page-subhead">Questions</div>
+          <p>If you have any questions during this process, please contact Client Services at (502) 632-9444 or Client@CarbyneAccounting.com.</p>
+        `;
+        pageMount.appendChild(content);
+        return;
+      }
+
       if (pageNum === 3){
-        content.className = "page-content page3";
+        const intake = readIntake();
+
+        const content = document.createElement("div");
+        content.className = "page-content scrollable";
+        content.innerHTML = `
+          <div class="page-scroll">
+            <div class="reference-number">Reference Number: ${secureCode}</div>
+            <h2>Client Intake Form</h2>
+
+            <div class="intake-section-title">Business Information</div>
+
+            <div class="intake-grid">
+              <div class="intake-field" style="grid-column:1 / -1;">
+                <div class="intake-label">Name of Business</div>
+                <input class="intake-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
+              </div>
+
+              <div class="intake-field">
+                <div class="intake-label">Full Name of Person Completing this Agreement</div>
+                <input class="intake-input" id="bi_signer_name" type="text" placeholder="Full Name" autocomplete="name">
+              </div>
+
+              <div class="intake-field">
+                <div class="intake-label">Title</div>
+                <input class="intake-input" id="bi_signer_title" type="text" placeholder="Title">
+              </div>
+
+              <div class="intake-field">
+                <div class="intake-label">Business Address</div>
+                <input class="intake-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
+              </div>
+
+              <div class="intake-field">
+                <div class="intake-label">Suite / Unit Number</div>
+                <input class="intake-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
+              </div>
+            </div>
+
+            <div class="intake-grid three" style="margin-top:12px;">
+              <div class="intake-field">
+                <div class="intake-label">City</div>
+                <input class="intake-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
+              </div>
+
+              <div class="intake-field">
+                <div class="intake-label">State</div>
+                <select class="intake-input" id="bi_state">
+                  <option value="">Select State</option>
+                  <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
+                  <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
+                  <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
+                  <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
+                  <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
+                  <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
+                  <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
+                  <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
+                  <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
+                  <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
+                  <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
+                  <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
+                  <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
+                  <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
+                  <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
+                  <option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
+                  <option value="WI">WI</option><option value="WY">WY</option>
+                </select>
+              </div>
+
+              <div class="intake-field">
+                <div class="intake-label">Zip Code</div>
+                <input class="intake-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code">
+              </div>
+            </div>
+
+            <div class="intake-grid" style="margin-top:12px;">
+              <div class="intake-field">
+                <div class="intake-label">Business Phone Number</div>
+                <input class="intake-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" maxlength="14" autocomplete="tel">
+              </div>
+
+              <div class="intake-field">
+                <div class="intake-label">Business Email Address</div>
+                <input class="intake-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
+              </div>
+
+              <div class="intake-field" style="grid-column:1 / -1;">
+                <div class="intake-label">Business Point of Contact</div>
+                <input class="intake-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
+              </div>
+            </div>
+          </div>
+        `;
+        pageMount.appendChild(content);
+
+        const el = {
+          name: content.querySelector("#bi_name"),
+          signer_name: content.querySelector("#bi_signer_name"),
+          signer_title: content.querySelector("#bi_signer_title"),
+          address: content.querySelector("#bi_address"),
+          suite: content.querySelector("#bi_suite"),
+          city: content.querySelector("#bi_city"),
+          state: content.querySelector("#bi_state"),
+          zip: content.querySelector("#bi_zip"),
+          phone: content.querySelector("#bi_phone"),
+          email: content.querySelector("#bi_email"),
+          poc: content.querySelector("#bi_poc")
+        };
+
+        el.name.value = intake.name || "";
+        el.signer_name.value = intake.signer_name || "";
+        el.signer_title.value = intake.signer_title || "";
+        el.address.value = intake.address || "";
+        el.suite.value = intake.suite || "";
+        el.city.value = intake.city || "";
+        el.state.value = intake.state || "";
+        el.zip.value = intake.zip || "";
+        el.phone.value = intake.phone || "";
+        el.email.value = intake.email || "";
+        el.poc.value = intake.poc || "";
+
+        function persist(){
+          const next = {
+            name: normalize(el.name.value),
+            signer_name: normalize(el.signer_name.value),
+            signer_title: normalize(el.signer_title.value),
+            address: normalize(el.address.value),
+            suite: normalize(el.suite.value),
+            city: normalize(el.city.value),
+            state: normalize(el.state.value),
+            zip: normalize(el.zip.value),
+            phone: normalize(el.phone.value),
+            email: normalize(el.email.value),
+            poc: normalize(el.poc.value)
+          };
+          writeIntake(next);
+        }
+
+        function onPhoneInput(){
+          el.phone.value = formatPhoneUS(el.phone.value);
+          persist();
+        }
+
+        el.phone.addEventListener("input", onPhoneInput);
+        el.phone.addEventListener("change", onPhoneInput);
+
+        [el.name, el.signer_name, el.signer_title, el.address, el.suite, el.city, el.state, el.zip, el.email, el.poc].forEach((node) => {
+          if (!node) return;
+          node.addEventListener("input", persist);
+          node.addEventListener("change", persist);
+        });
+
+        return;
+      }
+
+      if (pageNum === 4){
+        const content = document.createElement("div");
+        content.className = "page-content page4";
         content.innerHTML = `
           <div class="reference-number">Reference Number: ${secureCode}</div>
           <h2>Electronic Signature</h2>
@@ -817,18 +1116,22 @@
         const inputSlot = content.querySelector("#sigInputSlot");
         const statusSlot = content.querySelector("#sigStatusSlot");
 
-        mountSignatureOnPage3(headerSlot, inputSlot, statusSlot).catch(() => {
+        mountSignatureOnPage4(headerSlot, inputSlot, statusSlot).catch(() => {
           headerSlot.innerHTML = `<span class="sig-loading">Signature failed to load</span>`;
           inputSlot.innerHTML = "";
           statusSlot.innerHTML = "";
         });
+
         return;
       }
 
+      const stepNum = Math.max(1, getStepNumberForPage(pageNum));
+      const content = document.createElement("div");
       content.className = "page-content";
       content.innerHTML = `
         <div class="reference-number">Reference Number: ${secureCode}</div>
-        <h2>Step ${pageNum}</h2>
+        <h2>Step ${stepNum}</h2>
+        <p>Agreement content will be placed on this page.</p>
       `;
       pageMount.appendChild(content);
     }
