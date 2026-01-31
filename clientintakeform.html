@@ -39,11 +39,11 @@
       letter-spacing:.2px;
     }
 
-    /* NEW: light blue section divider line */
+    /* Section divider line (hex #00305B) */
     .ci-sectionline{
       width:100%;
       height:2px;
-      background:rgba(37,150,190,.35);
+      background:#00305B;
       border-radius:999px;
       margin:8px 0 12px;
     }
@@ -59,6 +59,7 @@
     }
 
     .ci-grid.three{
+      display:grid;
       grid-template-columns:repeat(3, minmax(0,1fr));
       gap:14px;
       margin-top:10px;
@@ -389,10 +390,19 @@
       </div>
     </div>
 
-    <div class="ci-section" style="margin-top:18px;">Basis of Accounting</div>
+    <div class="ci-section" style="margin-top:18px;">Accounting Information</div>
     <div class="ci-sectionline"></div>
 
-    <div class="ci-basis-row" role="group" aria-label="Basis of Accounting">
+    <!-- Label above radio buttons like input fields -->
+    <div class="ci-grid" style="margin-top:0;">
+      <div class="ci-field ci-wide">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">Basis of Accounting</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ci-basis-row" role="group" aria-label="Basis of Accounting" style="margin-top:0;">
       <label class="ci-radio">
         <input type="radio" name="boa_basis" id="boa_accrual" value="Accrual Basis">
         Accrual Basis
