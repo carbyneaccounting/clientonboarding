@@ -46,18 +46,22 @@
       grid-template-columns:repeat(2, minmax(0,1fr));
       gap:14px;
       margin-top:10px;
+      width:100%;
     }
 
     .ci-grid.three{
       grid-template-columns:repeat(3, minmax(0,1fr));
+      width:100%;
     }
 
-    /* === CHANGE: widths of fields driven by label/title widths (for the specific row) === */
+    /* === CHANGE: widths of fields driven by label/title widths AND row still spans full width === */
     .ci-grid.titlefit{
       grid-template-columns:none;
       grid-auto-flow:column;
       grid-auto-columns:max-content;
       align-items:end;
+      width:100%;
+      justify-content:space-between; /* stretch across container */
     }
 
     .ci-grid.titlefit .ci-label{
@@ -216,6 +220,7 @@
       .ci-grid.titlefit{
         grid-auto-flow:row;
         grid-auto-columns:unset;
+        justify-content:stretch;
       }
       .ci-grid.titlefit .ci-label{
         white-space:normal;
@@ -255,7 +260,6 @@
       </div>
     </div>
 
-    <!-- === CHANGE APPLIED HERE: titlefit === -->
     <div class="ci-grid three titlefit" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
