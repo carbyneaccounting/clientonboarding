@@ -83,9 +83,9 @@
       min-width:0;
     }
 
-    /* NEW: Industry / Address / Suite widths (Suite ~ half; width shifted to Address) */
+    /* UPDATED: Suite/Unit wider so label/input stays aligned */
     .ci-grid.industryaddr{
-      grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,.5fr);
+      grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
     }
 
     .ci-field{width:100%}
@@ -301,13 +301,12 @@
       </div>
     </div>
 
-    <!-- UPDATED: Industry + Business Address + Suite/Unit on same line (Suite narrower; Address wider) -->
     <div class="ci-grid three industryaddr" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Industry</div>
+          <div class="ci-label">Business Industry</div>
         </div>
-        <input class="ci-input" id="bi_industry" type="text" placeholder="Industry" autocomplete="organization">
+        <input class="ci-input" id="bi_industry" type="text" placeholder="Business Industry" autocomplete="organization">
       </div>
 
       <div class="ci-field">
