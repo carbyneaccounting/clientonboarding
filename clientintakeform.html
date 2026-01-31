@@ -296,7 +296,15 @@
       </div>
     </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
+    <!-- UPDATED: Industry + Business Address + Suite/Unit on same line -->
+    <div class="ci-grid three" style="margin-top:14px;">
+      <div class="ci-field">
+        <div class="ci-labelrow">
+          <div class="ci-label">Industry</div>
+        </div>
+        <input class="ci-input" id="bi_industry" type="text" placeholder="Industry" autocomplete="organization">
+      </div>
+
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Business Address</div>
@@ -425,7 +433,6 @@
       </div>
     </div>
 
-    <!-- NEW: Do you have another accountant? -->
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
@@ -446,7 +453,6 @@
       </div>
     </div>
 
-    <!-- NEW: Accountant details (always visible; disabled unless Yes) -->
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
@@ -510,7 +516,8 @@
         const data = JSON.parse(raw);
 
         const ids = [
-          "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
+          "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title",
+          "bi_industry","bi_address","bi_suite",
           "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
           "poc_email","poc_phone",
           "boa_other_text",
@@ -549,7 +556,8 @@
     function save(root){
       const out = {};
       const ids = [
-        "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
+        "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title",
+        "bi_industry","bi_address","bi_suite",
         "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
         "poc_email","poc_phone",
         "ai_accountant_name","ai_accountant_phone","ai_accountant_email"
@@ -583,6 +591,7 @@
       const zip = root.querySelector("#bi_zip");
 
       const pocPhone = root.querySelector("#poc_phone");
+      const acctPhone = root.querySelector("#ai_accountant_phone");
 
       const boaOtherRadio = root.querySelector("#boa_other");
       const boaOtherText = root.querySelector("#boa_other_text");
@@ -592,7 +601,6 @@
       const otherAcctYes = root.querySelector("#ai_other_acct_yes");
 
       const acctName = root.querySelector("#ai_accountant_name");
-      const acctPhone = root.querySelector("#ai_accountant_phone");
       const acctEmail = root.querySelector("#ai_accountant_email");
 
       loadSaved(root);
@@ -600,8 +608,7 @@
       const onFeinInput = () => {
         if (!fein) return;
         if (noFein && noFein.checked) return;
-        const formatted = formatFein(fein.value);
-        fein.value = formatted;
+        fein.value = formatFein(fein.value);
         save(root);
       };
 
