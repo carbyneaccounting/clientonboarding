@@ -61,7 +61,8 @@
       grid-auto-columns:max-content;
       align-items:end;
       width:100%;
-      justify-content:space-between; /* stretch across container */
+      justify-content:space-between;
+      column-gap:10px; /* tighter spacing between fields */
     }
 
     .ci-grid.titlefit .ci-label{
@@ -221,6 +222,7 @@
         grid-auto-flow:row;
         grid-auto-columns:unset;
         justify-content:stretch;
+        column-gap:0;
       }
       .ci-grid.titlefit .ci-label{
         white-space:normal;
