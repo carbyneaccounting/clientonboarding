@@ -1,1060 +1,683 @@
-<!-- electronicsignature.html (REPLACE YOUR GITHUB FILE WITH THIS EXACT HTML) -->
+<!-- electronicsignature.html -->
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Electronic Signature Components</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Electronic Signature</title>
 
-  <style data-carbyne-sig="style">
+  <style>
     :root{
+      --sig-blue:#00305B;
+      --sig-blue-2:#0A3D6F;
       --sig-ink:#0f172a;
       --sig-muted:#475569;
-      --sig-border:rgba(0,0,0,0.10);
-      --sig-border-2:rgba(0,0,0,0.08);
-      --sig-bg:rgba(255,255,255,0.92);
-      --sig-card-bg:rgba(255,255,255,0.96);
-      --sig-shadow:0 10px 24px rgba(0,0,0,0.14);
-      --sig-shadow-2:0 8px 18px rgba(0,0,0,0.09);
+      --sig-border:rgba(0,0,0,.10);
+      --sig-card:rgba(255,255,255,.90);
       --sig-radius:14px;
-      --sig-radius-2:12px;
-      --sig-accent:#2563eb;
-      --sig-accent-soft:#e0e7ff;
-      --sig-success:#16a34a;
-      --sig-danger:#dc2626;
-      --sig-focus:0 0 0 3px rgba(37,99,235,.18);
-      --sig-pad-h:110px;
-      --sig-adopted-h:72px;
-      --sig-max-w:520px;
+      --sig-shadow:0 14px 30px rgba(0,0,0,.12);
+      --sig-danger:#b91c1c;
+      --sig-ok:#16a34a;
     }
 
-    [hidden]{display:none !important;}
+    .sig-wrap{
+      width:100%;
+    }
 
-    /* ====== COMPONENT: HEADER ====== */
-    .sig-header{
+    /* Make compact by default */
+    .sig-header-row{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:10px;
-      padding:8px 10px;
-      border:1px solid var(--sig-border-2);
-      border-radius:12px;
-      background:linear-gradient(180deg,#ffffff,#f9fafb);
-      box-shadow:0 8px 18px rgba(0,0,0,0.10);
-      color:var(--sig-ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      gap:14px;
+      margin-bottom:12px;
     }
 
-    .sig-brand{
+    .sig-h-left{
       display:flex;
       align-items:center;
-      gap:8px;
+      gap:12px;
       min-width:0;
     }
 
     .sig-mark{
-      width:28px;
-      height:28px;
-      border-radius:10px;
-      background:linear-gradient(135deg,#2563eb,#60a5fa);
-      color:#fff;
-      display:grid;
-      place-items:center;
-      font-weight:900;
-      user-select:none;
+      width:34px;height:34px;border-radius:10px;
+      background:rgba(0,48,91,.08);
+      border:1px solid rgba(0,0,0,.06);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 10px 18px rgba(0,0,0,.08);
+      color:var(--sig-blue);
       flex:0 0 auto;
-      font-size:13px;
-      box-shadow:0 6px 14px rgba(15,23,42,.08);
     }
 
-    .sig-title{
-      display:flex;
-      flex-direction:column;
-      gap:1px;
+    .sig-titlebox{
       min-width:0;
     }
 
-    .sig-title h3{
-      margin:0;
-      font-size:12px;
-      letter-spacing:.2px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      line-height:1.1;
+    .sig-title{
+      font-weight:950;
       color:var(--sig-ink);
-    }
-
-    .sig-title p{
-      margin:0;
-      font-size:10px;
-      color:var(--sig-muted);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
+      font-size:14px;
       line-height:1.1;
+    }
+    .sig-sub{
+      font-weight:800;
+      color:var(--sig-muted);
+      font-size:11px;
+      opacity:.90;
+      margin-top:3px;
+      letter-spacing:.15px;
     }
 
     .sig-actions{
       display:flex;
-      gap:6px;
       align-items:center;
+      gap:10px;
       flex:0 0 auto;
     }
 
-    /* ====== BUTTONS ====== */
     .sig-btn{
-      appearance:none;
-      border:1px solid rgba(0,0,0,0.14);
+      border:1px solid rgba(0,0,0,.10);
       background:#fff;
-      padding:6px 9px;
-      border-radius:10px;
-      font-size:11px;
-      font-weight:800;
-      cursor:pointer;
-      transition:transform .08s ease, box-shadow .15s ease, border-color .15s ease, opacity .15s ease;
       color:var(--sig-ink);
-      line-height:1;
-      white-space:nowrap;
-      box-shadow:0 5px 12px rgba(15,23,42,.07);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      font-weight:900;
+      font-size:12px;
+      padding:6px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      transition:opacity .15s ease, transform .15s ease, box-shadow .15s ease;
+      box-shadow:0 10px 18px rgba(0,0,0,.06);
+      user-select:none;
     }
-
-    .sig-btn:hover{
-      box-shadow:0 8px 16px rgba(15,23,42,.10);
-      border-color:#c7d2fe;
-    }
-
-    .sig-btn:active{transform:translateY(1px)}
-
-    .sig-btn:focus{
-      outline:none;
-      box-shadow:var(--sig-focus), 0 8px 16px rgba(15,23,42,.10);
-      border-color:#c7d2fe;
-    }
+    .sig-btn:hover{opacity:.95;transform:translateY(-1px)}
+    .sig-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
 
     .sig-btn.primary{
-      background:linear-gradient(180deg,#eef2ff,#fff);
-      border-color:#c7d2fe;
-      color:#1e3a8a;
+      background:linear-gradient(90deg,var(--sig-blue) 0%, var(--sig-blue-2) 100%);
+      color:#fff;
     }
-
     .sig-btn.danger{
-      background:linear-gradient(180deg,#fee2e2,#fff);
-      border-color:#fecaca;
-      color:#7f1d1d;
-    }
-
-    .sig-btn:disabled{
-      opacity:.5;
-      cursor:not-allowed;
+      background:rgba(185,28,28,.08);
+      border-color:rgba(185,28,28,.25);
+      color:var(--sig-danger);
       box-shadow:none;
-      transform:none;
     }
 
-    /* ====== CARD BASE ====== */
+    .sig-grid{
+      display:grid;
+      grid-template-columns:1.2fr .9fr;
+      gap:12px;
+    }
+
+    @media (max-width: 880px){
+      .sig-grid{grid-template-columns:1fr}
+    }
+
     .sig-card{
-      background:var(--sig-card-bg);
-      border:1px solid var(--sig-border-2);
-      border-radius:var(--sig-radius-2);
-      box-shadow:var(--sig-shadow-2);
-      padding:10px;
-      overflow:hidden;
-      color:var(--sig-ink);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:var(--sig-card);
+      border:1px solid var(--sig-border);
+      border-radius:var(--sig-radius);
+      box-shadow:var(--sig-shadow);
+      padding:12px;
     }
 
-    .sig-card h4{
-      margin:0 0 8px;
+    .sig-card h3{
       font-size:12px;
-      letter-spacing:.2px;
-      line-height:1.1;
+      font-weight:950;
       color:var(--sig-ink);
-    }
-
-    /* ====== INPUT ====== */
-    .sig-tabs{
-      display:flex;
-      gap:6px;
       margin-bottom:8px;
     }
 
+    .sig-tabs{
+      display:flex;
+      gap:8px;
+      margin-bottom:10px;
+      align-items:center;
+    }
+
     .sig-tab{
-      appearance:none;
-      border:1px solid var(--sig-border);
-      background:#fff;
-      padding:6px 10px;
-      border-radius:999px;
       font-size:11px;
-      font-weight:800;
+      font-weight:950;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.10);
+      background:#fff;
       cursor:pointer;
-      color:var(--sig-muted);
-      transition:background .15s ease, border-color .15s ease, box-shadow .15s ease;
-      line-height:1;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      user-select:none;
+    }
+    .sig-tab.active{
+      background:rgba(37,99,235,.10);
+      border-color:rgba(37,99,235,.18);
+      color:#1d4ed8;
     }
 
-    .sig-tab:hover{
-      border-color:#c7d2fe;
-      box-shadow:0 5px 12px rgba(15,23,42,.07);
-    }
-
-    .sig-tab:focus{
-      outline:none;
-      box-shadow:var(--sig-focus), 0 5px 12px rgba(15,23,42,.07);
-      border-color:#c7d2fe;
-    }
-
-    .sig-tab[aria-selected="true"]{
-      background:var(--sig-accent-soft);
-      border-color:#c7d2fe;
-      color:#1e3a8a;
-    }
-
-    .sig-pad-wrap{
-      border:1px solid var(--sig-border);
+    .sig-canvas-wrap{
+      border:1px solid rgba(0,0,0,.10);
       border-radius:12px;
+      background:#fff;
       overflow:hidden;
-      background:#f8fafc;
     }
 
-    .sig-pad{
+    .sig-canvas-top{
+      padding:10px;
+      border-bottom:1px solid rgba(0,0,0,.08);
+      font-weight:900;
+      font-size:11px;
+      color:var(--sig-muted);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+
+    canvas{
+      display:block;
       width:100%;
-      height:var(--sig-pad-h);
+      height:140px; /* compact */
       background:#fff;
       cursor:crosshair;
-      touch-action:none;
-      display:block;
     }
 
-    .sig-tools{
+    .sig-controls{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:8px;
-      padding:8px 8px;
-      border-top:1px solid var(--sig-border-2);
-      background:#f9fafb;
+      gap:12px;
+      padding:10px;
+      border-top:1px solid rgba(0,0,0,.08);
+      background:rgba(248,250,252,.7);
+    }
+
+    .sig-left-controls{
+      display:flex;
+      align-items:center;
+      gap:10px;
       flex-wrap:wrap;
-      font-size:10px;
+    }
+
+    .sig-slider{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:900;
+      font-size:11px;
       color:var(--sig-muted);
     }
 
-    .sig-mini{
+    .sig-slider input[type="range"]{width:90px}
+
+    .sig-state{
+      font-size:11px;
+      font-weight:950;
+      letter-spacing:.2px;
+    }
+    .sig-state.ok{color:var(--sig-ok)}
+    .sig-state.bad{color:var(--sig-danger)}
+
+    .sig-type-wrap{
+      display:none;
+    }
+    .sig-type-wrap.active{display:block}
+
+    .sig-type-row{
       display:flex;
       gap:10px;
       align-items:center;
       flex-wrap:wrap;
+      margin-bottom:10px;
     }
 
-    .sig-range{
-      width:92px;
-      accent-color:var(--sig-accent);
-    }
-
-    .sig-status{
-      font-weight:900;
-      font-size:10px;
-      line-height:1;
-    }
-    .sig-status.ok{color:var(--sig-success)}
-    .sig-status.warn{color:var(--sig-danger)}
-
-    .sig-field{display:flex;flex-direction:column;gap:6px}
-
-    .sig-label{font-size:10px;color:var(--sig-muted);line-height:1.1}
-
-    .sig-text{
+    .sig-type-row input{
       width:100%;
-      padding:8px 10px;
-      border-radius:10px;
-      border:1px solid var(--sig-border);
-      font-size:12px;
+      padding:12px 12px;
+      border-radius:12px;
+      border:1px solid rgba(0,0,0,.12);
+      font-weight:900;
+      font-size:13px;
       outline:none;
-      transition:border-color .15s ease, box-shadow .15s ease;
-      background:#fff;
-      color:var(--sig-ink);
-      line-height:1.1;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    }
-
-    .sig-text:focus{
-      border-color:#c7d2fe;
-      box-shadow:0 0 0 3px rgba(224,231,255,0.9);
-    }
-
-    .sig-row{
-      display:flex;
-      gap:8px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin-top:8px;
     }
 
     .sig-preview{
-      border:1px dashed rgba(0,0,0,0.18);
+      border:1px dashed rgba(0,0,0,.18);
       border-radius:12px;
+      padding:10px;
+      background:rgba(255,255,255,.85);
       min-height:62px;
       display:flex;
       align-items:center;
       justify-content:center;
-      background:#fafafa;
-      margin-top:8px;
-      padding:10px;
       overflow:hidden;
     }
 
-    .sig-typed-render{
-      font-family:"Arial Narrow", Arial, sans-serif;
-      font-size:12px;
-      font-weight:700;
-      white-space:nowrap;
-      color:#020617;
-      text-align:center;
+    .sig-preview img{
+      max-width:100%;
+      max-height:48px;
+      display:block;
     }
 
-    .sig-hint{
-      font-size:10px;
-      color:var(--sig-muted);
-      margin-top:8px;
-      line-height:1.25;
-    }
-
-    /* ====== STATUS ====== */
-    .sig-meta{
+    .sig-mini-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:8px;
-      margin-top:4px;
+      gap:10px;
+      margin-bottom:10px;
     }
 
-    .sig-kv{
-      border:1px solid var(--sig-border-2);
-      border-radius:10px;
-      padding:8px;
-      background:#fff;
-    }
-
-    .sig-kv .k{
-      font-size:9px;
-      color:var(--sig-muted);
-      margin-bottom:6px;
-      line-height:1.1;
-    }
-
-    .sig-kv .v{
-      font-size:10px;
-      font-weight:900;
-      line-height:1;
-    }
-
-    .sig-adopted{
-      margin-top:10px;
-      border:1px solid var(--sig-border-2);
+    .sig-stat{
+      border:1px solid rgba(0,0,0,.10);
       border-radius:12px;
       background:#fff;
-      padding:8px;
+      padding:10px;
+      min-height:56px;
     }
-
-    .sig-adopted .k{
-      font-size:9px;
-      color:var(--sig-muted);
-      margin-bottom:6px;
-      line-height:1.1;
-    }
-
-    .sig-adopted-box{
-      border:1px dashed rgba(0,0,0,0.18);
-      border-radius:10px;
-      background:#fafafa;
-      height:var(--sig-adopted-h);
-      padding:6px;
-      overflow:hidden;
-      position:relative;
-    }
-
-    .sig-adopted-stage{
-      position:absolute;
-      inset:6px;
-      border-radius:8px;
-      background:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      overflow:hidden;
-    }
-
-    .sig-adopted-empty{
+    .sig-stat .k{
       font-size:10px;
+      font-weight:900;
       color:var(--sig-muted);
-      text-align:center;
-      padding:0 8px;
-      line-height:1.2;
+      opacity:.90;
+      margin-bottom:4px;
     }
-
-    .sig-adopted-canvas{
-      width:100%;
-      height:100%;
-      display:block;
-      background:#fff;
-    }
-
-    .sig-adopted-typed{
-      width:100%;
-      text-align:center;
-      font-family:"Arial Narrow", Arial, sans-serif;
+    .sig-stat .v{
       font-size:12px;
-      font-weight:700;
-      color:#020617;
-      white-space:nowrap;
-      padding:0 8px;
+      font-weight:950;
+      color:var(--sig-ink);
     }
   </style>
 </head>
 
 <body>
-  <!-- EXPORTABLE COMPONENTS -->
-  <template data-carbyne-sig="template" id="carbyne-sig-header">
-    <div class="sig-header" role="region" aria-label="Signature Header">
-      <div class="sig-brand">
-        <div class="sig-mark">✍</div>
-        <div class="sig-title">
-          <h3>Create Your Signature</h3>
-          <p>Draw or type, then adopt</p>
+  <!-- IMPORTABLE TEMPLATE -->
+  <template id="carbyne_electronic_signature">
+    <div class="sig-wrap">
+      <div class="sig-header-row">
+        <div class="sig-h-left">
+          <div class="sig-mark" aria-hidden="true">✍</div>
+          <div class="sig-titlebox">
+            <div class="sig-title">Create Your Signature</div>
+            <div class="sig-sub">Draw or type, then adopt</div>
+          </div>
+        </div>
+
+        <div class="sig-actions">
+          <button class="sig-btn danger" type="button" id="sigClearAllBtn">Clear</button>
+          <button class="sig-btn primary" type="button" id="sigAdoptBtn" disabled>Adopt</button>
         </div>
       </div>
 
-      <div class="sig-actions">
-        <button type="button" class="sig-btn danger" data-sig="clearAll">Clear</button>
-        <button type="button" class="sig-btn primary" data-sig="adopt" disabled>Adopt</button>
-      </div>
-    </div>
-  </template>
+      <div class="sig-grid">
+        <div class="sig-card">
+          <h3>Signature Input</h3>
 
-  <template data-carbyne-sig="template" id="carbyne-sig-input-card">
-    <div class="sig-card" role="region" aria-label="Signature Input">
-      <h4>Signature Input</h4>
+          <div class="sig-tabs">
+            <button class="sig-tab active" type="button" id="sigTabDraw">Draw</button>
+            <button class="sig-tab" type="button" id="sigTabType">Type</button>
+          </div>
 
-      <div class="sig-tabs" role="tablist" aria-label="Signature mode">
-        <button class="sig-tab" data-sig="tabDraw" role="tab" aria-selected="true">Draw</button>
-        <button class="sig-tab" data-sig="tabType" role="tab" aria-selected="false">Type</button>
-      </div>
+          <!-- DRAW -->
+          <div id="sigDrawWrap">
+            <div class="sig-canvas-wrap">
+              <div class="sig-canvas-top">
+                <span>Draw</span>
+                <button class="sig-btn" type="button" id="sigClearDrawBtn">Clear</button>
+              </div>
+              <canvas id="sigCanvas"></canvas>
+              <div class="sig-controls">
+                <div class="sig-left-controls">
+                  <div class="sig-slider">
+                    <span>Stroke</span>
+                    <input id="sigStroke" type="range" min="1" max="10" value="3">
+                  </div>
+                  <div class="sig-state" id="sigDrawState">Empty</div>
+                </div>
+                <div style="font-size:11px;font-weight:900;color:var(--sig-muted);opacity:.85;">
+                  Switching modes clears the other mode.
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <div data-sig="panelDraw" role="tabpanel">
-        <div class="sig-pad-wrap" aria-label="Signature pad container">
-          <canvas class="sig-pad" data-sig="pad" width="1200" height="420" aria-label="Signature pad"></canvas>
-
-          <div class="sig-tools">
-            <div class="sig-mini">
-              <span>Stroke <strong data-sig="strokeVal">3</strong></span>
-              <input class="sig-range" data-sig="stroke" type="range" min="1" max="8" step="1" value="3" aria-label="Stroke width" />
-              <span class="sig-status warn" data-sig="drawStatus">Empty</span>
+          <!-- TYPE -->
+          <div class="sig-type-wrap" id="sigTypeWrap">
+            <div class="sig-type-row">
+              <input id="sigTypedName" type="text" placeholder="Type your name" autocomplete="name">
+            </div>
+            <div class="sig-controls" style="border:1px solid rgba(0,0,0,.10); border-radius:12px; background:rgba(248,250,252,.7);">
+              <div class="sig-left-controls" style="justify-content:space-between; width:100%;">
+                <div class="sig-state" id="sigTypeState">Empty</div>
+                <button class="sig-btn" type="button" id="sigRenderTypeBtn">Render</button>
+              </div>
             </div>
 
-            <button type="button" class="sig-btn" data-sig="clearDraw">Clear</button>
+            <div style="height:10px"></div>
+
+            <div class="sig-preview" id="sigTypePreview">
+              <div style="font-size:11px;font-weight:950;color:var(--sig-muted);opacity:.85;">Render Empty</div>
+            </div>
+
+            <div style="height:10px"></div>
+
+            <div style="font-size:11px;font-weight:900;color:var(--sig-muted);opacity:.85;">
+              Switching modes clears the other mode.
+            </div>
           </div>
         </div>
 
-        <div class="sig-hint">Switching modes clears the other mode.</div>
-      </div>
+        <div class="sig-card">
+          <h3>Adoption Status</h3>
 
-      <div data-sig="panelType" role="tabpanel" hidden>
-        <div class="sig-field">
-          <div class="sig-label">Type your name</div>
-          <input class="sig-text" data-sig="typedInput" type="text" placeholder="Full Name" autocomplete="off" />
-        </div>
+          <div class="sig-mini-grid">
+            <div class="sig-stat">
+              <div class="k">Mode</div>
+              <div class="v" id="sigModeStat">Draw</div>
+            </div>
+            <div class="sig-stat">
+              <div class="k">Has signature</div>
+              <div class="v" id="sigHasStat">No</div>
+            </div>
+            <div class="sig-stat">
+              <div class="k">Adopt button</div>
+              <div class="v" id="sigBtnStat">Disabled</div>
+            </div>
+            <div class="sig-stat">
+              <div class="k">Last adopted</div>
+              <div class="v" id="sigLastStat">None</div>
+            </div>
+          </div>
 
-        <div class="sig-row">
-          <button type="button" class="sig-btn" data-sig="renderType">Render</button>
-          <span class="sig-status warn" data-sig="typeStatus">Empty</span>
-        </div>
+          <div class="sig-stat" style="margin-bottom:10px;">
+            <div class="k">Adopted signature</div>
+            <div class="sig-preview" style="margin-top:8px;" id="sigAdoptedPreview">
+              <div style="font-size:11px;font-weight:950;color:var(--sig-muted);opacity:.85;" id="sigAdoptedEmptyText">No adopted signature</div>
+            </div>
+          </div>
 
-        <div class="sig-preview" aria-label="Typed signature preview">
-          <div class="sig-typed-render" data-sig="typedRender">/s/ Full Name</div>
-        </div>
-
-        <div class="sig-hint">Switching modes clears the other mode.</div>
-      </div>
-    </div>
-  </template>
-
-  <template data-carbyne-sig="template" id="carbyne-sig-status-card">
-    <div class="sig-card" role="region" aria-label="Adoption Status">
-      <h4>Adoption Status</h4>
-
-      <div class="sig-meta" aria-label="Status values">
-        <div class="sig-kv">
-          <div class="k">Mode</div>
-          <div class="v" data-sig="statusMode">Draw</div>
-        </div>
-
-        <div class="sig-kv">
-          <div class="k">Has signature</div>
-          <div class="v" data-sig="statusHas">No</div>
-        </div>
-
-        <div class="sig-kv">
-          <div class="k">Adopt button</div>
-          <div class="v" data-sig="statusAdopt">Disabled</div>
-        </div>
-
-        <div class="sig-kv">
-          <div class="k">Last adopted</div>
-          <div class="v" data-sig="statusWhen">None</div>
-        </div>
-      </div>
-
-      <div class="sig-adopted">
-        <div class="k">Adopted signature</div>
-
-        <div class="sig-adopted-box">
-          <div class="sig-adopted-stage">
-            <div class="sig-adopted-empty" data-sig="adoptedEmpty">No adopted signature</div>
-            <canvas class="sig-adopted-canvas" data-sig="adoptedCanvas" width="900" height="260" style="display:none;"></canvas>
-            <div class="sig-adopted-typed" data-sig="adoptedTyped" style="display:none;"></div>
+          <div style="font-size:11px;font-weight:900;color:var(--sig-muted);opacity:.85;">
+            Adopt stores the signature for use across onboarding steps in the same session.
           </div>
         </div>
       </div>
     </div>
   </template>
 
-  <script data-carbyne-sig="script">
-    (function(){
-      "use strict";
+  <script>
+    // Mount function name MUST match: <template id="carbyne_electronic_signature"> + "_mount"
+    window.carbyne_electronic_signature_mount = function ({ root, referenceNumber, storageKey }) {
+      const KEY = "carbyne_adopted_signature_dataurl";
+      const TIME_KEY = "carbyne_adopted_signature_time";
 
-      const KIT_GLOBAL = "CarbyneSignatureKit";
-      const STORAGE_KEY = "carbyne_adopted_signature_v1";
+      const el = (id) => root.querySelector("#" + id);
 
-      function safeJSONParse(s){
-        try{ return JSON.parse(s); }catch(_){ return null; }
+      const tabDraw = el("sigTabDraw");
+      const tabType = el("sigTabType");
+      const drawWrap = el("sigDrawWrap");
+      const typeWrap = el("sigTypeWrap");
+
+      const canvas = el("sigCanvas");
+      const ctx = canvas.getContext("2d");
+
+      const stroke = el("sigStroke");
+      const drawState = el("sigDrawState");
+      const typeState = el("sigTypeState");
+      const typedName = el("sigTypedName");
+      const renderTypeBtn = el("sigRenderTypeBtn");
+      const typePreview = el("sigTypePreview");
+
+      const clearDrawBtn = el("sigClearDrawBtn");
+      const clearAllBtn = el("sigClearAllBtn");
+      const adoptBtn = el("sigAdoptBtn");
+
+      const modeStat = el("sigModeStat");
+      const hasStat = el("sigHasStat");
+      const btnStat = el("sigBtnStat");
+      const lastStat = el("sigLastStat");
+
+      const adoptedPreview = el("sigAdoptedPreview");
+      const adoptedEmptyText = el("sigAdoptedEmptyText");
+
+      let mode = "draw";
+      let isDrawing = false;
+      let hasDraw = false;
+      let hasType = false;
+      let typedDataUrl = "";
+
+      function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+        canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.strokeStyle = "#0f172a";
+        ctx.lineWidth = parseInt(stroke.value, 10) || 3;
+        clearCanvas();
+        hasDraw = false;
+        updateStates();
       }
 
-      function readStored(){
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? safeJSONParse(raw) : null;
+      function clearCanvas(){
+        const rect = canvas.getBoundingClientRect();
+        ctx.clearRect(0, 0, rect.width, rect.height);
       }
 
-      function writeStored(payload){
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      function setMode(next){
+        mode = next;
+        modeStat.textContent = next === "draw" ? "Draw" : "Type";
+
+        if (next === "draw"){
+          tabDraw.classList.add("active");
+          tabType.classList.remove("active");
+          drawWrap.style.display = "block";
+          typeWrap.classList.remove("active");
+          clearType();
+        } else {
+          tabType.classList.add("active");
+          tabDraw.classList.remove("active");
+          drawWrap.style.display = "none";
+          typeWrap.classList.add("active");
+          clearDraw();
+        }
+        updateStates();
       }
 
-      function clearStored(){
-        localStorage.removeItem(STORAGE_KEY);
+      function clearDraw(){
+        clearCanvas();
+        hasDraw = false;
+        updateStates();
       }
 
-      function nowStamp(){
-        const d = new Date();
-        const pad2 = (n) => String(n).padStart(2,"0");
-        return `${pad2(d.getMonth()+1)}/${pad2(d.getDate())}/${d.getFullYear()} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+      function clearType(){
+        typedName.value = "";
+        typedDataUrl = "";
+        hasType = false;
+        typePreview.innerHTML = '<div style="font-size:11px;font-weight:950;color:var(--sig-muted);opacity:.85;">Render Empty</div>';
+        updateStates();
       }
 
-      function fillWhite(ctx, w, h){
-        ctx.save();
-        ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(0,0,w,h);
-        ctx.restore();
+      function updateStates(){
+        ctx.lineWidth = parseInt(stroke.value, 10) || 3;
+
+        const has = (mode === "draw") ? hasDraw : hasType;
+
+        drawState.textContent = hasDraw ? "Ready" : "Empty";
+        drawState.className = "sig-state " + (hasDraw ? "ok" : "bad");
+
+        typeState.textContent = hasType ? "Ready" : "Empty";
+        typeState.className = "sig-state " + (hasType ? "ok" : "bad");
+
+        hasStat.textContent = has ? "Yes" : "No";
+        adoptBtn.disabled = !has;
+        btnStat.textContent = adoptBtn.disabled ? "Disabled" : "Enabled";
       }
 
-      function getInkBoundingBox(srcCanvas){
-        const sctx = srcCanvas.getContext("2d");
-        const w = srcCanvas.width, h = srcCanvas.height;
-        const img = sctx.getImageData(0,0,w,h).data;
+      function getDrawDataUrl(){
+        const rect = canvas.getBoundingClientRect();
+        const tmp = document.createElement("canvas");
+        tmp.width = Math.max(1, Math.floor(rect.width));
+        tmp.height = Math.max(1, Math.floor(rect.height));
+        const tctx = tmp.getContext("2d");
+        tctx.drawImage(canvas, 0, 0, rect.width, rect.height);
+        return tmp.toDataURL("image/png");
+      }
 
-        let minX = w, minY = h, maxX = 0, maxY = 0;
-        let found = false;
-
-        for (let y=0; y<h; y++){
-          for (let x=0; x<w; x++){
-            const i = (y*w + x) * 4;
-            const r = img[i], g = img[i+1], b = img[i+2], a = img[i+3];
-            if (a === 0) continue;
-            if (r > 245 && g > 245 && b > 245) continue;
-            found = true;
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-          }
+      function renderTyped(){
+        const name = (typedName.value || "").trim();
+        if (!name){
+          typedDataUrl = "";
+          hasType = false;
+          typePreview.innerHTML = '<div style="font-size:11px;font-weight:950;color:var(--sig-muted);opacity:.85;">Render Empty</div>';
+          updateStates();
+          return;
         }
 
-        if (!found) return null;
-        return { x:minX, y:minY, w:(maxX-minX+1), h:(maxY-minY+1) };
+        const tmp = document.createElement("canvas");
+        tmp.width = 900;
+        tmp.height = 160;
+        const tctx = tmp.getContext("2d");
+        tctx.clearRect(0,0,tmp.width,tmp.height);
+
+        // signature-like font stack
+        tctx.fillStyle = "#0f172a";
+        tctx.font = "72px \"Segoe Script\", \"Brush Script MT\", \"Comic Sans MS\", cursive";
+        tctx.textBaseline = "middle";
+        tctx.fillText(name, 24, tmp.height/2);
+
+        typedDataUrl = tmp.toDataURL("image/png");
+        hasType = true;
+        typePreview.innerHTML = "";
+        const img = new Image();
+        img.alt = "Typed signature preview";
+        img.src = typedDataUrl;
+        typePreview.appendChild(img);
+        updateStates();
       }
 
-      function drawCroppedTo(dstCtx, srcCanvas, dstW, dstH){
-        dstCtx.clearRect(0,0,dstW,dstH);
-        dstCtx.fillStyle = "#ffffff";
-        dstCtx.fillRect(0,0,dstW,dstH);
+      function adopt(){
+        // Clear old adopted signature first, then set new one
+        localStorage.removeItem(KEY);
+        localStorage.removeItem(TIME_KEY);
 
-        const bbox = getInkBoundingBox(srcCanvas);
-        if (!bbox) return false;
+        const dataUrl = (mode === "draw") ? getDrawDataUrl() : typedDataUrl;
+        if (!dataUrl) return;
 
-        const padding = 10;
-        const availW = Math.max(1, dstW - padding * 2);
-        const availH = Math.max(1, dstH - padding * 2);
-
-        const scale = Math.min(availW / bbox.w, availH / bbox.h);
-        const drawW = bbox.w * scale;
-        const drawH = bbox.h * scale;
-
-        const dx = (dstW - drawW) / 2;
-        const dy = (dstH - drawH) / 2;
-
-        dstCtx.drawImage(
-          srcCanvas,
-          bbox.x, bbox.y, bbox.w, bbox.h,
-          dx, dy, drawW, drawH
-        );
-        return true;
+        localStorage.setItem(KEY, dataUrl);
+        localStorage.setItem(TIME_KEY, new Date().toISOString());
+        paintAdopted();
+        updateStates();
       }
 
-      function cloneTemplate(hostDoc, sourceDoc, id){
-        const t = sourceDoc.getElementById(id);
-        if (!t || t.tagName.toLowerCase() !== "template") throw new Error("Missing template: " + id);
-        return hostDoc.importNode(t.content, true);
-      }
+      function paintAdopted(){
+        const dataUrl = localStorage.getItem(KEY) || "";
+        const ts = localStorage.getItem(TIME_KEY) || "";
 
-      function ensureInstalled(hostDoc, sourceDoc){
-        const STYLE_ATTR = 'data-carbyne-sig="style"';
-        const TEMPLATE_ATTR = 'data-carbyne-sig="template"';
-
-        const hasStyle = hostDoc.querySelector(`style[${STYLE_ATTR}]`);
-        if (!hasStyle){
-          const style = sourceDoc.querySelector(`style[${STYLE_ATTR}]`);
-          if (style){
-            const s = hostDoc.createElement("style");
-            s.setAttribute("data-carbyne-sig","style");
-            s.textContent = style.textContent || "";
-            hostDoc.head.appendChild(s);
-          }
+        adoptedPreview.innerHTML = "";
+        if (!dataUrl){
+          adoptedPreview.appendChild(adoptedEmptyText);
+          lastStat.textContent = "None";
+          return;
         }
 
-        const libId = "__carbyne_sig_template_library__";
-        if (!hostDoc.getElementById(libId)){
-          const lib = hostDoc.createElement("div");
-          lib.id = libId;
-          lib.style.display = "none";
+        const img = new Image();
+        img.alt = "Adopted signature";
+        img.src = dataUrl;
+        adoptedPreview.appendChild(img);
 
-          const templates = Array.from(sourceDoc.querySelectorAll(`template[${TEMPLATE_ATTR}]`));
-          for (const t of templates){
-            lib.appendChild(hostDoc.importNode(t, true));
-          }
-          hostDoc.body.appendChild(lib);
+        if (ts){
+          const d = new Date(ts);
+          const mm = String(d.getMonth()+1).padStart(2,"0");
+          const dd = String(d.getDate()).padStart(2,"0");
+          const yyyy = d.getFullYear();
+          const hh = String(d.getHours()).padStart(2,"0");
+          const mi = String(d.getMinutes()).padStart(2,"0");
+          lastStat.textContent = `${mm}/${dd}/${yyyy} ${hh}:${mi}`;
+        } else {
+          lastStat.textContent = "Saved";
         }
       }
 
-      function initBehavior(root){
-        const q = (k) => root.querySelector(`[data-sig="${k}"]`);
-
-        const tabDraw = q("tabDraw");
-        const tabType = q("tabType");
-        const panelDraw = q("panelDraw");
-        const panelType = q("panelType");
-
-        const btnClearAll = q("clearAll");
-        const btnAdopt = q("adopt");
-        const btnClearDraw = q("clearDraw");
-        const btnRenderType = q("renderType");
-
-        const stroke = q("stroke");
-        const strokeVal = q("strokeVal");
-
-        const drawStatus = q("drawStatus");
-        const typeStatus = q("typeStatus");
-
-        const typedInput = q("typedInput");
-        const typedRender = q("typedRender");
-
-        const statusMode = q("statusMode");
-        const statusHas = q("statusHas");
-        const statusAdopt = q("statusAdopt");
-        const statusWhen = q("statusWhen");
-
-        const adoptedEmpty = q("adoptedEmpty");
-        const adoptedCanvas = q("adoptedCanvas");
-        const adoptedTyped = q("adoptedTyped");
-
-        const pad = q("pad");
-        const ctx = pad.getContext("2d");
-
-        let mode = "draw";
-        let drawing = false;
-        let hasDrawInk = false;
-        let hasTypeInk = false;
-        let lastTypeText = "";
-
-        const listeners = [];
-
-        function on(target, event, handler, opts){
-          target.addEventListener(event, handler, opts);
-          listeners.push({ target, event, handler, opts });
-        }
-
-        function setStatusText(node, ok, text){
-          node.textContent = text;
-          node.classList.remove("ok","warn");
-          node.classList.add(ok ? "ok" : "warn");
-        }
-
-        function updateAdoptButton(){
-          const hasSig = (mode === "draw" && hasDrawInk) || (mode === "type" && hasTypeInk);
-          btnAdopt.disabled = !hasSig;
-          statusHas.textContent = hasSig ? "Yes" : "No";
-          statusAdopt.textContent = hasSig ? "Enabled" : "Disabled";
-          statusAdopt.style.color = hasSig ? "var(--sig-success)" : "var(--sig-ink)";
-        }
-
-        function resetPad(){
-          ctx.clearRect(0,0,pad.width,pad.height);
-          fillWhite(ctx, pad.width, pad.height);
-          ctx.lineCap = "round";
-          ctx.lineJoin = "round";
-          ctx.strokeStyle = "#0f172a";
-          ctx.lineWidth = Number(stroke.value);
-        }
-
-        function clearDrawInternal(){
-          resetPad();
-          hasDrawInk = false;
-          setStatusText(drawStatus, false, "Empty");
-          updateAdoptButton();
-        }
-
-        function clearTypeInternal(){
-          typedInput.value = "";
-          hasTypeInk = false;
-          lastTypeText = "";
-          typedRender.textContent = "/s/ Full Name";
-          setStatusText(typeStatus, false, "Empty");
-          updateAdoptButton();
-        }
-
-        function setMode(next){
-          if (next === mode) return;
-
-          if (next === "draw"){
-            clearTypeInternal();
-          } else {
-            clearDrawInternal();
-          }
-
-          mode = next;
-          statusMode.textContent = next === "draw" ? "Draw" : "Type";
-
-          const drawSelected = next === "draw";
-          tabDraw.setAttribute("aria-selected", drawSelected ? "true" : "false");
-          tabType.setAttribute("aria-selected", drawSelected ? "false" : "true");
-
-          panelDraw.hidden = !drawSelected;
-          panelType.hidden = drawSelected;
-
-          updateAdoptButton();
-        }
-
-        function canvasPoint(e){
-          const r = pad.getBoundingClientRect();
-          const touch = e.touches && e.touches[0];
-          const cx = touch ? touch.clientX : e.clientX;
-          const cy = touch ? touch.clientY : e.clientY;
-          return {
-            x: (cx - r.left) * pad.width / r.width,
-            y: (cy - r.top) * pad.height / r.height
-          };
-        }
-
-        function beginDraw(e){
-          if (mode !== "draw") return;
-          drawing = true;
-          const p = canvasPoint(e);
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          e.preventDefault();
-        }
-
-        function moveDraw(e){
-          if (!drawing || mode !== "draw") return;
-          const p = canvasPoint(e);
-          ctx.lineTo(p.x, p.y);
-          ctx.stroke();
-          hasDrawInk = true;
-          setStatusText(drawStatus, true, "Ready");
-          updateAdoptButton();
-          e.preventDefault();
-        }
-
-        function endDraw(){
-          if (!drawing) return;
-          drawing = false;
-          ctx.closePath();
-        }
-
-        function renderTyped(){
-          const v = (typedInput.value || "").trim();
-          if (!v){
-            hasTypeInk = false;
-            lastTypeText = "";
-            setStatusText(typeStatus, false, "Empty");
-            typedRender.textContent = "/s/ Full Name";
-            updateAdoptButton();
-            return;
-          }
-          hasTypeInk = true;
-          lastTypeText = v;
-          setStatusText(typeStatus, true, "Ready");
-          typedRender.textContent = `/s/ ${v}`;
-          updateAdoptButton();
-        }
-
-        function clearAdoptedView(){
-          adoptedCanvas.style.display = "none";
-          adoptedTyped.style.display = "none";
-          adoptedEmpty.style.display = "block";
-          adoptedEmpty.textContent = "No adopted signature";
-          statusWhen.textContent = "None";
-        }
-
-        function showAdoptedDraw(dataUrl, when){
-          adoptedEmpty.style.display = "none";
-          adoptedTyped.style.display = "none";
-          adoptedCanvas.style.display = "block";
-
-          const dctx = adoptedCanvas.getContext("2d");
-          const img = new Image();
-          img.onload = () => {
-            dctx.clearRect(0,0,adoptedCanvas.width,adoptedCanvas.height);
-            dctx.fillStyle = "#ffffff";
-            dctx.fillRect(0,0,adoptedCanvas.width,adoptedCanvas.height);
-            dctx.drawImage(img, 0, 0, adoptedCanvas.width, adoptedCanvas.height);
-          };
-          img.src = dataUrl;
-
-          statusWhen.textContent = when || "Saved";
-        }
-
-        function showAdoptedType(text, when){
-          adoptedEmpty.style.display = "none";
-          adoptedCanvas.style.display = "none";
-          adoptedTyped.style.display = "block";
-          adoptedTyped.textContent = `/s/ ${text}`;
-          statusWhen.textContent = when || "Saved";
-        }
-
-        function adoptCurrent(){
-          clearAdoptedView();
-
-          if (mode === "draw"){
-            if (!hasDrawInk) return;
-
-            adoptedEmpty.style.display = "none";
-            adoptedTyped.style.display = "none";
-            adoptedCanvas.style.display = "block";
-
-            const dctx = adoptedCanvas.getContext("2d");
-            drawCroppedTo(dctx, pad, adoptedCanvas.width, adoptedCanvas.height);
-
-            const when = nowStamp();
-            const payload = { type:"draw", when, dataUrl: adoptedCanvas.toDataURL("image/png") };
-            writeStored(payload);
-
-            showAdoptedDraw(payload.dataUrl, payload.when);
-            return;
-          }
-
-          if (mode === "type"){
-            if (!hasTypeInk || !lastTypeText) return;
-
-            const when = nowStamp();
-            const payload = { type:"type", when, text:lastTypeText };
-            writeStored(payload);
-
-            showAdoptedType(payload.text, payload.when);
-            return;
-          }
-        }
-
-        function clearAll(){
-          clearDrawInternal();
-          clearTypeInternal();
-          clearAdoptedView();
-          clearStored();
-          setMode("draw");
-          updateAdoptButton();
-        }
-
-        function restoreAdopted(){
-          const saved = readStored();
-          if (!saved) return;
-          clearAdoptedView();
-
-          if (saved.type === "draw" && saved.dataUrl){
-            showAdoptedDraw(saved.dataUrl, saved.when);
-            statusHas.textContent = "Yes";
-            statusAdopt.textContent = "Disabled";
-            statusAdopt.style.color = "var(--sig-ink)";
-            btnAdopt.disabled = true;
-          }
-
-          if (saved.type === "type" && saved.text){
-            showAdoptedType(saved.text, saved.when);
-            statusHas.textContent = "Yes";
-            statusAdopt.textContent = "Disabled";
-            statusAdopt.style.color = "var(--sig-ink)";
-            btnAdopt.disabled = true;
-          }
-        }
-
-        strokeVal.textContent = stroke.value;
-        setStatusText(drawStatus, false, "Empty");
-        setStatusText(typeStatus, false, "Empty");
-        statusMode.textContent = "Draw";
-        statusHas.textContent = "No";
-        statusAdopt.textContent = "Disabled";
-        statusWhen.textContent = "None";
-
-        resetPad();
-        clearAdoptedView();
-        updateAdoptButton();
-        restoreAdopted();
-
-        on(tabDraw, "click", () => setMode("draw"));
-        on(tabType, "click", () => setMode("type"));
-
-        on(stroke, "input", () => {
-          strokeVal.textContent = stroke.value;
-          ctx.lineWidth = Number(stroke.value);
-        });
-
-        on(btnClearDraw, "click", clearDrawInternal);
-        on(btnRenderType, "click", renderTyped);
-        on(typedInput, "keydown", (e) => { if (e.key === "Enter") renderTyped(); });
-
-        on(pad, "mousedown", beginDraw);
-        on(pad, "mousemove", moveDraw);
-        on(window, "mouseup", endDraw);
-
-        on(pad, "touchstart", beginDraw, { passive:false });
-        on(pad, "touchmove", moveDraw, { passive:false });
-        on(window, "touchend", endDraw);
-
-        on(btnAdopt, "click", adoptCurrent);
-        on(btnClearAll, "click", clearAll);
-
-        function destroy(){
-          for (const l of listeners){
-            l.target.removeEventListener(l.event, l.handler, l.opts);
-          }
-        }
-
-        return { destroy };
+      // Drawing events
+      function getPos(evt){
+        const r = canvas.getBoundingClientRect();
+        const x = (evt.touches ? evt.touches[0].clientX : evt.clientX) - r.left;
+        const y = (evt.touches ? evt.touches[0].clientY : evt.clientY) - r.top;
+        return { x, y };
       }
 
-      window[KIT_GLOBAL] = {
-        storageKey: STORAGE_KEY,
+      let last = null;
 
-        install(hostDoc, electronicsignatureDoc){
-          ensureInstalled(hostDoc, electronicsignatureDoc);
-        },
+      function start(evt){
+        evt.preventDefault();
+        isDrawing = true;
+        last = getPos(evt);
+      }
 
-        mount(hostDoc, slots){
-          if (!slots || !slots.header || !slots.input || !slots.status){
-            throw new Error("Missing slots: header, input, status");
-          }
+      function move(evt){
+        if (!isDrawing) return;
+        evt.preventDefault();
+        const p = getPos(evt);
+        ctx.beginPath();
+        ctx.moveTo(last.x, last.y);
+        ctx.lineTo(p.x, p.y);
+        ctx.stroke();
+        last = p;
+        hasDraw = true;
+        updateStates();
+      }
 
-          const prev = slots.__carbyneSigInstance;
-          if (prev && prev.destroy) prev.destroy();
+      function end(evt){
+        if (!isDrawing) return;
+        evt.preventDefault();
+        isDrawing = false;
+        last = null;
+      }
 
-          const libId = "__carbyne_sig_template_library__";
-          const lib = hostDoc.getElementById(libId);
-          if (!lib) throw new Error("Signature templates not installed.");
+      // Wire up
+      tabDraw.addEventListener("click", ()=>setMode("draw"));
+      tabType.addEventListener("click", ()=>setMode("type"));
 
-          const sourceDoc = hostDoc;
+      stroke.addEventListener("input", updateStates);
+      clearDrawBtn.addEventListener("click", clearDraw);
 
-          slots.header.innerHTML = "";
-          slots.input.innerHTML = "";
-          slots.status.innerHTML = "";
+      clearAllBtn.addEventListener("click", ()=>{
+        clearDraw();
+        clearType();
+        localStorage.removeItem(KEY);
+        localStorage.removeItem(TIME_KEY);
+        paintAdopted();
+      });
 
-          const headerFrag = cloneTemplate(hostDoc, sourceDoc, "carbyne-sig-header");
-          const inputFrag  = cloneTemplate(hostDoc, sourceDoc, "carbyne-sig-input-card");
-          const statusFrag = cloneTemplate(hostDoc, sourceDoc, "carbyne-sig-status-card");
+      adoptBtn.addEventListener("click", adopt);
 
-          slots.header.appendChild(headerFrag);
-          slots.input.appendChild(inputFrag);
-          slots.status.appendChild(statusFrag);
+      renderTypeBtn.addEventListener("click", renderTyped);
+      typedName.addEventListener("keydown", (e)=>{ if (e.key === "Enter") renderTyped(); });
 
-          const root = (function(){
-            const wrap = hostDoc.createElement("div");
-            wrap.style.display = "none";
-            hostDoc.body.appendChild(wrap);
-            return wrap;
-          })();
+      // Canvas pointer/mouse/touch
+      canvas.addEventListener("mousedown", start);
+      window.addEventListener("mousemove", move);
+      window.addEventListener("mouseup", end);
 
-          root.appendChild(slots.header.cloneNode(true));
-          root.appendChild(slots.input.cloneNode(true));
-          root.appendChild(slots.status.cloneNode(true));
+      canvas.addEventListener("touchstart", start, { passive:false });
+      canvas.addEventListener("touchmove", move, { passive:false });
+      canvas.addEventListener("touchend", end, { passive:false });
 
-          const headerLive = slots.header;
-          const inputLive = slots.input;
-          const statusLive = slots.status;
+      // Init
+      typeWrap.classList.remove("active");
+      drawWrap.style.display = "block";
+      setMode("draw");
 
-          const combined = hostDoc.createElement("div");
-          combined.style.display = "none";
-          hostDoc.body.appendChild(combined);
+      // Adopted preview
+      paintAdopted();
 
-          const headerNodes = Array.from(headerLive.childNodes);
-          const inputNodes = Array.from(inputLive.childNodes);
-          const statusNodes = Array.from(statusLive.childNodes);
+      // Resize after inserted into DOM
+      setTimeout(resizeCanvas, 0);
+      window.addEventListener("resize", resizeCanvas);
 
-          for (const n of headerNodes) combined.appendChild(n.cloneNode(true));
-          for (const n of inputNodes) combined.appendChild(n.cloneNode(true));
-          for (const n of statusNodes) combined.appendChild(n.cloneNode(true));
-
-          combined.remove();
-
-          const behaviorRoot = hostDoc.createElement("div");
-          behaviorRoot.style.display = "none";
-          hostDoc.body.appendChild(behaviorRoot);
-
-          for (const n of headerNodes) behaviorRoot.appendChild(n);
-          for (const n of inputNodes) behaviorRoot.appendChild(n);
-          for (const n of statusNodes) behaviorRoot.appendChild(n);
-
-          const instance = initBehavior(behaviorRoot);
-
-          while (behaviorRoot.firstChild){
-            const node = behaviorRoot.firstChild;
-            behaviorRoot.removeChild(node);
-
-            if (node.nodeType === 1 && node.classList.contains("sig-header")){
-              slots.header.appendChild(node);
-              continue;
-            }
-            if (node.nodeType === 1 && node.classList.contains("sig-card")){
-              if (!slots.input.querySelector(".sig-card")){
-                slots.input.appendChild(node);
-              } else {
-                slots.status.appendChild(node);
-              }
-              continue;
-            }
-
-            if (!slots.header.querySelector(".sig-header")){
-              slots.header.appendChild(node);
-            } else if (!slots.input.querySelector(".sig-card")){
-              slots.input.appendChild(node);
-            } else {
-              slots.status.appendChild(node);
-            }
-          }
-
-          behaviorRoot.remove();
-          root.remove();
-
-          slots.__carbyneSigInstance = instance;
-          return instance;
-        }
+      // Return unmount
+      return function unmount(){
+        window.removeEventListener("resize", resizeCanvas);
+        window.removeEventListener("mousemove", move);
+        window.removeEventListener("mouseup", end);
       };
-    })();
+    };
   </script>
 </body>
 </html>
