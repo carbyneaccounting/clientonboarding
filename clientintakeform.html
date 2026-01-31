@@ -1,33 +1,37 @@
+<!-- clientintakeform.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Client Intake Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
 
+<template id="carbyne_client_intake">
   <style>
     *{box-sizing:border-box}
 
-    body{
-      margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      color:#0f172a;
+    .ci-wrap{
+      width:100%;
     }
 
     h2{
-      font-size:20px;
+      margin:6px 0 14px;
+      font-size:22px;
       font-weight:950;
-      margin:22px 0 12px;
       color:#00305B;
+      letter-spacing:.2px;
     }
 
     .section{
-      margin-bottom:26px;
+      margin:0 0 22px;
+      padding:0;
     }
 
     .grid{
       display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
+      grid-template-columns:repeat(2, minmax(0, 1fr));
       gap:14px 18px;
     }
 
@@ -35,6 +39,7 @@
       display:flex;
       flex-direction:column;
       gap:6px;
+      min-width:0;
     }
 
     .field.full{
@@ -45,15 +50,19 @@
       font-size:12px;
       font-weight:900;
       color:#334155;
+      letter-spacing:.2px;
     }
 
     input{
+      width:100%;
       padding:12px 14px;
-      font-size:14px;
-      font-weight:800;
       border-radius:10px;
       border:1px solid rgba(0,0,0,.15);
       outline:none;
+      font-size:14px;
+      font-weight:800;
+      color:#0f172a;
+      background:#fff;
     }
 
     input[readonly]{
@@ -65,8 +74,9 @@
     .basis-options{
       display:flex;
       gap:22px;
-      margin-top:10px;
+      align-items:center;
       flex-wrap:wrap;
+      margin-top:6px;
     }
 
     .basis-option{
@@ -75,91 +85,108 @@
       gap:8px;
       font-size:14px;
       font-weight:900;
-      cursor:pointer;
       color:#0f172a;
+      cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
     }
 
     .basis-option input{
       cursor:pointer;
     }
   </style>
-</head>
 
-<body>
+  <div class="ci-wrap">
+    <!-- Business Information -->
+    <div class="section">
+      <h2>Client Intake Form</h2>
 
-  <!-- Business Information -->
-  <div class="section">
-    <h2>Client Intake Form</h2>
+      <div class="grid">
+        <div class="field full">
+          <label for="business_name">Name of Business</label>
+          <input id="business_name" name="business_name" type="text">
+        </div>
 
-    <div class="grid">
-      <div class="field full">
-        <label>Name of Business</label>
-        <input type="text" name="business_name">
+        <div class="field full">
+          <label for="business_address">Business Address</label>
+          <input id="business_address" name="business_address" type="text">
+        </div>
+
+        <div class="field">
+          <label for="suite_unit">Suite/Unit Number</label>
+          <input id="suite_unit" name="suite_unit" type="text">
+        </div>
+
+        <div class="field">
+          <label for="city">City</label>
+          <input id="city" name="city" type="text">
+        </div>
+
+        <div class="field">
+          <label for="state">State</label>
+          <input id="state" name="state" type="text" value="KY" readonly>
+        </div>
+
+        <div class="field">
+          <label for="zip">Zip Code</label>
+          <input id="zip" name="zip" type="text" placeholder="Kentucky Zip Code">
+        </div>
+
+        <div class="field">
+          <label for="business_phone">Business Phone Number</label>
+          <input id="business_phone" name="business_phone" type="tel">
+        </div>
+
+        <div class="field">
+          <label for="business_email">Business Email Address</label>
+          <input id="business_email" name="business_email" type="email">
+        </div>
+
+        <div class="field full">
+          <label for="point_of_contact">Business Point of Contact</label>
+          <input id="point_of_contact" name="point_of_contact" type="text">
+        </div>
       </div>
+    </div>
 
-      <div class="field full">
-        <label>Business Address</label>
-        <input type="text" name="business_address">
-      </div>
+    <!-- Basis of Accounting -->
+    <div class="section">
+      <h2>Basis of Accounting</h2>
 
-      <div class="field">
-        <label>Suite / Unit Number</label>
-        <input type="text" name="suite_unit">
-      </div>
+      <div class="basis-options" role="radiogroup" aria-label="Basis of Accounting">
+        <label class="basis-option">
+          <input type="radio" name="basis_of_accounting" value="Accrual">
+          <span>Accrual</span>
+        </label>
 
-      <div class="field">
-        <label>City</label>
-        <input type="text" name="city">
-      </div>
+        <label class="basis-option">
+          <input type="radio" name="basis_of_accounting" value="Cash">
+          <span>Cash</span>
+        </label>
 
-      <div class="field">
-        <label>State</label>
-        <input type="text" name="state" value="KY" readonly>
-      </div>
-
-      <div class="field">
-        <label>Zip Code</label>
-        <input type="text" name="zip" placeholder="Kentucky Zip Code">
-      </div>
-
-      <div class="field">
-        <label>Business Phone Number</label>
-        <input type="tel" name="business_phone">
-      </div>
-
-      <div class="field">
-        <label>Business Email Address</label>
-        <input type="email" name="business_email">
-      </div>
-
-      <div class="field full">
-        <label>Business Point of Contact</label>
-        <input type="text" name="point_of_contact">
+        <label class="basis-option">
+          <input type="radio" name="basis_of_accounting" value="Mixed Method">
+          <span>Mixed Method</span>
+        </label>
       </div>
     </div>
   </div>
+</template>
 
-  <!-- Basis of Accounting -->
-  <div class="section">
-    <h2>Basis of Accounting</h2>
+<script>
+  window.carbyne_client_intake_mount = function({ root, referenceNumber }){
+    if (!root) return function(){};
 
-    <div class="basis-options">
-      <label class="basis-option">
-        <input type="radio" name="basis_of_accounting" value="Accrual">
-        <span>Accrual</span>
-      </label>
+    root.innerHTML = "";
+    const tpl = document.getElementById("carbyne_client_intake");
+    const node = document.importNode(tpl.content, true);
+    root.appendChild(node);
 
-      <label class="basis-option">
-        <input type="radio" name="basis_of_accounting" value="Cash">
-        <span>Cash</span>
-      </label>
-
-      <label class="basis-option">
-        <input type="radio" name="basis_of_accounting" value="Mixed Method">
-        <span>Mixed Method</span>
-      </label>
-    </div>
-  </div>
+    return function unmount(){
+      try{ root.innerHTML = ""; } catch {}
+    };
+  };
+</script>
 
 </body>
 </html>
