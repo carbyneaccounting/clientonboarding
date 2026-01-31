@@ -83,7 +83,6 @@
       min-width:0;
     }
 
-    /* UPDATED: Suite/Unit wider so label/input stays aligned */
     .ci-grid.industryaddr{
       grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
     }
@@ -479,6 +478,54 @@
         <input class="ci-input" id="ai_accountant_email" type="email" placeholder="Email Address" autocomplete="email" disabled>
       </div>
     </div>
+
+    <!-- NEW: Accounting software (Yes/No) + Specify (always visible; disabled unless Yes) -->
+    <div class="ci-grid" style="margin-top:16px;">
+      <div class="ci-field ci-wide">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">Do you currently use an accounting software?</div>
+        </div>
+
+        <div class="ci-basis-row" role="group" aria-label="Do you currently use an accounting software?" style="margin-top:0;">
+          <label class="ci-radio">
+            <input type="radio" name="ai_use_accounting_software" id="ai_sw_yes" value="Yes">
+            Yes
+          </label>
+
+          <label class="ci-radio">
+            <input type="radio" name="ai_use_accounting_software" id="ai_sw_no" value="No">
+            No
+          </label>
+
+          <div class="ci-other-wrap" style="min-width:320px;">
+            <div class="ci-label" style="font-size:13px;font-weight:950;opacity:.92;white-space:nowrap;">If yes, specify</div>
+            <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW: Accounting records availability (Yes/No) -->
+    <div class="ci-grid" style="margin-top:16px;">
+      <div class="ci-field ci-wide">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">Do you have accounting records for the full life of the business?</div>
+        </div>
+
+        <div class="ci-basis-row" role="group" aria-label="Do you have accounting records for the full life of the business?" style="margin-top:0;">
+          <label class="ci-radio">
+            <input type="radio" name="ai_records_full_history" id="ai_records_yes" value="Yes">
+            Yes
+          </label>
+
+          <label class="ci-radio">
+            <input type="radio" name="ai_records_full_history" id="ai_records_no" value="No">
+            No
+          </label>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -525,7 +572,8 @@
           "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
           "poc_email","poc_phone",
           "boa_other_text",
-          "ai_accountant_name","ai_accountant_phone","ai_accountant_email"
+          "ai_accountant_name","ai_accountant_phone","ai_accountant_email",
+          "ai_sw_specify"
         ];
 
         ids.forEach(id=>{
@@ -554,6 +602,22 @@
             r.checked = (r.value === savedOtherAcct);
           });
         }
+
+        const savedUseSw = (data["ai_use_accounting_software"] ?? "");
+        if (savedUseSw){
+          const radios3 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
+          radios3.forEach(r=>{
+            r.checked = (r.value === savedUseSw);
+          });
+        }
+
+        const savedRecords = (data["ai_records_full_history"] ?? "");
+        if (savedRecords){
+          const radios4 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_records_full_history"]'));
+          radios4.forEach(r=>{
+            r.checked = (r.value === savedRecords);
+          });
+        }
       } catch {}
     }
 
@@ -564,7 +628,8 @@
         "bi_industry","bi_address","bi_suite",
         "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
         "poc_email","poc_phone",
-        "ai_accountant_name","ai_accountant_phone","ai_accountant_email"
+        "ai_accountant_name","ai_accountant_phone","ai_accountant_email",
+        "ai_sw_specify"
       ];
       ids.forEach(id=>{
         const el = root.querySelector("#"+id);
@@ -583,6 +648,12 @@
 
       const selectedOtherAcct = root.querySelector('input[type="radio"][name="ai_other_accountant"]:checked');
       out["ai_other_accountant"] = selectedOtherAcct ? (selectedOtherAcct.value || "") : "";
+
+      const selectedUseSw = root.querySelector('input[type="radio"][name="ai_use_accounting_software"]:checked');
+      out["ai_use_accounting_software"] = selectedUseSw ? (selectedUseSw.value || "") : "";
+
+      const selectedRecords = root.querySelector('input[type="radio"][name="ai_records_full_history"]:checked');
+      out["ai_records_full_history"] = selectedRecords ? (selectedRecords.value || "") : "";
 
       try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
     }
@@ -606,6 +677,10 @@
 
       const acctName = root.querySelector("#ai_accountant_name");
       const acctEmail = root.querySelector("#ai_accountant_email");
+
+      const useSwRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
+      const useSwYes = root.querySelector("#ai_sw_yes");
+      const swSpecify = root.querySelector("#ai_sw_specify");
 
       loadSaved(root);
 
@@ -681,9 +756,22 @@
         save(root);
       }
 
+      function syncAccountingSoftwareState(){
+        if (!swSpecify) return;
+        const yes = !!(useSwYes && useSwYes.checked);
+        if (yes){
+          swSpecify.disabled = false;
+        } else {
+          swSpecify.disabled = true;
+          swSpecify.value = "";
+        }
+        save(root);
+      }
+
       const onBasisChange = () => syncOtherState();
       const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
       const onOtherAcctChange = () => syncOtherAccountantState();
+      const onUseSwChange = () => syncAccountingSoftwareState();
 
       if (fein){
         fein.addEventListener("input", onFeinInput);
@@ -724,14 +812,27 @@
         r.addEventListener("change", onOtherAcctChange);
       });
 
+      useSwRadios.forEach(r=>{
+        r.addEventListener("change", onUseSwChange);
+      });
+
+      if (swSpecify){
+        swSpecify.addEventListener("input", onAnyChange);
+        swSpecify.addEventListener("change", onAnyChange);
+        swSpecify.addEventListener("blur", onAnyChange);
+      }
+
       syncOtherState();
       syncOtherAccountantState();
+      syncAccountingSoftwareState();
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
         if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "poc_phone" || el.id === "ai_accountant_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
         if (el.name === "boa_basis" || el.id === "boa_other_text") return;
         if (el.name === "ai_other_accountant") return;
+        if (el.name === "ai_use_accounting_software") return;
+        if (el.id === "ai_sw_specify") return;
 
         el.addEventListener("input", onAnyChange);
         el.addEventListener("change", onAnyChange);
@@ -776,6 +877,16 @@
         otherAcctRadios.forEach(r=>{
           r.removeEventListener("change", onOtherAcctChange);
         });
+
+        useSwRadios.forEach(r=>{
+          r.removeEventListener("change", onUseSwChange);
+        });
+
+        if (swSpecify){
+          swSpecify.removeEventListener("input", onAnyChange);
+          swSpecify.removeEventListener("change", onAnyChange);
+          swSpecify.removeEventListener("blur", onAnyChange);
+        }
 
         allInputs.forEach(el=>{
           el.removeEventListener("input", onAnyChange);
