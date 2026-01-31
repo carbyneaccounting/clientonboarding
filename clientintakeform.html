@@ -95,12 +95,10 @@
       grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
     }
 
-    /* Card row: card number slightly shorter, others wider */
     .ci-grid.paycard{
-      grid-template-columns: minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
+      grid-template-columns:minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
     }
 
-    /* Payment: tighten gap between ownership & type */
     .ci-grid.paymeta{
       column-gap:10px;
       row-gap:0px;
@@ -164,12 +162,12 @@
       box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
     }
 
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      opacity: 0.6;
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator{
+      cursor:pointer;
+      opacity:0.6;
     }
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover{
+      opacity:1;
     }
 
     .ci-input:disabled{
@@ -198,7 +196,6 @@
       opacity:1;
     }
 
-    /* Basis of Accounting */
     .ci-basis-row{
       display:flex;
       align-items:center;
@@ -272,7 +269,6 @@
       cursor:not-allowed;
     }
 
-    /* Payment note */
     .ci-note{
       width:100%;
       border:1px solid rgba(0,48,91,.18);
@@ -296,9 +292,7 @@
         justify-content:stretch;
         column-gap:0;
       }
-      .ci-grid.titlefit .ci-label{
-        white-space:normal;
-      }
+      .ci-grid.titlefit .ci-label{white-space:normal}
       .ci-basis-row{flex-wrap:wrap}
       .ci-other-wrap{flex:1 1 100%}
       .ci-hint{white-space:normal}
@@ -702,7 +696,6 @@
       </div>
     </div>
 
-    <!-- Acknowledgement -->
     <div class="ci-section" style="margin-top:18px;">Acknowledgement</div>
     <div class="ci-sectionline"></div>
 
@@ -920,15 +913,15 @@
 
       const boaOtherRadio = root.querySelector("#boa_other");
       const boaOtherText = root.querySelector("#boa_other_text");
-      const boaRadios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]));
+      const boaRadios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
 
-      const otherAcctRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]));
+      const otherAcctRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]'));
       const otherAcctYes = root.querySelector("#ai_other_acct_yes");
 
       const acctName = root.querySelector("#ai_accountant_name");
       const acctEmail = root.querySelector("#ai_accountant_email");
 
-      const useSwRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]));
+      const useSwRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
       const useSwYes = root.querySelector("#ai_sw_yes");
       const swSpecify = root.querySelector("#ai_sw_specify");
 
@@ -947,7 +940,8 @@
       const onFeinInput = () => {
         if (!fein) return;
         if (noFein && noFein.checked) return;
-        fein.value = formatFein(fein.value);
+        const formatted = formatFein(fein.value);
+        fein.value = formatted;
         save(root);
       };
 
