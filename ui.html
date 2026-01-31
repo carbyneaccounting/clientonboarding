@@ -142,7 +142,6 @@
       scrollbar-gutter:stable;
     }
 
-    /* scrollbar INSIDE rounded frame (not overlapping the outside) */
     .scroll::-webkit-scrollbar{width:12px}
     .scroll::-webkit-scrollbar-track{background:rgba(0,0,0,.10)}
     .scroll::-webkit-scrollbar-thumb{background:rgba(0,48,91,.45);border-radius:999px;border:3px solid rgba(255,255,255,.60)}
@@ -353,15 +352,25 @@
     const CACHE_TS_KEY = "carbyne_valid_codes_timestamp";
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    // IMPORTANT: Same-origin first for Wix
+    function dirOfCurrent(){
+      const p = location.pathname || "/";
+      if (p.endsWith("/")) return p;
+      return p.substring(0, p.lastIndexOf("/") + 1);
+    }
+
+    // Try same-dir and root-dir variants (Wix sometimes changes served path)
     const CLIENT_INTAKE_URLS = [
       "./clientintakeform.html",
-      "clientintakeform.html"
+      "clientintakeform.html",
+      location.origin + dirOfCurrent() + "clientintakeform.html",
+      location.origin + "/clientintakeform.html"
     ];
 
     const SIGNATURE_URLS = [
       "./electronicsignature.html",
-      "electronicsignature.html"
+      "electronicsignature.html",
+      location.origin + dirOfCurrent() + "electronicsignature.html",
+      location.origin + "/electronicsignature.html"
     ];
 
     let currentPage = 1;
@@ -523,7 +532,7 @@
       for (const u of urls){
         try{
           const res = await fetch(u, { cache:"no-store" });
-          if (!res.ok) throw new Error("HTTP " + res.status);
+          if (!res.ok) throw new Error("HTTP " + res.status + " @ " + u);
           return { text: await res.text(), baseUrl: u };
         } catch(e){
           lastErr = e;
@@ -533,64 +542,43 @@
     }
 
     function absolutizeUrl(src, baseUrl){
-      try{
-        return new URL(src, baseUrl).toString();
-      } catch {
-        return src;
-      }
+      try{ return new URL(src, baseUrl).toString(); }
+      catch{ return src; }
     }
 
-    function isSameScriptAlreadyLoaded(key){
+    function isScriptAlreadyLoaded(key){
       return !!document.querySelector('script[data-carbyne-loaded="' + key.replaceAll('"','') + '"]');
     }
 
-    async function loadScriptAndWait(s){
-      return new Promise((resolve, reject) => {
+    function appendInlineScriptOnce(key, code){
+      if (isScriptAlreadyLoaded(key)) return;
+      const s = document.createElement("script");
+      s.async = false;
+      s.textContent = code || "";
+      s.setAttribute("data-carbyne-loaded", key);
+      document.body.appendChild(s);
+    }
+
+    async function appendSrcScriptOnce(absSrc){
+      if (isScriptAlreadyLoaded(absSrc)) return;
+      const s = document.createElement("script");
+      s.async = false;
+      s.src = absSrc;
+      s.setAttribute("data-carbyne-loaded", absSrc);
+
+      await new Promise((resolve, reject) => {
         s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Script load error"));
+        s.onerror = () => reject(new Error("Script load error: " + absSrc));
         document.body.appendChild(s);
       });
     }
 
     async function loadExternalTemplate(urls, templateId, mountFnName, hostEl, mountArgs){
-      // IMPORTANT: do NOT inject any <style> into <head> (keeps your ui formatting intact)
-      // We only execute scripts from the fetched file so mount function exists.
-
       const fetched = await fetchFirstWorking(urls);
       const html = fetched.text;
       const baseUrl = fetched.baseUrl;
 
       const doc = new DOMParser().parseFromString(html, "text/html");
-
-      // Execute scripts (so window[mountFnName] is defined)
-      const scripts = Array.from(doc.querySelectorAll("script"));
-      for (let i=0;i<scripts.length;i++){
-        const sc = scripts[i];
-
-        if (sc.src){
-          const absSrc = absolutizeUrl(sc.getAttribute("src"), baseUrl);
-          const key = absSrc;
-
-          if (isSameScriptAlreadyLoaded(key)) continue;
-
-          const s = document.createElement("script");
-          s.src = absSrc;
-          s.async = false;
-          s.setAttribute("data-carbyne-loaded", key);
-
-          await loadScriptAndWait(s);
-        } else {
-          const inlineKey = baseUrl + "::inline::" + i;
-          if (isSameScriptAlreadyLoaded(inlineKey)) continue;
-
-          const s = document.createElement("script");
-          s.async = false;
-          s.textContent = sc.textContent || "";
-          s.setAttribute("data-carbyne-loaded", inlineKey);
-
-          document.body.appendChild(s);
-        }
-      }
 
       const tpl = doc.getElementById(templateId);
       if (!tpl || tpl.tagName.toLowerCase() !== "template"){
@@ -599,6 +587,19 @@
 
       hostEl.innerHTML = "";
       hostEl.appendChild(document.importNode(tpl.content, true));
+
+      const scripts = Array.from(doc.querySelectorAll("script"));
+      for (let i=0;i<scripts.length;i++){
+        const sc = scripts[i];
+
+        if (sc.src){
+          const absSrc = absolutizeUrl(sc.getAttribute("src"), baseUrl);
+          await appendSrcScriptOnce(absSrc);
+        } else {
+          const inlineKey = baseUrl + "::inline::" + i;
+          appendInlineScriptOnce(inlineKey, sc.textContent || "");
+        }
+      }
 
       const fn = window[mountFnName];
       if (typeof fn !== "function"){
@@ -727,7 +728,7 @@
         );
       } catch(e){
         host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load intake form.</div>`;
-        console.error(e);
+        console.error("Intake load error:", e);
       }
     }
 
@@ -751,7 +752,7 @@
         );
       } catch(e){
         host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load signature.</div>`;
-        console.error(e);
+        console.error("Signature load error:", e);
       }
     }
 
