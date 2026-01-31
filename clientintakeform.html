@@ -117,8 +117,68 @@
 
     .ci-wide{grid-column:1 / -1}
 
+    /* Basis of Accounting */
+    .ci-basis-row{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin-top:10px;
+      padding:2px 2px 0;
+    }
+
+    .ci-radio{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:950;
+      color:#0f172a;
+      opacity:.92;
+      white-space:nowrap;
+      user-select:none;
+    }
+
+    .ci-radio input[type="radio"]{
+      width:16px;height:16px;
+      accent-color:#00305B;
+      cursor:pointer;
+    }
+
+    .ci-other-wrap{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      flex:0 0 auto;
+    }
+
+    .ci-other-input{
+      width:min(360px, 70vw);
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,.14);
+      font-size:14px;
+      font-weight:900;
+      outline:none;
+      background:#fff;
+      box-shadow:0 10px 20px rgba(2,6,23,.08);
+      transition:border-color .18s ease, box-shadow .18s ease;
+      color:#0f172a;
+      display:none;
+    }
+
+    .ci-other-input.show{display:inline-block}
+
+    .ci-other-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
+
+    .ci-other-input:focus{
+      border-color:rgba(0,48,91,.70);
+      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
+    }
+
     @media (max-width:820px){
       .ci-grid, .ci-grid.three{grid-template-columns:1fr}
+      .ci-other-input{width:100%}
     }
   </style>
 
@@ -255,6 +315,33 @@
         <input class="ci-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
       </div>
     </div>
+
+    <div class="ci-section" style="margin-top:18px;">Basis of Accounting</div>
+
+    <div class="ci-basis-row" role="group" aria-label="Basis of Accounting">
+      <label class="ci-radio">
+        <input type="radio" name="boa_basis" id="boa_accrual" value="Accrual Basis">
+        Accrual Basis
+      </label>
+
+      <label class="ci-radio">
+        <input type="radio" name="boa_basis" id="boa_cash" value="Cash Basis">
+        Cash Basis
+      </label>
+
+      <label class="ci-radio">
+        <input type="radio" name="boa_basis" id="boa_mixed" value="Mixed Method">
+        Mixed Method
+      </label>
+
+      <div class="ci-other-wrap">
+        <label class="ci-radio">
+          <input type="radio" name="boa_basis" id="boa_other" value="Other">
+          Other
+        </label>
+        <input class="ci-other-input" id="boa_other_text" type="text" placeholder="Specify" autocomplete="off">
+      </div>
+    </div>
   </div>
 </template>
 
@@ -297,22 +384,32 @@
 
         const ids = [
           "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
-          "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc"
+          "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc",
+          "boa_basis","boa_other_text"
         ];
 
         ids.forEach(id=>{
           const el = root.querySelector("#"+id);
           if (!el) return;
-          if (el.tagName.toLowerCase() === "select"){
-            el.value = (data[id] ?? "");
-          } else {
-            el.value = (data[id] ?? "");
-          }
+          el.value = (data[id] ?? "");
         });
 
         const cb = root.querySelector("#bi_no_fein");
         if (cb){
           cb.checked = !!data["bi_no_fein"];
+        }
+
+        const savedBasis = (data["boa_basis"] ?? "");
+        if (savedBasis){
+          const radios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
+          radios.forEach(r=>{
+            r.checked = (r.value === savedBasis);
+          });
+        }
+
+        const otherText = root.querySelector("#boa_other_text");
+        if (otherText){
+          otherText.value = (data["boa_other_text"] ?? "");
         }
       } catch {}
     }
@@ -332,6 +429,12 @@
       const cb = root.querySelector("#bi_no_fein");
       out["bi_no_fein"] = cb ? !!cb.checked : false;
 
+      const selected = root.querySelector('input[type="radio"][name="boa_basis"]:checked');
+      out["boa_basis"] = selected ? (selected.value || "") : "";
+
+      const otherText = root.querySelector("#boa_other_text");
+      out["boa_other_text"] = otherText ? (otherText.value || "") : "";
+
       try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
     }
 
@@ -341,6 +444,22 @@
       const noFein = root.querySelector("#bi_no_fein");
       const phone = root.querySelector("#bi_phone");
       const zip = root.querySelector("#bi_zip");
+
+      const boaOtherRadio = root.querySelector("#boa_other");
+      const boaOtherText = root.querySelector("#boa_other_text");
+      const boaRadios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
+
+      function setOtherVisibility(){
+        if (!boaOtherText) return;
+        const show = !!(boaOtherRadio && boaOtherRadio.checked);
+        if (show){
+          boaOtherText.classList.add("show");
+        } else {
+          boaOtherText.classList.remove("show");
+          boaOtherText.value = "";
+        }
+        save(root);
+      }
 
       loadSaved(root);
 
@@ -378,6 +497,15 @@
 
       const onAnyChange = () => save(root);
 
+      const onBasisChange = () => {
+        setOtherVisibility();
+      };
+
+      const onOtherTextInput = () => {
+        if (!boaOtherText) return;
+        save(root);
+      };
+
       if (fein){
         fein.addEventListener("input", onFeinInput);
         fein.addEventListener("blur", onFeinInput);
@@ -395,9 +523,28 @@
         zip.addEventListener("blur", onZipInput);
       }
 
+      boaRadios.forEach(r=>{
+        r.addEventListener("change", onBasisChange);
+      });
+
+      if (boaOtherText){
+        boaOtherText.addEventListener("input", onOtherTextInput);
+        boaOtherText.addEventListener("change", onOtherTextInput);
+        boaOtherText.addEventListener("blur", onOtherTextInput);
+      }
+
+      setOtherVisibility();
+
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
-        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
+        if (
+          el.id === "bi_fein" ||
+          el.id === "bi_phone" ||
+          el.id === "bi_zip" ||
+          el.id === "bi_no_fein" ||
+          el.name === "boa_basis" ||
+          el.id === "boa_other_text"
+        ) return;
         el.addEventListener("input", onAnyChange);
         el.addEventListener("change", onAnyChange);
         el.addEventListener("blur", onAnyChange);
@@ -419,6 +566,17 @@
           zip.removeEventListener("input", onZipInput);
           zip.removeEventListener("blur", onZipInput);
         }
+
+        boaRadios.forEach(r=>{
+          r.removeEventListener("change", onBasisChange);
+        });
+
+        if (boaOtherText){
+          boaOtherText.removeEventListener("input", onOtherTextInput);
+          boaOtherText.removeEventListener("change", onOtherTextInput);
+          boaOtherText.removeEventListener("blur", onOtherTextInput);
+        }
+
         allInputs.forEach(el=>{
           el.removeEventListener("input", onAnyChange);
           el.removeEventListener("change", onAnyChange);
