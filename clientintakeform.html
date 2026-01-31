@@ -130,7 +130,7 @@
       display:flex;
       align-items:center;
       gap:14px;
-      flex-wrap:nowrap; /* keep one line on desktop */
+      flex-wrap:nowrap;
       margin-top:10px;
       padding:2px 2px 0;
       width:100%;
@@ -160,14 +160,14 @@
       display:flex;
       align-items:center;
       gap:10px;
-      flex:1 1 auto;   /* take remaining space */
-      min-width:220px; /* prevents collapsing too hard */
+      flex:1 1 auto;
+      min-width:220px;
     }
 
     .ci-other-input{
-      flex:1 1 auto;   /* fill remaining width */
+      flex:1 1 auto;
       width:100%;
-      min-width:0;     /* allow flex shrink without overflow */
+      min-width:0;
       padding:12px 14px;
       border-radius:14px;
       border:1px solid rgba(0,0,0,.14);
@@ -232,7 +232,7 @@
       </div>
     </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
+    <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Business Formation Date</div>
@@ -246,17 +246,17 @@
         </div>
         <input class="ci-input" id="bi_fullname" type="text" placeholder="Full Name" autocomplete="name">
       </div>
-    </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Title</div>
         </div>
         <input class="ci-input" id="bi_title" type="text" placeholder="Title" autocomplete="organization-title">
       </div>
+    </div>
 
-      <div class="ci-field">
+    <div class="ci-grid" style="margin-top:14px;">
+      <div class="ci-field ci-wide">
         <div class="ci-labelrow">
           <div class="ci-label">Business Address</div>
         </div>
@@ -411,7 +411,11 @@
         ids.forEach(id=>{
           const el = root.querySelector("#"+id);
           if (!el) return;
-          el.value = (data[id] ?? "");
+          if (el.tagName.toLowerCase() === "select"){
+            el.value = (data[id] ?? "");
+          } else {
+            el.value = (data[id] ?? "");
+          }
         });
 
         const cb = root.querySelector("#bi_no_fein");
@@ -455,7 +459,6 @@
 
     window.carbyne_client_intake_mount = function(args){
       const root = args && args.root ? args.root : document;
-
       const fein = root.querySelector("#bi_fein");
       const noFein = root.querySelector("#bi_no_fein");
       const phone = root.querySelector("#bi_phone");
@@ -464,18 +467,6 @@
       const boaOtherRadio = root.querySelector("#boa_other");
       const boaOtherText = root.querySelector("#boa_other_text");
       const boaRadios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
-
-      function syncOtherState(){
-        if (!boaOtherText) return;
-        const active = !!(boaOtherRadio && boaOtherRadio.checked);
-        if (active){
-          boaOtherText.disabled = false;
-        } else {
-          boaOtherText.disabled = true;
-          boaOtherText.value = "";
-        }
-        save(root);
-      }
 
       loadSaved(root);
 
@@ -513,9 +504,19 @@
 
       const onAnyChange = () => save(root);
 
-      const onBasisChange = () => {
-        syncOtherState();
-      };
+      function syncOtherState(){
+        if (!boaOtherText) return;
+        const active = !!(boaOtherRadio && boaOtherRadio.checked);
+        if (active){
+          boaOtherText.disabled = false;
+        } else {
+          boaOtherText.disabled = true;
+          boaOtherText.value = "";
+        }
+        save(root);
+      }
+
+      const onBasisChange = () => syncOtherState();
 
       const onOtherTextInput = () => {
         if (!boaOtherText) return;
@@ -526,17 +527,14 @@
         fein.addEventListener("input", onFeinInput);
         fein.addEventListener("blur", onFeinInput);
       }
-
       if (noFein){
         noFein.addEventListener("change", onNoFeinToggle);
         onNoFeinToggle();
       }
-
       if (phone){
         phone.addEventListener("input", onPhoneInput);
         phone.addEventListener("blur", onPhoneInput);
       }
-
       if (zip){
         zip.addEventListener("input", onZipInput);
         zip.addEventListener("blur", onZipInput);
@@ -556,14 +554,8 @@
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
-        if (
-          el.id === "bi_fein" ||
-          el.id === "bi_phone" ||
-          el.id === "bi_zip" ||
-          el.id === "bi_no_fein" ||
-          el.name === "boa_basis" ||
-          el.id === "boa_other_text"
-        ) return;
+        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
+        if (el.name === "boa_basis" || el.id === "boa_other_text") return;
 
         el.addEventListener("input", onAnyChange);
         el.addEventListener("change", onAnyChange);
@@ -609,4 +601,3 @@
 
 </body>
 </html>
-
