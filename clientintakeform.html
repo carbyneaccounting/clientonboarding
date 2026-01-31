@@ -3,300 +3,295 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Client Intake Form</title>
+  <title>Client Intake Form Module</title>
 
-  <style>
-    :root{
-      --ci-blue:#00305B;
-      --ci-ink:#0f172a;
-      --ci-muted:#475569;
-      --ci-border:rgba(0,0,0,.12);
-      --ci-radius:14px;
-    }
-
-    .ci-wrap{
+  <style id="carbyne-client-intake-styles">
+    #clientIntakeRoot{
       width:100%;
-      padding-top:2px; /* moves form up a bit */
+      color:#0f172a;
     }
 
-    .ci-h2{
+    .intake-h2{
       font-size:26px;
-      font-weight:950;
-      color:var(--ci-blue);
-      margin:4px 0 0 0;
-      letter-spacing:.2px;
-    }
-
-    .ci-section{
-      margin-top:14px; /* space between Client Intake Form and Business Information */
-    }
-
-    .ci-section-title{
-      font-size:14px;
-      font-weight:950;
-      color:var(--ci-ink);
-      margin:0 0 12px 0;
-      letter-spacing:.2px;
-    }
-
-    .ci-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    .ci-grid.three{
-      grid-template-columns:1fr .55fr .55fr;
-    }
-
-    @media (max-width: 860px){
-      .ci-grid,
-      .ci-grid.three{
-        grid-template-columns:1fr;
-      }
-    }
-
-    .ci-field{min-width:0}
-
-    .ci-label{
-      font-size:12px;
       font-weight:900;
-      color:var(--ci-ink);
-      margin:0 0 8px 0;
+      color:#00305B;
+      margin:0 0 12px 0; /* spacing between Client Intake Form and Business Information */
+    }
+
+    .intake-section-title{
+      font-size:14px;
+      font-weight:900;
+      color:#0f172a;
+      margin:0 0 14px 0;
       letter-spacing:.2px;
     }
 
-    .ci-input,
-    .ci-select{
+    .intake-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px 14px;
       width:100%;
-      padding:13px 14px;
-      border-radius:14px;
-      border:1px solid var(--ci-border);
-      background:rgba(255,255,255,.92);
-      outline:none;
-      font-size:14px;
-      font-weight:800;
-      color:var(--ci-ink);
-      box-shadow:0 10px 18px rgba(0,0,0,.06);
-      transition:border-color .2s ease, box-shadow .2s ease;
     }
 
-    .ci-input:focus,
-    .ci-select:focus{
-      border-color:rgba(0,48,91,.60);
-      box-shadow:0 0 0 3px rgba(0,48,91,.12), 0 12px 22px rgba(0,0,0,.08);
+    .intake-grid.three{
+      grid-template-columns: 1fr 220px 1fr;
     }
 
-    .ci-inline-row{
+    .intake-field{width:100%}
+
+    .intake-label-row{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      margin:0 0 8px 0;
     }
 
-    .ci-checkbox{
-      display:inline-flex;
+    .intake-label{
+      font-size:12px;
+      font-weight:900;
+      color:#0f172a;
+      letter-spacing:.2px;
+    }
+
+    .intake-inline-check{
+      display:flex;
       align-items:center;
       gap:8px;
       font-size:12px;
       font-weight:900;
-      color:var(--ci-ink);
-      white-space:nowrap;
+      color:#0f172a;
       user-select:none;
+      white-space:nowrap;
     }
-    .ci-checkbox input{
+
+    .intake-inline-check input{
       width:16px;height:16px;
-      accent-color:var(--ci-blue);
+      accent-color:#00305B;
       cursor:pointer;
+    }
+
+    .intake-input, .intake-select{
+      width:100%;
+      padding:13px 14px;
+      font-size:14px;
+      font-weight:700;
+      border:1px solid rgba(0,0,0,.18);
+      border-radius:12px;
+      outline:none;
+      background:#ffffff;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .intake-input:focus, .intake-select:focus{
+      border-color:rgba(0,48,91,.75);
+      box-shadow:0 0 0 3px rgba(0,48,91,.16);
+    }
+
+    .intake-input[readonly], .intake-input:disabled{
+      background:rgba(15,23,42,.04);
+      color:#0f172a;
+    }
+
+    @media (max-width: 880px){
+      .intake-grid{grid-template-columns:1fr}
+      .intake-grid.three{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
-  <template id="carbyne_client_intake">
-    <div class="ci-wrap">
-      <div class="ci-h2">Client Intake Form</div>
+  <template id="client-intake-form-template">
+    <div id="clientIntakeRoot">
+      <div class="intake-h2">Client Intake Form</div>
+      <div class="intake-section-title">Business Information</div>
 
-      <div class="ci-section">
-        <div class="ci-section-title">Business Information</div>
-
-        <!-- Row 1: Business Name + FEIN -->
-        <div class="ci-grid">
-          <div class="ci-field">
-            <div class="ci-label">Name of Business</div>
-            <input class="ci-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
-          </div>
-
-          <div class="ci-field">
-            <div class="ci-inline-row">
-              <div class="ci-label" style="margin:0;">Federal Employer Identification Number (FEIN)</div>
-              <label class="ci-checkbox" for="bi_no_fein">
-                <input id="bi_no_fein" type="checkbox">
-                No FEIN
-              </label>
-            </div>
-            <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off">
-          </div>
+      <div class="intake-grid">
+        <div class="intake-field">
+          <div class="intake-label">Name of Business</div>
+          <input class="intake-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
         </div>
 
-        <!-- Row 2: Full Name + Title -->
-        <div style="height:14px"></div>
-        <div class="ci-grid">
-          <div class="ci-field">
-            <div class="ci-label">Full Name of Person Completing this Agreement</div>
-            <input class="ci-input" id="bi_fullname" type="text" placeholder="Full Name" autocomplete="name">
+        <div class="intake-field">
+          <div class="intake-label-row">
+            <div class="intake-label">Federal Employer Identification Number (FEIN)</div>
+            <label class="intake-inline-check">
+              <input id="bi_no_fein" type="checkbox">
+              No FEIN
+            </label>
           </div>
-          <div class="ci-field">
-            <div class="ci-label">Title</div>
-            <input class="ci-input" id="bi_title" type="text" placeholder="Title" autocomplete="organization-title">
-          </div>
+          <input class="intake-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10">
+        </div>
+      </div>
+
+      <div class="intake-grid" style="margin-top:14px;">
+        <div class="intake-field">
+          <div class="intake-label">Full Name of Person Completing this Agreement</div>
+          <input class="intake-input" id="bi_fullname" type="text" placeholder="Full Name" autocomplete="name">
         </div>
 
-        <!-- Row 3: Address + Suite -->
-        <div style="height:14px"></div>
-        <div class="ci-grid">
-          <div class="ci-field">
-            <div class="ci-label">Business Address</div>
-            <input class="ci-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
-          </div>
-          <div class="ci-field">
-            <div class="ci-label">Suite / Unit Number</div>
-            <input class="ci-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
-          </div>
+        <div class="intake-field">
+          <div class="intake-label">Title</div>
+          <input class="intake-input" id="bi_title" type="text" placeholder="Title" autocomplete="organization-title">
+        </div>
+      </div>
+
+      <div class="intake-grid" style="margin-top:14px;">
+        <div class="intake-field">
+          <div class="intake-label">Business Address</div>
+          <input class="intake-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
         </div>
 
-        <!-- Row 4: City + State + Zip -->
-        <div style="height:14px"></div>
-        <div class="ci-grid three">
-          <div class="ci-field">
-            <div class="ci-label">City</div>
-            <input class="ci-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
-          </div>
+        <div class="intake-field">
+          <div class="intake-label">Suite / Unit Number</div>
+          <input class="intake-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
+        </div>
+      </div>
 
-          <div class="ci-field">
-            <div class="ci-label">State</div>
-            <select class="ci-select" id="bi_state" autocomplete="address-level1">
-              <option value="" selected>Select</option>
-              <option value="AL">Alabama</option><option value="AK">Alaska</option><option value="AZ">Arizona</option><option value="AR">Arkansas</option>
-              <option value="CA">California</option><option value="CO">Colorado</option><option value="CT">Connecticut</option><option value="DE">Delaware</option>
-              <option value="FL">Florida</option><option value="GA">Georgia</option><option value="HI">Hawaii</option><option value="ID">Idaho</option>
-              <option value="IL">Illinois</option><option value="IN">Indiana</option><option value="IA">Iowa</option><option value="KS">Kansas</option>
-              <option value="KY">Kentucky</option><option value="LA">Louisiana</option><option value="ME">Maine</option><option value="MD">Maryland</option>
-              <option value="MA">Massachusetts</option><option value="MI">Michigan</option><option value="MN">Minnesota</option><option value="MS">Mississippi</option>
-              <option value="MO">Missouri</option><option value="MT">Montana</option><option value="NE">Nebraska</option><option value="NV">Nevada</option>
-              <option value="NH">New Hampshire</option><option value="NJ">New Jersey</option><option value="NM">New Mexico</option><option value="NY">New York</option>
-              <option value="NC">North Carolina</option><option value="ND">North Dakota</option><option value="OH">Ohio</option><option value="OK">Oklahoma</option>
-              <option value="OR">Oregon</option><option value="PA">Pennsylvania</option><option value="RI">Rhode Island</option><option value="SC">South Carolina</option>
-              <option value="SD">South Dakota</option><option value="TN">Tennessee</option><option value="TX">Texas</option><option value="UT">Utah</option>
-              <option value="VT">Vermont</option><option value="VA">Virginia</option><option value="WA">Washington</option><option value="WV">West Virginia</option>
-              <option value="WI">Wisconsin</option><option value="WY">Wyoming</option>
-              <option value="DC">District of Columbia</option>
-            </select>
-          </div>
-
-          <div class="ci-field">
-            <div class="ci-label">Zip Code</div>
-            <input class="ci-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code">
-          </div>
+      <div class="intake-grid three" style="margin-top:14px;">
+        <div class="intake-field">
+          <div class="intake-label">City</div>
+          <input class="intake-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
         </div>
 
-        <!-- Row 5: Phone + Email -->
-        <div style="height:14px"></div>
-        <div class="ci-grid">
-          <div class="ci-field">
-            <div class="ci-label">Business Phone Number</div>
-            <input class="ci-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel">
-          </div>
-          <div class="ci-field">
-            <div class="ci-label">Business Email Address</div>
-            <input class="ci-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
-          </div>
+        <div class="intake-field">
+          <div class="intake-label">State</div>
+          <select class="intake-select" id="bi_state" autocomplete="address-level1">
+            <option value="" selected>Select</option>
+            <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option>
+            <option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option>
+            <option value="DC">DC</option><option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option>
+            <option value="ID">ID</option><option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
+            <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option>
+            <option value="MD">MD</option><option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option>
+            <option value="MS">MS</option><option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
+            <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option>
+            <option value="NY">NY</option><option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option>
+            <option value="OK">OK</option><option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
+            <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option>
+            <option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option>
+            <option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option>
+          </select>
         </div>
 
-        <!-- Row 6: POC full width -->
-        <div style="height:14px"></div>
-        <div class="ci-grid">
-          <div class="ci-field" style="grid-column:1 / -1;">
-            <div class="ci-label">Business Point of Contact</div>
-            <input class="ci-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
-          </div>
+        <div class="intake-field">
+          <div class="intake-label">Zip Code</div>
+          <input class="intake-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10">
+        </div>
+      </div>
+
+      <div class="intake-grid" style="margin-top:14px;">
+        <div class="intake-field">
+          <div class="intake-label">Business Phone Number</div>
+          <input class="intake-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14">
+        </div>
+
+        <div class="intake-field">
+          <div class="intake-label">Business Email Address</div>
+          <input class="intake-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
+        </div>
+      </div>
+
+      <div class="intake-grid" style="margin-top:14px;">
+        <div class="intake-field" style="grid-column:1 / -1;">
+          <div class="intake-label">Business Point of Contact</div>
+          <input class="intake-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
         </div>
       </div>
     </div>
   </template>
 
-  <script>
-    window.carbyne_client_intake_mount = function ({ root }) {
-      const $ = (id) => root.querySelector("#" + id);
+  <script id="carbyne-client-intake-script">
+    (function(){
+      function digitsOnly(s){ return (s || "").replace(/\D/g, ""); }
 
-      const phone = $("bi_phone");
-      const zip = $("bi_zip");
-      const fein = $("bi_fein");
-      const noFein = $("bi_no_fein");
-
-      function digitsOnly(v){ return (v || "").replace(/\D/g, ""); }
-
-      function formatPhone(v){
-        const d = digitsOnly(v).slice(0,10);
+      function formatPhone(raw){
+        const d = digitsOnly(raw).slice(0, 10);
         const a = d.slice(0,3);
         const b = d.slice(3,6);
         const c = d.slice(6,10);
-        if (d.length <= 3) return a ? `(${a}` : "";
-        if (d.length <= 6) return `(${a}) ${b}`;
-        return `(${a}) ${b}-${c}`;
+        if (d.length <= 3) return a ? "(" + a : "";
+        if (d.length <= 6) return "(" + a + ") " + b;
+        return "(" + a + ") " + b + "-" + c;
       }
 
-      function formatFEIN(v){
-        const d = digitsOnly(v).slice(0,9);
+      function formatFein(raw){
+        const d = digitsOnly(raw).slice(0, 9);
         const a = d.slice(0,2);
         const b = d.slice(2,9);
         if (d.length <= 2) return a;
-        return `${a}-${b}`;
+        return a + "-" + b;
       }
 
-      function handlePhone(){
-        const cur = phone.value;
-        phone.value = formatPhone(cur);
+      function formatZip(raw){
+        const d = digitsOnly(raw).slice(0, 9);
+        const a = d.slice(0,5);
+        const b = d.slice(5,9);
+        if (d.length <= 5) return a;
+        return a + "-" + b;
       }
 
-      function handleZip(){
-        // allow digits only; do not force length
-        zip.value = digitsOnly(zip.value);
-      }
+      function byId(id){ return document.getElementById(id); }
 
-      function handleFein(){
-        if (noFein.checked) return;
-        fein.value = formatFEIN(fein.value);
-      }
+      function init(opts){
+        const root = byId(opts && opts.rootId ? opts.rootId : "clientIntakeRoot");
+        if (!root) return;
 
-      function setNoFeinState(){
-        if (noFein.checked){
-          fein.value = "Unavailable";
-          fein.readOnly = true;
-        } else {
-          fein.readOnly = false;
-          fein.value = formatFEIN(fein.value);
+        const phone = byId("bi_phone");
+        const fein = byId("bi_fein");
+        const noFein = byId("bi_no_fein");
+        const zip = byId("bi_zip");
+
+        if (phone){
+          phone.addEventListener("input", function(){
+            const pos = phone.selectionStart || 0;
+            const before = phone.value;
+            phone.value = formatPhone(before);
+            try{ phone.setSelectionRange(pos, pos); }catch(e){}
+          });
+          phone.addEventListener("blur", function(){ phone.value = formatPhone(phone.value); });
+        }
+
+        if (zip){
+          zip.addEventListener("input", function(){
+            const pos = zip.selectionStart || 0;
+            const before = zip.value;
+            zip.value = formatZip(before);
+            try{ zip.setSelectionRange(pos, pos); }catch(e){}
+          });
+          zip.addEventListener("blur", function(){ zip.value = formatZip(zip.value); });
+        }
+
+        if (fein){
+          fein.addEventListener("input", function(){
+            if (noFein && noFein.checked) return;
+            const pos = fein.selectionStart || 0;
+            const before = fein.value;
+            fein.value = formatFein(before);
+            try{ fein.setSelectionRange(pos, pos); }catch(e){}
+          });
+          fein.addEventListener("blur", function(){
+            if (noFein && noFein.checked) return;
+            fein.value = formatFein(fein.value);
+          });
+        }
+
+        if (noFein && fein){
+          noFein.addEventListener("change", function(){
+            if (noFein.checked){
+              fein.value = "Unavailable";
+              fein.disabled = true;
+            }else{
+              fein.disabled = false;
+              fein.value = "";
+              fein.focus();
+            }
+          });
         }
       }
 
-      // Wire
-      phone.addEventListener("input", handlePhone);
-      phone.addEventListener("blur", handlePhone);
-
-      zip.addEventListener("input", handleZip);
-      zip.addEventListener("blur", handleZip);
-
-      fein.addEventListener("input", handleFein);
-      fein.addEventListener("blur", handleFein);
-
-      noFein.addEventListener("change", setNoFeinState);
-
-      // Init
-      setNoFeinState();
-
-      return function unmount(){};
-    };
+      window.CarbyneClientIntakeForm = { init:init };
+    })();
   </script>
 </body>
 </html>
