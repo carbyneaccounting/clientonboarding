@@ -95,8 +95,9 @@
       grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
     }
 
+    /* Card row: card number slightly shorter, others wider */
     .ci-grid.paycard{
-      grid-template-columns: minmax(0,2.4fr) minmax(0,1fr) minmax(0,.55fr) minmax(0,.55fr);
+      grid-template-columns: minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
     }
 
     .ci-field{width:100%}
@@ -170,6 +171,24 @@
       box-shadow:none;
       opacity:.95;
       cursor:not-allowed;
+    }
+
+    .ci-input.ci-invalid{
+      border-color:rgba(185,28,28,.65);
+      box-shadow:0 0 0 3px rgba(185,28,28,.10), 0 12px 24px rgba(2,6,23,.10);
+    }
+
+    .ci-hint{
+      font-size:12px;
+      font-weight:950;
+      color:#0f172a;
+      opacity:.75;
+      white-space:nowrap;
+    }
+
+    .ci-hint.bad{
+      color:#b91c1c;
+      opacity:1;
     }
 
     /* Basis of Accounting */
@@ -271,6 +290,7 @@
       }
       .ci-basis-row{flex-wrap:wrap}
       .ci-other-wrap{flex:1 1 100%}
+      .ci-hint{white-space:normal}
     }
   </style>
 
@@ -589,6 +609,49 @@
       </div>
     </div>
 
+    <div class="ci-grid" style="margin-top:14px;">
+      <div class="ci-field ci-wide">
+        <div class="ci-labelrow">
+          <div class="ci-label">Name of Person on Card</div>
+        </div>
+        <input class="ci-input" id="pay_name_on_card" type="text" placeholder="Name on Card" autocomplete="cc-name">
+      </div>
+    </div>
+
+    <div class="ci-grid" style="margin-top:14px;">
+      <div class="ci-field">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">Card Ownership</div>
+        </div>
+        <div class="ci-basis-row" role="group" aria-label="Card Ownership" style="margin-top:0;">
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_ownership" id="pay_own_personal" value="Personal">
+            Personal Card
+          </label>
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_ownership" id="pay_own_business" value="Business">
+            Business Card
+          </label>
+        </div>
+      </div>
+
+      <div class="ci-field">
+        <div class="ci-labelrow" style="margin-bottom:8px;">
+          <div class="ci-label">Card Funding</div>
+        </div>
+        <div class="ci-basis-row" role="group" aria-label="Card Funding" style="margin-top:0;">
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_funding" id="pay_fund_debit" value="Debit">
+            Debit
+          </label>
+          <label class="ci-radio">
+            <input type="radio" name="pay_card_funding" id="pay_fund_credit" value="Credit">
+            Credit
+          </label>
+        </div>
+      </div>
+    </div>
+
     <div class="ci-grid paycard" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
@@ -600,6 +663,7 @@
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Expiration Date</div>
+          <div class="ci-hint" id="pay_exp_hint"></div>
         </div>
         <input class="ci-input" id="pay_card_exp" type="text" placeholder="MM/YY" inputmode="numeric" autocomplete="cc-exp" maxlength="5">
       </div>
@@ -686,6 +750,27 @@
       return d.slice(0,2) + "/" + d.slice(2);
     }
 
+    function parseExp(mmYY){
+      const d = onlyDigits(mmYY);
+      if (d.length !== 4) return null;
+      const mm = parseInt(d.slice(0,2), 10);
+      const yy = parseInt(d.slice(2,4), 10);
+      if (!mm || mm < 1 || mm > 12) return null;
+      const year = 2000 + yy;
+      return { mm, year };
+    }
+
+    function isExpNotExpired(mmYY){
+      const p = parseExp(mmYY);
+      if (!p) return false;
+      const now = new Date();
+      const curYear = now.getFullYear();
+      const curMonth = now.getMonth() + 1;
+      if (p.year > curYear) return true;
+      if (p.year < curYear) return false;
+      return p.mm >= curMonth;
+    }
+
     function maxCvvLen(cardType){
       return (cardType === "American Express") ? 4 : 3;
     }
@@ -704,6 +789,7 @@
           "boa_other_text",
           "ai_accountant_name","ai_accountant_phone","ai_accountant_email",
           "ai_sw_specify",
+          "pay_name_on_card",
           "pay_card_number","pay_card_exp","pay_card_cvv","pay_card_zip"
         ];
 
@@ -747,6 +833,18 @@
           const radios5 = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_type"]'));
           radios5.forEach(r=>{ r.checked = (r.value === savedCardType); });
         }
+
+        const savedOwnership = (data["pay_card_ownership"] ?? "");
+        if (savedOwnership){
+          const radios6 = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_ownership"]'));
+          radios6.forEach(r=>{ r.checked = (r.value === savedOwnership); });
+        }
+
+        const savedFunding = (data["pay_card_funding"] ?? "");
+        if (savedFunding){
+          const radios7 = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_funding"]'));
+          radios7.forEach(r=>{ r.checked = (r.value === savedFunding); });
+        }
       } catch {}
     }
 
@@ -759,6 +857,7 @@
         "poc_email","poc_phone",
         "ai_accountant_name","ai_accountant_phone","ai_accountant_email",
         "ai_sw_specify",
+        "pay_name_on_card",
         "pay_card_number","pay_card_exp","pay_card_cvv","pay_card_zip"
       ];
       ids.forEach(id=>{
@@ -779,12 +878,15 @@
       out["ai_records_full_history"] = getSelectedValue(root, "ai_records_full_history");
 
       out["pay_card_type"] = getSelectedValue(root, "pay_card_type");
+      out["pay_card_ownership"] = getSelectedValue(root, "pay_card_ownership");
+      out["pay_card_funding"] = getSelectedValue(root, "pay_card_funding");
 
       try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
     }
 
     window.carbyne_client_intake_mount = function(args){
       const root = args && args.root ? args.root : document;
+
       const fein = root.querySelector("#bi_fein");
       const noFein = root.querySelector("#bi_no_fein");
       const phone = root.querySelector("#bi_phone");
@@ -808,22 +910,21 @@
       const swSpecify = root.querySelector("#ai_sw_specify");
 
       const payCardTypeRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_type"]'));
+      const payOwnerRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_ownership"]'));
+      const payFundingRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_funding"]'));
+
       const payCardNumber = root.querySelector("#pay_card_number");
       const payCardExp = root.querySelector("#pay_card_exp");
       const payCardCvv = root.querySelector("#pay_card_cvv");
       const payCardZip = root.querySelector("#pay_card_zip");
+      const payExpHint = root.querySelector("#pay_exp_hint");
 
       loadSaved(root);
 
       const onFeinInput = () => {
         if (!fein) return;
         if (noFein && noFein.checked) return;
-        fein.value = (function(raw){
-          const d = onlyDigits(raw).slice(0,9);
-          if (!d) return "";
-          if (d.length <= 2) return d;
-          return d.slice(0,2) + "-" + d.slice(2);
-        })(fein.value);
+        fein.value = formatFein(fein.value);
         save(root);
       };
 
@@ -928,7 +1029,52 @@
           payCardCvv.value = onlyDigits(payCardCvv.value).slice(0, maxLen);
         }
 
+        validateExp();
         save(root);
+      }
+
+      function validateExp(){
+        if (!payCardExp) return;
+        const v = payCardExp.value || "";
+        if (!v){
+          payCardExp.classList.remove("ci-invalid");
+          payCardExp.removeAttribute("aria-invalid");
+          if (payExpHint){
+            payExpHint.textContent = "";
+            payExpHint.classList.remove("bad");
+          }
+          return;
+        }
+
+        const okFormat = !!parseExp(v);
+        const okNotExpired = okFormat && isExpNotExpired(v);
+
+        if (!okFormat){
+          payCardExp.classList.add("ci-invalid");
+          payCardExp.setAttribute("aria-invalid","true");
+          if (payExpHint){
+            payExpHint.textContent = "Use MM/YY";
+            payExpHint.classList.add("bad");
+          }
+          return;
+        }
+
+        if (!okNotExpired){
+          payCardExp.classList.add("ci-invalid");
+          payCardExp.setAttribute("aria-invalid","true");
+          if (payExpHint){
+            payExpHint.textContent = "Card expired";
+            payExpHint.classList.add("bad");
+          }
+          return;
+        }
+
+        payCardExp.classList.remove("ci-invalid");
+        payCardExp.removeAttribute("aria-invalid");
+        if (payExpHint){
+          payExpHint.textContent = "";
+          payExpHint.classList.remove("bad");
+        }
       }
 
       const onPayCardNumberInput = () => {
@@ -941,6 +1087,12 @@
       const onPayExpInput = () => {
         if (!payCardExp) return;
         payCardExp.value = formatExp(payCardExp.value);
+        validateExp();
+        save(root);
+      };
+
+      const onPayExpBlur = () => {
+        validateExp();
         save(root);
       };
 
@@ -1003,6 +1155,8 @@
       }
 
       payCardTypeRadios.forEach(r=>{ r.addEventListener("change", onCardTypeChange); });
+      payOwnerRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
+      payFundingRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
 
       if (payCardNumber){
         payCardNumber.addEventListener("input", onPayCardNumberInput);
@@ -1010,7 +1164,8 @@
       }
       if (payCardExp){
         payCardExp.addEventListener("input", onPayExpInput);
-        payCardExp.addEventListener("blur", onPayExpInput);
+        payCardExp.addEventListener("blur", onPayExpBlur);
+        payCardExp.addEventListener("change", onPayExpBlur);
       }
       if (payCardCvv){
         payCardCvv.addEventListener("input", onPayCvvInput);
@@ -1025,6 +1180,7 @@
       syncOtherAccountantState();
       syncAccountingSoftwareState();
       syncCardFormat();
+      validateExp();
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
@@ -1035,6 +1191,8 @@
         if (el.id === "ai_sw_specify") return;
 
         if (el.name === "pay_card_type") return;
+        if (el.name === "pay_card_ownership") return;
+        if (el.name === "pay_card_funding") return;
         if (el.id === "pay_card_number" || el.id === "pay_card_exp" || el.id === "pay_card_cvv" || el.id === "pay_card_zip") return;
 
         el.addEventListener("input", onAnyChange);
@@ -1085,6 +1243,8 @@
         }
 
         payCardTypeRadios.forEach(r=>{ r.removeEventListener("change", onCardTypeChange); });
+        payOwnerRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
+        payFundingRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
 
         if (payCardNumber){
           payCardNumber.removeEventListener("input", onPayCardNumberInput);
@@ -1092,7 +1252,8 @@
         }
         if (payCardExp){
           payCardExp.removeEventListener("input", onPayExpInput);
-          payCardExp.removeEventListener("blur", onPayExpInput);
+          payCardExp.removeEventListener("blur", onPayExpBlur);
+          payCardExp.removeEventListener("change", onPayExpBlur);
         }
         if (payCardCvv){
           payCardCvv.removeEventListener("input", onPayCvvInput);
