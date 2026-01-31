@@ -287,18 +287,11 @@
       margin-top:2px;
     }
 
-    /* Acknowledgement */
-    .ci-ack-text{
-      font-size:13px;
-      font-weight:900;
-      color:#0f172a;
-      line-height:1.4;
-    }
-
+    /* Bottom submit (match nav button height/style) */
     .ci-actions{
       width:100%;
       display:flex;
-      justify-content:flex-end;
+      justify-content:flex-start;
       margin-top:16px;
     }
 
@@ -642,7 +635,6 @@
       </div>
     </div>
 
-    <!-- Ownership + Type ABOVE issuer -->
     <div class="ci-grid paymeta" style="margin-top:10px;">
       <div class="ci-field">
         <div class="ci-labelrow" style="margin-bottom:8px;">
@@ -677,7 +669,6 @@
       </div>
     </div>
 
-    <!-- Issuer title + issuer radios -->
     <div class="ci-grid" style="margin-top:12px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
@@ -748,28 +739,8 @@
       </div>
     </div>
 
-    <div class="ci-section" style="margin-top:18px;">Acknowledgement</div>
-    <div class="ci-sectionline"></div>
-
-    <div class="ci-grid" style="margin-top:6px;">
-      <div class="ci-field ci-wide">
-        <div class="ci-ack-text">
-          I hereby acknowledge that, to the best of my knowledge, the provided information in this Client intake is true and accurate.
-        </div>
-      </div>
-    </div>
-
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field ci-wide">
-        <label class="ci-inline">
-          <input class="ci-check" id="ack_agree" type="checkbox">
-          I agree
-        </label>
-      </div>
-    </div>
-
     <div class="ci-actions">
-      <button class="ci-submit" id="ack_submit" type="button" disabled>I Agree and Submit</button>
+      <button class="ci-submit" id="ci_submit_intake" type="button">Submit Client Intake Form</button>
     </div>
 
   </div>
@@ -1008,9 +979,6 @@
       const payCardZip = root.querySelector("#pay_card_zip");
       const payExpHint = root.querySelector("#pay_exp_hint");
 
-      const ackAgree = root.querySelector("#ack_agree");
-      const ackSubmit = root.querySelector("#ack_submit");
-
       loadSaved(root);
 
       const onFeinInput = () => {
@@ -1205,11 +1173,6 @@
       const onBrandChange = () => syncCardFormat();
       const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
 
-      const onAckAgreeChange = () => {
-        if (!ackAgree || !ackSubmit) return;
-        ackSubmit.disabled = !ackAgree.checked;
-      };
-
       if (fein){
         fein.addEventListener("input", onFeinInput);
         fein.addEventListener("blur", onFeinInput);
@@ -1274,11 +1237,6 @@
         payCardZip.addEventListener("blur", onPayZipInput);
       }
 
-      if (ackAgree){
-        ackAgree.addEventListener("change", onAckAgreeChange);
-      }
-      onAckAgreeChange();
-
       syncOtherState();
       syncOtherAccountantState();
       syncAccountingSoftwareState();
@@ -1297,8 +1255,6 @@
         if (el.name === "pay_card_ownership") return;
         if (el.name === "pay_card_type") return;
         if (el.id === "pay_card_number" || el.id === "pay_card_exp" || el.id === "pay_card_cvv" || el.id === "pay_card_zip") return;
-
-        if (el.id === "ack_agree" || el.id === "ack_submit") return;
 
         el.addEventListener("input", onAnyChange);
         el.addEventListener("change", onAnyChange);
@@ -1367,10 +1323,6 @@
         if (payCardZip){
           payCardZip.removeEventListener("input", onPayZipInput);
           payCardZip.removeEventListener("blur", onPayZipInput);
-        }
-
-        if (ackAgree){
-          ackAgree.removeEventListener("change", onAckAgreeChange);
         }
 
         allInputs.forEach(el=>{
