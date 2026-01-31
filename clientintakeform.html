@@ -1,433 +1,165 @@
-<!-- clientintakeform.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <title>Client Intake Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body>
 
-<template id="carbyne_client_intake">
   <style>
-    .ci-wrap{
-      width:100%;
-      max-width:980px;
-    }
+    *{box-sizing:border-box}
 
-    .ci-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      padding:4px 2px 0;
-    }
-
-    .ci-h2{
+    body{
       margin:0;
-      font-size:28px;
-      font-weight:950;
-      color:#0b2f4e;
-      letter-spacing:.2px;
-    }
-
-    .ci-section{
-      margin-top:12px;
-      font-size:14px;
-      font-weight:950;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:#0f172a;
-      letter-spacing:.2px;
     }
 
-    .ci-spacer{height:10px}
+    h2{
+      font-size:20px;
+      font-weight:950;
+      margin:22px 0 12px;
+      color:#00305B;
+    }
 
-    .ci-grid{
+    .section{
+      margin-bottom:26px;
+    }
+
+    .grid{
       display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px 18px;
     }
 
-    .ci-grid.three{
-      grid-template-columns:repeat(3, minmax(0,1fr));
-    }
-
-    .ci-field{width:100%}
-
-    .ci-labelrow{
+    .field{
       display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin:0 0 8px;
+      flex-direction:column;
+      gap:6px;
     }
 
-    .ci-label{
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.92;
+    .field.full{
+      grid-column:1 / -1;
     }
 
-    .ci-inline{
-      display:flex;
-      align-items:center;
-      gap:10px;
+    label{
       font-size:12px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.85;
-      white-space:nowrap;
+      font-weight:900;
+      color:#334155;
     }
 
-    .ci-check{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
+    input{
+      padding:12px 14px;
+      font-size:14px;
+      font-weight:800;
+      border-radius:10px;
+      border:1px solid rgba(0,0,0,.15);
+      outline:none;
     }
 
-    .ci-input, .ci-select{
-      width:100%;
-      border:1px solid rgba(0,0,0,.14);
-      border-radius:14px;
-      padding:14px 16px;
+    input[readonly]{
+      background:#f1f5f9;
+      color:#475569;
+    }
+
+    /* Basis of Accounting */
+    .basis-options{
+      display:flex;
+      gap:22px;
+      margin-top:10px;
+      flex-wrap:wrap;
+    }
+
+    .basis-option{
+      display:flex;
+      align-items:center;
+      gap:8px;
       font-size:14px;
       font-weight:900;
-      outline:none;
-      background:#fff;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
-      transition:border-color .18s ease, box-shadow .18s ease;
+      cursor:pointer;
       color:#0f172a;
     }
 
-    .ci-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
-
-    .ci-input:focus, .ci-select:focus{
-      border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
-    }
-
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      opacity: 0.6;
-    }
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
-    }
-
-    .ci-wide{grid-column:1 / -1}
-
-    @media (max-width:820px){
-      .ci-grid, .ci-grid.three{grid-template-columns:1fr}
+    .basis-option input{
+      cursor:pointer;
     }
   </style>
+</head>
 
-  <div class="ci-wrap" id="ciRoot">
-    <div class="ci-top">
-      <h2 class="ci-h2">Client Intake Form</h2>
-      <div></div>
-    </div>
+<body>
 
-    <div class="ci-spacer"></div>
+  <!-- Business Information -->
+  <div class="section">
+    <h2>Client Intake Form</h2>
 
-    <div class="ci-section">Business Information</div>
-
-    <div class="ci-grid">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Name of Business</div>
-        </div>
-        <input class="ci-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
+    <div class="grid">
+      <div class="field full">
+        <label>Name of Business</label>
+        <input type="text" name="business_name">
       </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Employer Identification Number (FEIN)</div>
-          <label class="ci-inline">
-            <input class="ci-check" id="bi_no_fein" type="checkbox">
-            No FEIN
-          </label>
-        </div>
-        <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10">
-      </div>
-    </div>
-
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Formation Date</div>
-        </div>
-        <input class="ci-input" id="bi_formation_date" type="date" autocomplete="off">
+      <div class="field full">
+        <label>Business Address</label>
+        <input type="text" name="business_address">
       </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Full Name of Person Completing this Agreement</div>
-        </div>
-        <input class="ci-input" id="bi_fullname" type="text" placeholder="Full Name" autocomplete="name">
-      </div>
-    </div>
-
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Title</div>
-        </div>
-        <input class="ci-input" id="bi_title" type="text" placeholder="Title" autocomplete="organization-title">
+      <div class="field">
+        <label>Suite / Unit Number</label>
+        <input type="text" name="suite_unit">
       </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Address</div>
-        </div>
-        <input class="ci-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
-      </div>
-    </div>
-
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Suite / Unit Number</div>
-        </div>
-        <input class="ci-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
+      <div class="field">
+        <label>City</label>
+        <input type="text" name="city">
       </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">City</div>
-        </div>
-        <input class="ci-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
-      </div>
-    </div>
-
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">State</div>
-        </div>
-        <select class="ci-select" id="bi_state" autocomplete="address-level1">
-          <option value="" selected>Select</option>
-          <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option>
-          <option value="CA">CA</option><option value="CO">CO</option><option value="CT">CT</option><option value="DE">DE</option>
-          <option value="FL">FL</option><option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
-          <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option><option value="KS">KS</option>
-          <option value="KY">KY</option><option value="LA">LA</option><option value="ME">ME</option><option value="MD">MD</option>
-          <option value="MA">MA</option><option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
-          <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option>
-          <option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
-          <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
-          <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option>
-          <option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
-          <option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
-          <option value="WI">WI</option><option value="WY">WY</option>
-        </select>
+      <div class="field">
+        <label>State</label>
+        <input type="text" name="state" value="KY" readonly>
       </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Zip Code</div>
-        </div>
-        <input class="ci-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10">
-      </div>
-    </div>
-
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Phone Number</div>
-        </div>
-        <input class="ci-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14">
+      <div class="field">
+        <label>Zip Code</label>
+        <input type="text" name="zip" placeholder="Kentucky Zip Code">
       </div>
 
-      <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Email Address</div>
-        </div>
-        <input class="ci-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
+      <div class="field">
+        <label>Business Phone Number</label>
+        <input type="tel" name="business_phone">
       </div>
-    </div>
 
-    <div class="ci-grid" style="margin-top:14px;">
-      <div class="ci-field ci-wide">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Point of Contact</div>
-        </div>
-        <input class="ci-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
+      <div class="field">
+        <label>Business Email Address</label>
+        <input type="email" name="business_email">
+      </div>
+
+      <div class="field full">
+        <label>Business Point of Contact</label>
+        <input type="text" name="point_of_contact">
       </div>
     </div>
   </div>
-</template>
 
-<script>
-  (function(){
-    const STORAGE_KEY_INTAKE = "carbyne_intake_business_info";
+  <!-- Basis of Accounting -->
+  <div class="section">
+    <h2>Basis of Accounting</h2>
 
-    function onlyDigits(s){ return (s || "").replace(/\D/g,""); }
+    <div class="basis-options">
+      <label class="basis-option">
+        <input type="radio" name="basis_of_accounting" value="Accrual">
+        <span>Accrual</span>
+      </label>
 
-    function formatPhone(raw){
-      const d = onlyDigits(raw).slice(0,10);
-      const a = d.slice(0,3);
-      const b = d.slice(3,6);
-      const c = d.slice(6,10);
-      if (!d) return "";
-      if (d.length <= 3) return "(" + a;
-      if (d.length <= 6) return "(" + a + ") " + b;
-      return "(" + a + ") " + b + "-" + c;
-    }
+      <label class="basis-option">
+        <input type="radio" name="basis_of_accounting" value="Cash">
+        <span>Cash</span>
+      </label>
 
-    function formatFein(raw){
-      const d = onlyDigits(raw).slice(0,9);
-      if (!d) return "";
-      if (d.length <= 2) return d;
-      return d.slice(0,2) + "-" + d.slice(2);
-    }
-
-    function formatZip(raw){
-      const d = onlyDigits(raw).slice(0,9);
-      if (!d) return "";
-      if (d.length <= 5) return d;
-      return d.slice(0,5) + "-" + d.slice(5);
-    }
-
-    function loadSaved(root){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY_INTAKE);
-        if (!raw) return;
-        const data = JSON.parse(raw);
-
-        const ids = [
-          "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
-          "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc"
-        ];
-
-        ids.forEach(id=>{
-          const el = root.querySelector("#"+id);
-          if (!el) return;
-          if (el.tagName.toLowerCase() === "select"){
-            el.value = (data[id] ?? "");
-          } else {
-            el.value = (data[id] ?? "");
-          }
-        });
-
-        const cb = root.querySelector("#bi_no_fein");
-        if (cb){
-          cb.checked = !!data["bi_no_fein"];
-        }
-      } catch {}
-    }
-
-    function save(root){
-      const out = {};
-      const ids = [
-        "bi_name","bi_fein","bi_formation_date","bi_fullname","bi_title","bi_address","bi_suite",
-        "bi_city","bi_state","bi_zip","bi_phone","bi_email","bi_poc"
-      ];
-      ids.forEach(id=>{
-        const el = root.querySelector("#"+id);
-        if (!el) return;
-        out[id] = el.value || "";
-      });
-
-      const cb = root.querySelector("#bi_no_fein");
-      out["bi_no_fein"] = cb ? !!cb.checked : false;
-
-      try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
-    }
-
-    window.carbyne_client_intake_mount = function(args){
-      const root = args && args.root ? args.root : document;
-      const fein = root.querySelector("#bi_fein");
-      const noFein = root.querySelector("#bi_no_fein");
-      const phone = root.querySelector("#bi_phone");
-      const zip = root.querySelector("#bi_zip");
-
-      loadSaved(root);
-
-      const onFeinInput = () => {
-        if (!fein) return;
-        if (noFein && noFein.checked) return;
-        const formatted = formatFein(fein.value);
-        fein.value = formatted;
-        save(root);
-      };
-
-      const onNoFeinToggle = () => {
-        if (!fein || !noFein) return;
-        if (noFein.checked){
-          fein.value = "Unavailable";
-          fein.setAttribute("readonly","readonly");
-        } else {
-          fein.removeAttribute("readonly");
-          fein.value = "";
-        }
-        save(root);
-      };
-
-      const onPhoneInput = () => {
-        if (!phone) return;
-        phone.value = formatPhone(phone.value);
-        save(root);
-      };
-
-      const onZipInput = () => {
-        if (!zip) return;
-        zip.value = formatZip(zip.value);
-        save(root);
-      };
-
-      const onAnyChange = () => save(root);
-
-      if (fein){
-        fein.addEventListener("input", onFeinInput);
-        fein.addEventListener("blur", onFeinInput);
-      }
-      if (noFein){
-        noFein.addEventListener("change", onNoFeinToggle);
-        onNoFeinToggle();
-      }
-      if (phone){
-        phone.addEventListener("input", onPhoneInput);
-        phone.addEventListener("blur", onPhoneInput);
-      }
-      if (zip){
-        zip.addEventListener("input", onZipInput);
-        zip.addEventListener("blur", onZipInput);
-      }
-
-      const allInputs = Array.from(root.querySelectorAll("input,select"));
-      allInputs.forEach(el=>{
-        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
-        el.addEventListener("input", onAnyChange);
-        el.addEventListener("change", onAnyChange);
-        el.addEventListener("blur", onAnyChange);
-      });
-
-      return function unmount(){
-        if (fein){
-          fein.removeEventListener("input", onFeinInput);
-          fein.removeEventListener("blur", onFeinInput);
-        }
-        if (noFein){
-          noFein.removeEventListener("change", onNoFeinToggle);
-        }
-        if (phone){
-          phone.removeEventListener("input", onPhoneInput);
-          phone.removeEventListener("blur", onPhoneInput);
-        }
-        if (zip){
-          zip.removeEventListener("input", onZipInput);
-          zip.removeEventListener("blur", onZipInput);
-        }
-        allInputs.forEach(el=>{
-          el.removeEventListener("input", onAnyChange);
-          el.removeEventListener("change", onAnyChange);
-          el.removeEventListener("blur", onAnyChange);
-        });
-      };
-    };
-  })();
-</script>
+      <label class="basis-option">
+        <input type="radio" name="basis_of_accounting" value="Mixed Method">
+        <span>Mixed Method</span>
+      </label>
+    </div>
+  </div>
 
 </body>
 </html>
