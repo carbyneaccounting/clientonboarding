@@ -352,17 +352,9 @@
     const CACHE_TS_KEY = "carbyne_valid_codes_timestamp";
     const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    const CLIENT_INTAKE_URLS = [
-      "clientintakeform.html",
-      "./clientintakeform.html",
-      location.origin + "/clientintakeform.html"
-    ];
-
-    const SIGNATURE_URLS = [
-      "electronicsignature.html",
-      "./electronicsignature.html",
-      location.origin + "/electronicsignature.html"
-    ];
+    // External modules (GitHub raw URLs)
+    const CLIENT_INTAKE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
+    const SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
 
     let currentPage = 1;
     let isAccessValidated = false;
@@ -518,86 +510,56 @@
       return shell;
     }
 
-    async function fetchFirstWorking(urls){
-      let lastErr = null;
-      for (const u of urls){
-        try{
-          const res = await fetch(u, { cache:"no-store" });
-          if (!res.ok) throw new Error("HTTP " + res.status + " @ " + u);
-          return { text: await res.text(), baseUrl: u };
-        } catch(e){
-          lastErr = e;
-        }
-      }
-      throw lastErr || new Error("All fetch attempts failed");
-    }
+    async function loadExternalModule(url, templateId, mountFnName, hostEl, secureCode){
+      const res = await fetch(url, { cache:"no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    function absolutizeUrl(src, baseUrl){
-      try{ return new URL(src, baseUrl).toString(); }
-      catch{ return src; }
-    }
+      const text = await res.text();
+      const doc = new DOMParser().parseFromString(text, "text/html");
 
-    function isScriptAlreadyLoaded(key){
-      return !!document.querySelector('script[data-carbyne-loaded="' + key.replaceAll('"','') + '"]');
-    }
-
-    function appendInlineScriptOnce(key, code){
-      if (isScriptAlreadyLoaded(key)) return;
-      const s = document.createElement("script");
-      s.async = false;
-      s.textContent = code || "";
-      s.setAttribute("data-carbyne-loaded", key);
-      document.body.appendChild(s);
-    }
-
-    async function appendSrcScriptOnce(absSrc){
-      if (isScriptAlreadyLoaded(absSrc)) return;
-      const s = document.createElement("script");
-      s.async = false;
-      s.src = absSrc;
-      s.setAttribute("data-carbyne-loaded", absSrc);
-
-      await new Promise((resolve, reject) => {
-        s.onload = () => resolve();
-        s.onerror = () => reject(new Error("Script load error: " + absSrc));
-        document.body.appendChild(s);
+      // Append styles
+      const styles = Array.from(doc.querySelectorAll("style"));
+      styles.forEach(st => {
+        const s = document.createElement("style");
+        s.textContent = st.textContent || "";
+        document.head.appendChild(s);
       });
-    }
 
-    async function loadExternalTemplate(urls, templateId, mountFnName, hostEl, mountArgs){
-      const fetched = await fetchFirstWorking(urls);
-      const html = fetched.text;
-      const baseUrl = fetched.baseUrl;
+      // Append scripts
+      const scripts = Array.from(doc.querySelectorAll("script"));
+      for (const sc of scripts){
+        const s = document.createElement("script");
+        if (sc.src){
+          s.src = sc.src;
+          s.async = false;
+        } else {
+          s.textContent = sc.textContent || "";
+        }
+        document.body.appendChild(s);
+      }
 
-      const doc = new DOMParser().parseFromString(html, "text/html");
-
+      // Find template
       const tpl = doc.getElementById(templateId);
       if (!tpl || tpl.tagName.toLowerCase() !== "template"){
-        throw new Error("Template not found: " + templateId);
+        throw new Error(`Template #${templateId} not found`);
       }
 
+      // Mount template
       hostEl.innerHTML = "";
-      hostEl.appendChild(document.importNode(tpl.content, true));
+      const cloned = document.importNode(tpl.content, true);
+      hostEl.appendChild(cloned);
 
-      const scripts = Array.from(doc.querySelectorAll("script"));
-      for (let i=0;i<scripts.length;i++){
-        const sc = scripts[i];
-
-        if (sc.src){
-          const absSrc = absolutizeUrl(sc.getAttribute("src"), baseUrl);
-          await appendSrcScriptOnce(absSrc);
-        } else {
-          const inlineKey = baseUrl + "::inline::" + i;
-          appendInlineScriptOnce(inlineKey, sc.textContent || "");
-        }
-      }
-
+      // Call mount function
       const fn = window[mountFnName];
       if (typeof fn !== "function"){
-        throw new Error("Mount function not found: " + mountFnName);
+        throw new Error(`Mount function ${mountFnName} not found`);
       }
 
-      const unmount = fn(mountArgs);
+      const unmount = fn({
+        root: hostEl,
+        referenceNumber: secureCode
+      });
+
       if (typeof unmount === "function") activeUnmount = unmount;
     }
 
@@ -710,12 +672,12 @@
       const host = content.querySelector("#intakeHost");
 
       try{
-        await loadExternalTemplate(
-          CLIENT_INTAKE_URLS,
+        await loadExternalModule(
+          CLIENT_INTAKE_URL,
           "carbyne_client_intake",
           "carbyne_client_intake_mount",
           host,
-          { root: host, referenceNumber: secureCode }
+          secureCode
         );
       } catch(e){
         host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load intake form.</div>`;
@@ -734,12 +696,12 @@
       const host = content.querySelector("#sigHost");
 
       try{
-        await loadExternalTemplate(
-          SIGNATURE_URLS,
+        await loadExternalModule(
+          SIGNATURE_URL,
           "carbyne_electronic_signature",
           "carbyne_electronic_signature_mount",
           host,
-          { root: host, referenceNumber: secureCode }
+          secureCode
         );
       } catch(e){
         host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load signature.</div>`;
