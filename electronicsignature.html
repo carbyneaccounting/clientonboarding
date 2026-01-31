@@ -10,291 +10,223 @@
 
 <template id="carbyne_electronic_signature">
   <style>
-    .es-wrap{width:100%}
-    .es-head{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-      padding:0 2px 6px;
+    .es-wrap{width:100%;max-width:100%}
+    
+    .es-header{
+      display:flex;align-items:center;justify-content:space-between;gap:6px;
+      padding:0 2px 4px;margin-bottom:4px;
     }
     .es-title{
-      margin:0;
-      font-size:18px;
-      font-weight:950;
-      color:#0b2f4e;
-      letter-spacing:.2px;
+      margin:0;font-size:16px;font-weight:950;color:#0b2f4e;letter-spacing:.2px;
     }
-
-    .es-bar{
-      display:flex;align-items:center;justify-content:space-between;gap:8px;
-      background:#fff;
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:10px;
-      padding:6px 8px;
-      box-shadow:0 6px 12px rgba(2,6,23,.08);
-      margin-top:4px;
-    }
-
-    .es-bar-left{display:flex;align-items:center;gap:8px}
-    .es-ico{
-      width:30px;height:30px;border-radius:8px;
-      background:rgba(0,48,91,.08);
-      border:1px solid rgba(0,0,0,.06);
-      display:flex;align-items:center;justify-content:center;
-      color:#00305B;
-      box-shadow:0 6px 10px rgba(0,0,0,.08);
-      flex:0 0 auto;
-    }
-    .es-bar-title{font-size:11px;font-weight:950;color:#0f172a;line-height:1.05}
-    .es-bar-sub{font-size:9px;font-weight:900;color:#334155;opacity:.85;margin-top:2px}
-
-    .es-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    
+    .es-header-actions{display:flex;align-items:center;gap:4px}
+    .es-mode-toggle{display:flex;gap:3px;margin-right:6px}
+    
     .es-pill{
       border:1px solid rgba(0,0,0,.12);
       background:#fff;
       color:#0f172a;
-      font-weight:950;
-      font-size:10px;
-      padding:4px 8px;
+      font-weight:900;
+      font-size:9px;
+      padding:3px 7px;
       border-radius:999px;
       cursor:pointer;
-      transition:transform .12s ease, opacity .12s ease, background .12s ease;
+      transition:all .12s ease;
+      white-space:nowrap;
     }
-    .es-pill.primary{
-      background:rgba(0,48,91,.08);
-      border-color:rgba(0,48,91,.18);
-      color:#00305B;
-    }
-    .es-pill.danger{
-      background:rgba(185,28,28,.06);
-      border-color:rgba(185,28,28,.20);
-      color:#b91c1c;
-    }
+    .es-pill.primary{background:rgba(0,48,91,.08);border-color:rgba(0,48,91,.18);color:#00305B}
+    .es-pill.danger{background:rgba(185,28,28,.06);border-color:rgba(185,28,28,.20);color:#b91c1c}
     .es-pill:hover{transform:translateY(-1px);opacity:.96}
-    .es-pill.active{
-      background:rgba(0,48,91,.14);
-      border-color:rgba(0,48,91,.28);
-    }
+    .es-pill.active{background:rgba(0,48,91,.14);border-color:rgba(0,48,91,.28)}
 
-    .es-grid{
+    .es-main{
       display:grid;
-      grid-template-columns: 1.3fr .7fr;
-      gap:10px;
-      margin-top:8px;
+      grid-template-columns:1.4fr .6fr;
+      gap:8px;
     }
 
     .es-card{
       background:#fff;
       border:1px solid rgba(0,0,0,.10);
-      border-radius:10px;
-      box-shadow:0 6px 12px rgba(2,6,23,.08);
+      border-radius:8px;
+      box-shadow:0 4px 10px rgba(2,6,23,.08);
       overflow:hidden;
     }
 
     .es-card-h{
-      padding:6px 8px;
+      padding:4px 6px;
       border-bottom:1px solid rgba(0,0,0,.08);
-      font-size:10px;
+      font-size:9px;
       font-weight:950;
       color:#0f172a;
       opacity:.90;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:8px;
     }
 
-    .es-canvas-wrap{padding:8px}
+    .es-canvas-area{padding:6px}
     canvas{
       width:100%;
-      height:120px;
+      height:100px;
       border:1px solid rgba(0,0,0,.14);
-      border-radius:8px;
+      border-radius:6px;
       background:#fff;
       display:block;
       touch-action:none;
     }
 
     .es-controls{
-      padding:6px 8px 8px;
+      padding:4px 6px 6px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:8px;
-      flex-wrap:wrap;
+      gap:6px;
     }
 
-    .es-slider{display:flex;align-items:center;gap:6px}
-    .es-slider label{font-size:9px;font-weight:950;color:#0f172a;opacity:.82}
-    .es-slider input{width:80px}
+    .es-slider{display:flex;align-items:center;gap:4px}
+    .es-slider label{font-size:8px;font-weight:900;color:#0f172a;opacity:.82}
+    .es-slider input{width:60px;height:16px}
 
-    .es-status{
-      font-size:9px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.75;
-    }
+    .es-status{font-size:8px;font-weight:900;color:#0f172a;opacity:.75}
     .es-status.good{color:#0a7a3a;opacity:1}
     .es-status.bad{color:#b91c1c;opacity:1}
 
-    .es-type-wrap{padding:8px}
-    .es-type-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+    .es-type-area{padding:6px}
     .es-type-input{
-      flex:1;
-      min-width:180px;
+      width:100%;
       border:1px solid rgba(0,0,0,.14);
-      border-radius:8px;
-      padding:8px 10px;
-      font-size:12px;
+      border-radius:6px;
+      padding:6px 8px;
+      font-size:11px;
       font-weight:900;
       outline:none;
       background:#fff;
-      box-shadow:0 6px 12px rgba(2,6,23,.08);
+      box-shadow:0 4px 10px rgba(2,6,23,.08);
       color:#0f172a;
     }
     .es-type-preview{
-      margin-top:6px;
+      margin-top:4px;
       border:1px dashed rgba(0,0,0,.18);
-      border-radius:8px;
-      padding:10px;
-      min-height:40px;
+      border-radius:6px;
+      padding:6px;
+      min-height:32px;
       display:flex;
       align-items:center;
       justify-content:center;
       background:rgba(0,0,0,.02);
     }
     .es-script{
-      font-family: "Brush Script MT", "Segoe Script", "Snell Roundhand", "Apple Chancery", cursive;
-      font-size:26px;
+      font-family:"Brush Script MT","Segoe Script","Snell Roundhand","Apple Chancery",cursive;
+      font-size:22px;
       color:#0f172a;
       line-height:1;
       user-select:none;
       white-space:nowrap;
     }
+    .es-type-controls{padding-top:4px;display:flex;justify-content:flex-end}
 
-    .es-side{
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
+    .es-sidebar{display:flex;flex-direction:column;gap:8px}
 
-    .es-kv{
-      padding:8px;
-    }
-    .es-kv-row{
+    .es-info{padding:6px}
+    .es-info-grid{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:6px;
-      margin-top:6px;
+      grid-template-columns:1fr 1fr;
+      gap:4px;
+      margin-top:4px;
     }
-    .es-kv-item{
+    .es-info-item{
       border:1px solid rgba(0,0,0,.10);
-      border-radius:8px;
-      padding:6px;
+      border-radius:6px;
+      padding:4px 5px;
       background:#fff;
     }
-    .es-k{font-size:8px;font-weight:950;color:#0f172a;opacity:.65;text-transform:uppercase;letter-spacing:.3px}
-    .es-v{margin-top:2px;font-size:10px;font-weight:950;color:#0f172a}
+    .es-info-label{font-size:7px;font-weight:900;color:#0f172a;opacity:.65;text-transform:uppercase;letter-spacing:.2px}
+    .es-info-value{margin-top:1px;font-size:9px;font-weight:900;color:#0f172a}
 
-    .es-adopted{
-      padding:8px;
-    }
+    .es-adopted-area{padding:6px}
     .es-adopted-box{
       border:1px dashed rgba(0,0,0,.18);
-      border-radius:8px;
+      border-radius:6px;
       background:rgba(0,0,0,.02);
-      min-height:55px;
+      min-height:45px;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:6px;
+      padding:4px;
       overflow:hidden;
     }
-    .es-adopted-img{max-width:100%;max-height:50px;display:block}
+    .es-adopted-img{max-width:100%;max-height:40px;display:block}
+    .es-adopted-empty{font-size:8px;font-weight:900;color:#334155;opacity:.80}
 
     @media (max-width:900px){
-      .es-grid{grid-template-columns:1fr}
+      .es-main{grid-template-columns:1fr}
     }
   </style>
 
   <div class="es-wrap" id="esRoot">
-    <div class="es-head">
+    <div class="es-header">
       <h2 class="es-title">Electronic Signature</h2>
-      <div class="es-actions">
+      <div class="es-header-actions">
+        <div class="es-mode-toggle">
+          <button class="es-pill active" id="esModeDraw" type="button">Draw</button>
+          <button class="es-pill" id="esModeType" type="button">Type</button>
+        </div>
         <button class="es-pill danger" id="esClearTop" type="button">Clear</button>
         <button class="es-pill primary" id="esAdoptTop" type="button">Adopt</button>
       </div>
     </div>
 
-    <div class="es-bar">
-      <div class="es-bar-left">
-        <div class="es-ico" aria-hidden="true">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-            <path d="M4 20h6l10-10a2 2 0 0 0 0-3l-.5-.5a2 2 0 0 0-3 0L6 17v3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-            <path d="M13 7l4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div>
-          <div class="es-bar-title">Create Your Signature</div>
-          <div class="es-bar-sub">Draw or type, then adopt</div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:4px;align-items:center;">
-        <button class="es-pill active" id="esModeDraw" type="button">Draw</button>
-        <button class="es-pill" id="esModeType" type="button">Type</button>
-      </div>
-    </div>
-
-    <div class="es-grid">
+    <div class="es-main">
       <div class="es-card">
         <div class="es-card-h">
-          <div>Signature Input</div>
+          <span>Signature Input</span>
+          <span class="es-status" id="esDrawStatus">Empty</span>
         </div>
 
-        <div class="es-canvas-wrap" id="esDrawWrap">
+        <div class="es-canvas-area" id="esDrawWrap">
           <canvas id="esCanvas"></canvas>
           <div class="es-controls">
             <div class="es-slider">
               <label for="esStroke">Stroke</label>
               <input id="esStroke" type="range" min="1" max="8" value="3">
-              <span class="es-status" id="esDrawStatus">Empty</span>
             </div>
             <button class="es-pill danger" id="esClearDraw" type="button">Clear</button>
           </div>
         </div>
 
-        <div class="es-type-wrap" id="esTypeWrap" style="display:none;">
-          <div class="es-type-row">
-            <input class="es-type-input" id="esTypeInput" type="text" placeholder="Type your name">
-          </div>
+        <div class="es-type-area" id="esTypeWrap" style="display:none;">
+          <input class="es-type-input" id="esTypeInput" type="text" placeholder="Type your name">
           <div class="es-type-preview">
             <div class="es-script" id="esTypePreview"></div>
           </div>
-          <div style="padding-top:6px;display:flex;justify-content:flex-end;">
+          <div class="es-type-controls">
             <button class="es-pill danger" id="esClearType" type="button">Clear</button>
           </div>
         </div>
       </div>
 
-      <div class="es-side">
+      <div class="es-sidebar">
         <div class="es-card">
           <div class="es-card-h">Status</div>
-          <div class="es-kv">
-            <div class="es-kv-row">
-              <div class="es-kv-item">
-                <div class="es-k">Mode</div>
-                <div class="es-v" id="esModeVal">Draw</div>
+          <div class="es-info">
+            <div class="es-info-grid">
+              <div class="es-info-item">
+                <div class="es-info-label">Mode</div>
+                <div class="es-info-value" id="esModeVal">Draw</div>
               </div>
-              <div class="es-kv-item">
-                <div class="es-k">Signature</div>
-                <div class="es-v" id="esHasVal">No</div>
+              <div class="es-info-item">
+                <div class="es-info-label">Ready</div>
+                <div class="es-info-value" id="esHasVal">No</div>
               </div>
-              <div class="es-kv-item">
-                <div class="es-k">Adopt</div>
-                <div class="es-v" id="esAdoptVal">Disabled</div>
+              <div class="es-info-item">
+                <div class="es-info-label">Adopt</div>
+                <div class="es-info-value" id="esAdoptVal">No</div>
               </div>
-              <div class="es-kv-item">
-                <div class="es-k">Adopted</div>
-                <div class="es-v" id="esLastVal">—</div>
+              <div class="es-info-item">
+                <div class="es-info-label">Time</div>
+                <div class="es-info-value" id="esLastVal">—</div>
               </div>
             </div>
           </div>
@@ -302,15 +234,14 @@
 
         <div class="es-card">
           <div class="es-card-h">Adopted</div>
-          <div class="es-adopted">
+          <div class="es-adopted-area">
             <div class="es-adopted-box" id="esAdoptedBox">
-              <div style="font-size:9px;font-weight:950;color:#334155;opacity:.80;" id="esAdoptedEmpty">No signature</div>
+              <div class="es-adopted-empty" id="esAdoptedEmpty">None</div>
             </div>
           </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -365,18 +296,13 @@
 
     function setAdoptedUI(root, dataUrl){
       const box = root.querySelector("#esAdoptedBox");
-      const empty = root.querySelector("#esAdoptedEmpty");
       if (!box) return;
 
       box.innerHTML = "";
       if (!dataUrl){
         const d = document.createElement("div");
-        d.id = "esAdoptedEmpty";
-        d.style.fontSize = "9px";
-        d.style.fontWeight = "950";
-        d.style.color = "#334155";
-        d.style.opacity = ".80";
-        d.textContent = "No signature";
+        d.className = "es-adopted-empty";
+        d.textContent = "None";
         box.appendChild(d);
         return;
       }
@@ -386,7 +312,6 @@
       img.alt = "Adopted signature";
       img.src = dataUrl;
       box.appendChild(img);
-      if (empty) empty.remove();
     }
 
     function resizeCanvasToCSS(canvas){
