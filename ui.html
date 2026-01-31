@@ -220,16 +220,8 @@
       pointer-events:none;
     }
 
-    .access-card::before{
-      left:-120px;
-      bottom:-140px;
-    }
-
-    .access-card::after{
-      right:-140px;
-      top:-150px;
-      opacity:.85;
-    }
+    .access-card::before{left:-120px;bottom:-140px}
+    .access-card::after{right:-140px;top:-150px;opacity:.85}
 
     .access-center{
       position:relative;
@@ -238,7 +230,7 @@
       display:flex;
       flex-direction:column;
       gap:14px;
-      padding-top:78px;
+      padding-top:74px;
     }
 
     .access-header{
@@ -401,14 +393,12 @@
       color:#0f172a;
       letter-spacing:.3px;
       opacity:.85;
-      z-index:5;
+      z-index:50;
       pointer-events:none;
     }
 
     /* INTRO PAGE (STEP 2 OF 15) */
-    .intro-wrap{
-      max-width:820px;
-    }
+    .intro-wrap{max-width:820px}
 
     .intro-title{
       font-size:24px;
@@ -426,9 +416,7 @@
       font-weight:650;
     }
 
-    .intro-section{
-      margin-top:16px;
-    }
+    .intro-section{margin-top:16px}
 
     .intro-section h3{
       font-size:14px;
@@ -464,126 +452,25 @@
     .page-scroll{
       flex:1;
       overflow:auto;
-      padding:44px 52px 44px 40px;
+      padding:36px 52px 44px 40px;
       scrollbar-gutter:stable both-edges;
     }
 
-    .page-scroll::-webkit-scrollbar{
-      width:12px;
-    }
-
+    .page-scroll::-webkit-scrollbar{width:12px}
     .page-scroll::-webkit-scrollbar-track{
       background:rgba(15,23,42,.08);
       border-radius:999px;
       margin:12px 0;
     }
-
     .page-scroll::-webkit-scrollbar-thumb{
       background:rgba(0,48,91,.38);
       border-radius:999px;
       border:3px solid rgba(255,255,255,.55);
     }
+    .page-scroll::-webkit-scrollbar-thumb:hover{background:rgba(0,48,91,.48)}
 
-    .page-scroll::-webkit-scrollbar-thumb:hover{
-      background:rgba(0,48,91,.48);
-    }
-
-    /* INTAKE FORM */
-    .intake-section-title{
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      letter-spacing:.2px;
-      margin:12px 0 12px 0; /* space between Client Intake Form and Business Information */
-      text-transform:none;
-    }
-
-    .intake-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px 14px;
-    }
-
-    .intake-grid.three{
-      grid-template-columns:1fr 220px 220px;
-    }
-
-    .intake-field{
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    .intake-label{
-      font-size:12px;
-      font-weight:900;
-      color:#0f172a;
-      letter-spacing:.15px;
-    }
-
-    .intake-label-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .fein-check{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      font-weight:900;
-      color:#334155;
-      letter-spacing:0.15px;
-      user-select:none;
-      white-space:nowrap;
-    }
-
-    .fein-check input{
-      width:14px;
-      height:14px;
-      accent-color:var(--carbyne-blue);
-    }
-
-    .intake-input{
-      width:100%;
-      padding:12px 14px;
-      font-size:14px;
-      border:1px solid rgba(0,0,0,.16);
-      border-radius:12px;
-      outline:none;
-      background:#ffffff;
-      transition:border-color .2s ease, box-shadow .2s ease;
-      font-weight:700;
-      color:#0f172a;
-    }
-
-    .intake-input:focus{
-      border-color:rgba(0,48,91,.75);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16);
-    }
-
-    select.intake-input{
-      appearance:none;
-      background-image:
-        linear-gradient(45deg, transparent 50%, rgba(0,48,91,.65) 50%),
-        linear-gradient(135deg, rgba(0,48,91,.65) 50%, transparent 50%),
-        linear-gradient(to right, transparent, transparent);
-      background-position:
-        calc(100% - 18px) calc(1em + 2px),
-        calc(100% - 13px) calc(1em + 2px),
-        calc(100% - 2.2em) 0.5em;
-      background-size:
-        5px 5px,
-        5px 5px,
-        1px 1.9em;
-      background-repeat:no-repeat;
-      padding-right:42px;
-    }
-
-    /* PAGE 4: SIGNATURE PAGE WRAPPER */
-    .sig-page3{
+    /* PAGE 4: SIGNATURE WRAPPER */
+    .sig-page{
       width:100%;
       max-width:980px;
       margin:0 auto;
@@ -591,7 +478,7 @@
       transform-origin:top center;
     }
 
-    .sig-page3-grid{
+    .sig-grid{
       display:grid;
       grid-template-columns:1.25fr .75fr;
       gap:14px;
@@ -607,16 +494,13 @@
     }
 
     @media (max-width:980px){
-      .sig-page3{transform:scale(.90)}
-      .sig-page3-grid{grid-template-columns:1fr}
-      .intake-grid.three{grid-template-columns:1fr 1fr 1fr}
+      .sig-page{transform:scale(.90)}
+      .sig-grid{grid-template-columns:1fr}
     }
 
     @media (max-width:720px){
       .access-center{padding-top:64px}
-      .intake-grid{grid-template-columns:1fr}
-      .intake-grid.three{grid-template-columns:1fr}
-      .page-scroll{padding:40px 44px 40px 34px}
+      .page-scroll{padding:34px 44px 40px 34px}
     }
   </style>
 </head>
@@ -663,21 +547,17 @@
     // ============================================
     const TOTAL_PAGES = 15;
 
-    // Access code gate (page 1 only)
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
     const CACHE_KEY = "carbyne_valid_codes_cache";
     const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
 
-    // Client Intake
-    const INTAKE_KEY = "carbyne_client_intake_v1";
-
     const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
     const TARGET_HEADER = "Unique Identifier";
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+    const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
-    // Signature "element imports"
     const SIG_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
+    const INTAKE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
 
     // ============================================
     // STATE
@@ -703,49 +583,14 @@
       return (v ?? "").toString().trim();
     }
 
-    function readIntake(){
-      try{
-        const raw = localStorage.getItem(INTAKE_KEY);
-        if (!raw) return {};
-        const parsed = JSON.parse(raw);
-        if (!parsed || typeof parsed !== "object") return {};
-        return parsed;
-      }catch(e){
-        return {};
-      }
-    }
-
-    function writeIntake(obj){
-      try{
-        localStorage.setItem(INTAKE_KEY, JSON.stringify(obj || {}));
-      }catch(e){}
-    }
-
-    function formatPhoneUS(raw){
-      const digits = (raw || "").replace(/\D/g, "").slice(0,10);
-      if (!digits) return "";
-      if (digits.length <= 3) return "(" + digits;
-      if (digits.length <= 6) return "(" + digits.slice(0,3) + ") " + digits.slice(3);
-      return "(" + digits.slice(0,3) + ") " + digits.slice(3,6) + "-" + digits.slice(6);
-    }
-
-    function formatFeinUS(raw){
-      const digits = (raw || "").replace(/\D/g, "").slice(0,9);
-      if (!digits) return "";
-      if (digits.length <= 2) return digits;
-      return digits.slice(0,2) + "-" + digits.slice(2);
-    }
-
     // ============================================
     // VALIDATION FUNCTIONS
     // ============================================
     function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
-
       try{
         const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
         const now = Date.now();
-
         if (timestamp && (now - parseInt(timestamp)) < CACHE_DURATION){
           const cached = localStorage.getItem(CACHE_KEY);
           if (cached){
@@ -808,8 +653,6 @@
 
         setCachedCodes(validCodes);
         return validCodes;
-      }catch(error){
-        throw error;
       }finally{
         isFetchingCodes = false;
       }
@@ -858,12 +701,7 @@
       progressBar.style.width = `${progress}%`;
 
       pageIndicator.textContent = `Step ${currentPage} of ${TOTAL_PAGES}`;
-
-      if (currentPage === 1){
-        pageIndicator.style.visibility = "hidden";
-      }else{
-        pageIndicator.style.visibility = "visible";
-      }
+      pageIndicator.style.visibility = (currentPage === 1) ? "hidden" : "visible";
 
       prevBtn.disabled = currentPage === 1;
       nextBtn.disabled = currentPage === TOTAL_PAGES || currentPage === 1;
@@ -1001,16 +839,33 @@
       }
 
       btn.addEventListener("click", submit);
-      input.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") submit();
-      });
+      input.addEventListener("keydown", (e) => { if (e.key === "Enter") submit(); });
 
       showInvalid(false);
       input.focus();
     }
 
     // ============================================
-    // PAGE CONTENT 2..15
+    // IMPORT HELPERS (ELEMENT-LEVEL)
+    // ============================================
+    function injectStyleTag(cssText, id){
+      if (!cssText) return;
+      if (id && document.getElementById(id)) return;
+      const style = document.createElement("style");
+      if (id) style.id = id;
+      style.textContent = cssText;
+      document.head.appendChild(style);
+    }
+
+    function injectScriptText(jsText){
+      if (!jsText) return;
+      const s = document.createElement("script");
+      s.textContent = jsText;
+      document.body.appendChild(s);
+    }
+
+    // ============================================
+    // SIGNATURE IMPORT (PAGE 4)
     // ============================================
     async function injectSignatureElements(root){
       const doc = await fetch(SIG_URL, { cache: "no-store" }).then(r => r.text());
@@ -1037,18 +892,58 @@
       inputSlot.appendChild(input);
       statusSlot.appendChild(status);
 
+      const styleTags = Array.from(tmp.querySelectorAll("style"));
+      for (let i = 0; i < styleTags.length; i++){
+        injectStyleTag(styleTags[i].textContent || "", "sig_style_" + i);
+      }
+
       const scripts = Array.from(tmp.querySelectorAll("script"));
       for (const sc of scripts){
-        const s = document.createElement("script");
         if (sc.src){
+          const s = document.createElement("script");
           s.src = sc.src;
+          document.body.appendChild(s);
         }else{
-          s.textContent = sc.textContent || "";
+          injectScriptText(sc.textContent || "");
         }
-        document.body.appendChild(s);
       }
     }
 
+    // ============================================
+    // INTAKE IMPORT (PAGE 3)
+    // ============================================
+    async function injectClientIntake(root){
+      const html = await fetch(INTAKE_URL, { cache: "no-store" }).then(r => r.text());
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+
+      const intakeRoot = tmp.querySelector("#intakeFormRoot");
+      const slot = root.querySelector("#intakeSlot");
+      if (!intakeRoot || !slot) throw new Error("Missing intake root or slot");
+
+      slot.innerHTML = "";
+      slot.appendChild(intakeRoot);
+
+      const styleTags = Array.from(tmp.querySelectorAll("style"));
+      for (let i = 0; i < styleTags.length; i++){
+        injectStyleTag(styleTags[i].textContent || "", "intake_style_" + i);
+      }
+
+      const scripts = Array.from(tmp.querySelectorAll("script"));
+      for (const sc of scripts){
+        if (sc.src){
+          const s = document.createElement("script");
+          s.src = sc.src;
+          document.body.appendChild(s);
+        }else{
+          injectScriptText(sc.textContent || "");
+        }
+      }
+    }
+
+    // ============================================
+    // PAGE CONTENT 2..15
+    // ============================================
     function loadPageContent(pageNum){
       const secureCode = localStorage.getItem(STORAGE_KEY) || "";
 
@@ -1086,198 +981,19 @@
       }
 
       if (pageNum === 3){
-        const intake = readIntake();
-
         const content = document.createElement("div");
         content.className = "page-content scrollable";
         content.innerHTML = `
           <div class="reference-number">Reference Number: ${secureCode}</div>
           <div class="page-scroll">
-            <h2>Client Intake Form</h2>
-
-            <div class="intake-section-title">Business Information</div>
-
-            <div class="intake-grid">
-              <div class="intake-field">
-                <div class="intake-label">Name of Business</div>
-                <input class="intake-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label intake-label-row">
-                  <span>Employer Identification Number (FEIN)</span>
-                  <label class="fein-check"><input type="checkbox" id="bi_no_fein"> <span>No FEIN</span></label>
-                </div>
-                <input class="intake-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" maxlength="10" autocomplete="off">
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label">Full Name of Person Completing this Agreement</div>
-                <input class="intake-input" id="bi_signer_name" type="text" placeholder="Full Name" autocomplete="name">
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label">Title</div>
-                <input class="intake-input" id="bi_signer_title" type="text" placeholder="Title">
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label">Business Address</div>
-                <input class="intake-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label">Suite / Unit Number</div>
-                <input class="intake-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
-              </div>
-            </div>
-
-            <div class="intake-grid three" style="margin-top:12px;">
-              <div class="intake-field">
-                <div class="intake-label">City</div>
-                <input class="intake-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label">State</div>
-                <select class="intake-input" id="bi_state">
-                  <option value="">Select State</option>
-                  <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
-                  <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
-                  <option value="CT">CT</option><option value="DE">DE</option><option value="FL">FL</option>
-                  <option value="GA">GA</option><option value="HI">HI</option><option value="ID">ID</option>
-                  <option value="IL">IL</option><option value="IN">IN</option><option value="IA">IA</option>
-                  <option value="KS">KS</option><option value="KY">KY</option><option value="LA">LA</option>
-                  <option value="ME">ME</option><option value="MD">MD</option><option value="MA">MA</option>
-                  <option value="MI">MI</option><option value="MN">MN</option><option value="MS">MS</option>
-                  <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option>
-                  <option value="NV">NV</option><option value="NH">NH</option><option value="NJ">NJ</option>
-                  <option value="NM">NM</option><option value="NY">NY</option><option value="NC">NC</option>
-                  <option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
-                  <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
-                  <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option>
-                  <option value="TX">TX</option><option value="UT">UT</option><option value="VT">VT</option>
-                  <option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
-                  <option value="WI">WI</option><option value="WY">WY</option>
-                </select>
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label">Zip Code</div>
-                <input class="intake-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code">
-              </div>
-            </div>
-
-            <div class="intake-grid" style="margin-top:12px;">
-              <div class="intake-field">
-                <div class="intake-label">Business Phone Number</div>
-                <input class="intake-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" maxlength="14" autocomplete="tel">
-              </div>
-
-              <div class="intake-field">
-                <div class="intake-label">Business Email Address</div>
-                <input class="intake-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
-              </div>
-
-              <div class="intake-field" style="grid-column:1 / -1;">
-                <div class="intake-label">Business Point of Contact</div>
-                <input class="intake-input" id="bi_poc" type="text" placeholder="Business Point of Contact" autocomplete="name">
-              </div>
-            </div>
+            <div id="intakeSlot"><span class="sig-loading">Loading client intake form...</span></div>
           </div>
         `;
         pageMount.appendChild(content);
 
-        const el = {
-          name: content.querySelector("#bi_name"),
-          fein: content.querySelector("#bi_fein"),
-          no_fein: content.querySelector("#bi_no_fein"),
-          signer_name: content.querySelector("#bi_signer_name"),
-          signer_title: content.querySelector("#bi_signer_title"),
-          address: content.querySelector("#bi_address"),
-          suite: content.querySelector("#bi_suite"),
-          city: content.querySelector("#bi_city"),
-          state: content.querySelector("#bi_state"),
-          zip: content.querySelector("#bi_zip"),
-          phone: content.querySelector("#bi_phone"),
-          email: content.querySelector("#bi_email"),
-          poc: content.querySelector("#bi_poc")
-        };
-
-        el.name.value = intake.name || "";
-        el.fein.value = intake.fein || "";
-        el.no_fein.checked = !!intake.no_fein;
-        el.signer_name.value = intake.signer_name || "";
-        el.signer_title.value = intake.signer_title || "";
-        el.address.value = intake.address || "";
-        el.suite.value = intake.suite || "";
-        el.city.value = intake.city || "";
-        el.state.value = intake.state || "";
-        el.zip.value = intake.zip || "";
-        el.phone.value = intake.phone || "";
-        el.email.value = intake.email || "";
-        el.poc.value = intake.poc || "";
-
-        function applyNoFeinState(){
-          if (el.no_fein.checked){
-            el.fein.value = "Unavailable";
-            el.fein.setAttribute("disabled","disabled");
-          }else{
-            el.fein.removeAttribute("disabled");
-            if (normalize(el.fein.value).toLowerCase() === "unavailable") el.fein.value = "";
-          }
-        }
-        applyNoFeinState();
-
-        function persist(){
-          const next = {
-            name: normalize(el.name.value),
-            fein: el.no_fein.checked ? "Unavailable" : normalize(el.fein.value),
-            no_fein: !!el.no_fein.checked,
-            signer_name: normalize(el.signer_name.value),
-            signer_title: normalize(el.signer_title.value),
-            address: normalize(el.address.value),
-            suite: normalize(el.suite.value),
-            city: normalize(el.city.value),
-            state: normalize(el.state.value),
-            zip: normalize(el.zip.value),
-            phone: normalize(el.phone.value),
-            email: normalize(el.email.value),
-            poc: normalize(el.poc.value)
-          };
-          writeIntake(next);
-        }
-
-        function onPhoneInput(){
-          el.phone.value = formatPhoneUS(el.phone.value);
-          persist();
-        }
-
-        function onFeinInput(){
-          if (el.no_fein.checked){
-            el.fein.value = "Unavailable";
-          }else{
-            el.fein.value = formatFeinUS(el.fein.value);
-          }
-          persist();
-        }
-
-        function onNoFeinToggle(){
-          applyNoFeinState();
-          persist();
-        }
-
-        el.fein.addEventListener("input", onFeinInput);
-        el.fein.addEventListener("change", onFeinInput);
-        el.no_fein.addEventListener("change", onNoFeinToggle);
-
-        el.phone.addEventListener("input", onPhoneInput);
-        el.phone.addEventListener("change", onPhoneInput);
-
-        [el.name, el.fein, el.no_fein, el.signer_name, el.signer_title, el.address, el.suite, el.city, el.state, el.zip, el.email, el.poc].forEach((node) => {
-          if (!node) return;
-          node.addEventListener("input", persist);
-          node.addEventListener("change", persist);
+        injectClientIntake(content).catch(() => {
+          const slot = content.querySelector("#intakeSlot");
+          if (slot) slot.innerHTML = '<span class="sig-loading">Unable to load client intake form.</span>';
         });
 
         return;
@@ -1285,14 +1001,14 @@
 
       if (pageNum === 4){
         const content = document.createElement("div");
-        content.className = "page-content page4";
+        content.className = "page-content";
         content.innerHTML = `
           <div class="reference-number">Reference Number: ${secureCode}</div>
           <h2>Electronic Signature</h2>
 
-          <div class="sig-page3">
+          <div class="sig-page">
             <div id="sigHeaderSlot"><span class="sig-loading">Loading signature...</span></div>
-            <div class="sig-page3-grid">
+            <div class="sig-grid">
               <div id="sigInputSlot"></div>
               <div id="sigStatusSlot"></div>
             </div>
@@ -1308,7 +1024,6 @@
         return;
       }
 
-      // Pages 5..15 placeholders
       const content = document.createElement("div");
       content.className = "page-content";
       content.innerHTML = `
