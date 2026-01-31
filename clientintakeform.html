@@ -272,7 +272,7 @@
       cursor:not-allowed;
     }
 
-    /* Payment notice */
+    /* Payment note */
     .ci-note{
       width:100%;
       border:1px solid rgba(0,48,91,.18);
@@ -598,7 +598,6 @@
       </div>
     </div>
 
-    <!-- Ownership + Type ABOVE issuer -->
     <div class="ci-grid paymeta" style="margin-top:10px;">
       <div class="ci-field">
         <div class="ci-labelrow" style="margin-bottom:8px;">
@@ -633,7 +632,6 @@
       </div>
     </div>
 
-    <!-- Issuer title + issuer radios -->
     <div class="ci-grid" style="margin-top:12px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
@@ -703,6 +701,10 @@
         <input class="ci-input" id="pay_card_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10">
       </div>
     </div>
+
+    <!-- Acknowledgement -->
+    <div class="ci-section" style="margin-top:18px;">Acknowledgement</div>
+    <div class="ci-sectionline"></div>
 
   </div>
 </template>
@@ -918,21 +920,21 @@
 
       const boaOtherRadio = root.querySelector("#boa_other");
       const boaOtherText = root.querySelector("#boa_other_text");
-      const boaRadios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
+      const boaRadios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]));
 
-      const otherAcctRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]'));
+      const otherAcctRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]));
       const otherAcctYes = root.querySelector("#ai_other_acct_yes");
 
       const acctName = root.querySelector("#ai_accountant_name");
       const acctEmail = root.querySelector("#ai_accountant_email");
 
-      const useSwRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
+      const useSwRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]));
       const useSwYes = root.querySelector("#ai_sw_yes");
       const swSpecify = root.querySelector("#ai_sw_specify");
 
-      const payBrandRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_brand"]'));
-      const payOwnerRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_ownership"]'));
-      const payTypeRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_type"]'));
+      const payBrandRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_brand"]));
+      const payOwnerRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_ownership"]));
+      const payTypeRadios = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_type"]));
 
       const payCardNumber = root.querySelector("#pay_card_number");
       const payCardExp = root.querySelector("#pay_card_exp");
