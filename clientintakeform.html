@@ -83,6 +83,11 @@
       min-width:0;
     }
 
+    /* NEW: Industry / Address / Suite widths (Suite ~ half; width shifted to Address) */
+    .ci-grid.industryaddr{
+      grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) minmax(0,.5fr);
+    }
+
     .ci-field{width:100%}
 
     .ci-wide{grid-column:1 / -1}
@@ -296,8 +301,8 @@
       </div>
     </div>
 
-    <!-- UPDATED: Industry + Business Address + Suite/Unit on same line -->
-    <div class="ci-grid three" style="margin-top:14px;">
+    <!-- UPDATED: Industry + Business Address + Suite/Unit on same line (Suite narrower; Address wider) -->
+    <div class="ci-grid three industryaddr" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Industry</div>
@@ -343,10 +348,10 @@
           <option value="MO">MO</option><option value="MT">MT</option><option value="NE">NE</option><option value="NV">NV</option>
           <option value="NH">NH</option><option value="NJ">NJ</option><option value="NM">NM</option><option value="NY">NY</option>
           <option value="NC">NC</option><option value="ND">ND</option><option value="OH">OH</option><option value="OK">OK</option>
-          <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option><option value="SC">SC</option>
-          <option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option><option value="UT">UT</option>
-          <option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option><option value="WV">WV</option>
-          <option value="WI">WI</option><option value="WY">WY</option>
+          <option value="OR">OR</option><option value="PA">PA</option><option value="RI">RI</option>
+          <option value="SC">SC</option><option value="SD">SD</option><option value="TN">TN</option><option value="TX">TX</option>
+          <option value="UT">UT</option><option value="VT">VT</option><option value="VA">VA</option><option value="WA">WA</option>
+          <option value="WV">WV</option><option value="WI">WI</option><option value="WY">WY</option>
         </select>
       </div>
 
