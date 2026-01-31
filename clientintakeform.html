@@ -3,107 +3,108 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Client Intake Form Module</title>
-
-  <style id="carbyne-client-intake-styles">
-    #clientIntakeRoot{
-      width:100%;
-      color:#0f172a;
-    }
-
-    .intake-h2{
-      font-size:26px;
-      font-weight:900;
-      color:#00305B;
-      margin:0 0 12px 0; /* spacing between Client Intake Form and Business Information */
-    }
-
-    .intake-section-title{
-      font-size:14px;
-      font-weight:900;
-      color:#0f172a;
-      margin:0 0 14px 0;
-      letter-spacing:.2px;
-    }
-
-    .intake-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:14px 14px;
-      width:100%;
-    }
-
-    .intake-grid.three{
-      grid-template-columns: 1fr 220px 1fr;
-    }
-
-    .intake-field{width:100%}
-
-    .intake-label-row{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin:0 0 8px 0;
-    }
-
-    .intake-label{
-      font-size:12px;
-      font-weight:900;
-      color:#0f172a;
-      letter-spacing:.2px;
-    }
-
-    .intake-inline-check{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      font-size:12px;
-      font-weight:900;
-      color:#0f172a;
-      user-select:none;
-      white-space:nowrap;
-    }
-
-    .intake-inline-check input{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
-    }
-
-    .intake-input, .intake-select{
-      width:100%;
-      padding:13px 14px;
-      font-size:14px;
-      font-weight:700;
-      border:1px solid rgba(0,0,0,.18);
-      border-radius:12px;
-      outline:none;
-      background:#ffffff;
-      transition:border-color .2s ease, box-shadow .2s ease;
-    }
-
-    .intake-input:focus, .intake-select:focus{
-      border-color:rgba(0,48,91,.75);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16);
-    }
-
-    .intake-input[readonly], .intake-input:disabled{
-      background:rgba(15,23,42,.04);
-      color:#0f172a;
-    }
-
-    @media (max-width: 880px){
-      .intake-grid{grid-template-columns:1fr}
-      .intake-grid.three{grid-template-columns:1fr}
-    }
-  </style>
+  <title>Client Intake Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
-  <template id="client-intake-form-template">
-    <div id="clientIntakeRoot">
-      <div class="intake-h2">Client Intake Form</div>
+  <template id="carbyne_client_intake">
+    <div id="carbyneClientIntakeRoot">
+      <style>
+        .intake-title{
+          font-size:26px;
+          font-weight:950;
+          color:#00305B;
+          margin:6px 0 18px; /* space between Client Intake Form and Business Information */
+          letter-spacing:.2px;
+        }
+
+        .intake-section-title{
+          font-size:13px;
+          font-weight:950;
+          color:#0f172a;
+          margin:0 0 12px;
+          letter-spacing:.2px;
+        }
+
+        .intake-grid{
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:14px 14px;
+          width:100%;
+        }
+
+        .intake-grid.three{
+          grid-template-columns:1fr 220px 1fr;
+        }
+
+        .intake-field{width:100%}
+
+        .intake-label{
+          font-size:12px;
+          font-weight:950;
+          color:#0f172a;
+          letter-spacing:.2px;
+          margin:0 0 8px;
+        }
+
+        .label-row{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          margin:0 0 8px;
+        }
+
+        .inline-check{
+          display:flex;
+          align-items:center;
+          gap:8px;
+          font-size:12px;
+          font-weight:950;
+          color:#0f172a;
+          white-space:nowrap;
+          user-select:none;
+        }
+
+        .inline-check input{
+          width:16px;height:16px;
+          accent-color:#00305B;
+          cursor:pointer;
+        }
+
+        .intake-input, .intake-select{
+          width:100%;
+          padding:14px 16px;
+          font-size:14px;
+          font-weight:900;
+          border:1px solid rgba(0,0,0,.14);
+          border-radius:12px;
+          outline:none;
+          background:#fff;
+          box-shadow:0 8px 18px rgba(0,0,0,.06);
+          transition:border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .intake-input:focus, .intake-select:focus{
+          border-color:rgba(0,48,91,.70);
+          box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 10px 22px rgba(0,0,0,.08);
+        }
+
+        .intake-input:disabled{
+          background:rgba(15,23,42,.04);
+          color:#0f172a;
+          box-shadow:none;
+        }
+
+        @media (max-width: 860px){
+          .intake-grid{grid-template-columns:1fr}
+          .intake-grid.three{grid-template-columns:1fr}
+        }
+      </style>
+
+      <div class="intake-title">Client Intake Form</div>
+
       <div class="intake-section-title">Business Information</div>
 
       <div class="intake-grid">
@@ -113,9 +114,9 @@
         </div>
 
         <div class="intake-field">
-          <div class="intake-label-row">
-            <div class="intake-label">Federal Employer Identification Number (FEIN)</div>
-            <label class="intake-inline-check">
+          <div class="label-row">
+            <div class="intake-label" style="margin:0;">Federal Employer Identification Number (FEIN)</div>
+            <label class="inline-check">
               <input id="bi_no_fein" type="checkbox">
               No FEIN
             </label>
@@ -201,97 +202,87 @@
     </div>
   </template>
 
-  <script id="carbyne-client-intake-script">
-    (function(){
-      function digitsOnly(s){ return (s || "").replace(/\D/g, ""); }
+  <script>
+    function carbyne_client_intake_mount(opts){
+      const root = opts && opts.root ? opts.root : document;
+      const fein = root.querySelector("#bi_fein");
+      const noFein = root.querySelector("#bi_no_fein");
+      const phone = root.querySelector("#bi_phone");
+      const zip = root.querySelector("#bi_zip");
 
-      function formatPhone(raw){
-        const d = digitsOnly(raw).slice(0, 10);
-        const a = d.slice(0,3);
-        const b = d.slice(3,6);
-        const c = d.slice(6,10);
-        if (d.length <= 3) return a ? "(" + a : "";
-        if (d.length <= 6) return "(" + a + ") " + b;
-        return "(" + a + ") " + b + "-" + c;
-      }
+      const digitsOnly = (s) => (s || "").replace(/\D/g,"");
 
-      function formatFein(raw){
-        const d = digitsOnly(raw).slice(0, 9);
+      const formatFein = (raw) => {
+        const d = digitsOnly(raw).slice(0,9);
         const a = d.slice(0,2);
         const b = d.slice(2,9);
         if (d.length <= 2) return a;
         return a + "-" + b;
-      }
+      };
 
-      function formatZip(raw){
-        const d = digitsOnly(raw).slice(0, 9);
+      const formatPhone = (raw) => {
+        const d = digitsOnly(raw).slice(0,10);
+        const a = d.slice(0,3);
+        const b = d.slice(3,6);
+        const c = d.slice(6,10);
+        if (d.length === 0) return "";
+        if (d.length <= 3) return "(" + a;
+        if (d.length <= 6) return "(" + a + ") " + b;
+        return "(" + a + ") " + b + "-" + c;
+      };
+
+      const formatZip = (raw) => {
+        const d = digitsOnly(raw).slice(0,9);
         const a = d.slice(0,5);
         const b = d.slice(5,9);
         if (d.length <= 5) return a;
         return a + "-" + b;
+      };
+
+      if (phone){
+        phone.addEventListener("input", () => {
+          phone.value = formatPhone(phone.value);
+        });
+        phone.addEventListener("blur", () => {
+          phone.value = formatPhone(phone.value);
+        });
       }
 
-      function byId(id){ return document.getElementById(id); }
-
-      function init(opts){
-        const root = byId(opts && opts.rootId ? opts.rootId : "clientIntakeRoot");
-        if (!root) return;
-
-        const phone = byId("bi_phone");
-        const fein = byId("bi_fein");
-        const noFein = byId("bi_no_fein");
-        const zip = byId("bi_zip");
-
-        if (phone){
-          phone.addEventListener("input", function(){
-            const pos = phone.selectionStart || 0;
-            const before = phone.value;
-            phone.value = formatPhone(before);
-            try{ phone.setSelectionRange(pos, pos); }catch(e){}
-          });
-          phone.addEventListener("blur", function(){ phone.value = formatPhone(phone.value); });
-        }
-
-        if (zip){
-          zip.addEventListener("input", function(){
-            const pos = zip.selectionStart || 0;
-            const before = zip.value;
-            zip.value = formatZip(before);
-            try{ zip.setSelectionRange(pos, pos); }catch(e){}
-          });
-          zip.addEventListener("blur", function(){ zip.value = formatZip(zip.value); });
-        }
-
-        if (fein){
-          fein.addEventListener("input", function(){
-            if (noFein && noFein.checked) return;
-            const pos = fein.selectionStart || 0;
-            const before = fein.value;
-            fein.value = formatFein(before);
-            try{ fein.setSelectionRange(pos, pos); }catch(e){}
-          });
-          fein.addEventListener("blur", function(){
-            if (noFein && noFein.checked) return;
-            fein.value = formatFein(fein.value);
-          });
-        }
-
-        if (noFein && fein){
-          noFein.addEventListener("change", function(){
-            if (noFein.checked){
-              fein.value = "Unavailable";
-              fein.disabled = true;
-            }else{
-              fein.disabled = false;
-              fein.value = "";
-              fein.focus();
-            }
-          });
-        }
+      if (zip){
+        zip.addEventListener("input", () => {
+          zip.value = formatZip(zip.value);
+        });
+        zip.addEventListener("blur", () => {
+          zip.value = formatZip(zip.value);
+        });
       }
 
-      window.CarbyneClientIntakeForm = { init:init };
-    })();
+      if (fein){
+        fein.addEventListener("input", () => {
+          if (noFein && noFein.checked) return;
+          fein.value = formatFein(fein.value);
+        });
+        fein.addEventListener("blur", () => {
+          if (noFein && noFein.checked) return;
+          fein.value = formatFein(fein.value);
+        });
+      }
+
+      if (noFein && fein){
+        noFein.addEventListener("change", () => {
+          if (noFein.checked){
+            fein.value = "Unavailable";
+            fein.disabled = true;
+          } else {
+            fein.disabled = false;
+            fein.value = "";
+            fein.focus();
+          }
+        });
+      }
+
+      return function unmount(){};
+    }
   </script>
 </body>
 </html>
