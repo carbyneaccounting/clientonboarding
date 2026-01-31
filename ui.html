@@ -17,7 +17,6 @@
       --shadow:0 28px 56px rgba(0,0,0,0.30);
       --danger:#b91c1c;
 
-      /* embed-aware padding (set by JS if inside iframe) */
       --outer-pad-v:40px;
       --outer-pad-h:20px;
     }
@@ -168,7 +167,7 @@
       z-index:10;
     }
 
-    /* Access Module Styles */
+    /* Access Module */
     .access-shell{
       width:min(900px,92%);
       padding:2px;
@@ -182,37 +181,97 @@
       background:rgba(255,255,255,0.92);
       border:1px solid rgba(0,0,0,0.06);
       border-radius:20px;
-      padding:50px 40px;
+      padding:42px 44px;
       min-height:396px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .access-card::before{
+      content:"";
+      position:absolute;
+      inset:-120px -120px auto auto;
+      width:260px;
+      height:260px;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, rgba(0,48,91,0.16), rgba(10,61,111,0.00) 62%);
+      pointer-events:none;
+    }
+
+    .access-card::after{
+      content:"";
+      position:absolute;
+      inset:auto auto -140px -140px;
+      width:320px;
+      height:320px;
+      border-radius:50%;
+      background:radial-gradient(circle at 60% 60%, rgba(10,61,111,0.14), rgba(0,48,91,0.00) 65%);
+      pointer-events:none;
+    }
+
+    /* UPDATED: push the whole block downward */
+    .access-center{
+      width:min(640px, 100%);
+      margin:0 auto;
+      display:flex;
+      flex-direction:column;
+      align-items:stretch;
+      position:relative;
+      z-index:1;
+      padding-top:72px;
+    }
+
+    .access-top{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom:12px;
+    }
+
+    .access-badge{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:linear-gradient(135deg, rgba(0,48,91,0.12), rgba(10,61,111,0.08));
+      border:1px solid rgba(0,0,0,0.06);
+      box-shadow:0 10px 22px rgba(0,0,0,0.10);
+      flex:0 0 auto;
     }
 
     .access-title{
       font-size:18px;
-      font-weight:800;
-      color:#111827;
-      margin:0 0 14px 0;
-      text-align:left;
+      font-weight:900;
+      color:#0f172a;
+      margin:0;
+      letter-spacing:0.2px;
     }
 
-    .access-label{
-      font-size:13px;
-      font-weight:800;
-      color:#334155;
-      margin:0 0 8px 0;
-      text-align:left;
-      letter-spacing:0.2px;
+    .access-subtitle{
+      font-size:12px;
+      font-weight:700;
+      color:#475569;
+      margin-top:2px;
+      letter-spacing:0.15px;
     }
 
     .access-input{
       width:100%;
-      padding:14px 16px;
+      padding:15px 16px;
       font-size:15px;
-      border:1px solid rgba(0,0,0,0.18);
+      border:1px solid rgba(0,0,0,0.14);
       border-radius:12px;
       outline:none;
-      margin:0 0 16px 0;
+      margin:10px 0 16px 0;
       background:#ffffff;
       transition:border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .access-input::placeholder{
+      color:#94a3b8;
+      font-weight:700;
     }
 
     .access-input:focus{
@@ -233,7 +292,7 @@
     .access-submit{
       padding:11px 22px;
       font-size:14px;
-      font-weight:800;
+      font-weight:900;
       border-radius:10px;
       border:1px solid rgba(0,0,0,0.10);
       background:linear-gradient(90deg,var(--carbyne-blue) 0%,var(--carbyne-blue-2) 100%);
@@ -242,17 +301,22 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      min-width:132px;
+      min-width:150px;
       box-shadow:0 10px 20px rgba(0,0,0,0.14);
-      transition:opacity 0.2s ease, box-shadow 0.2s ease;
+      transition:opacity 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
     }
 
-    .access-submit:hover:not(:disabled){opacity:0.95}
-    .access-submit:disabled{opacity:0.6;cursor:not-allowed;box-shadow:none}
+    .access-submit:hover:not(:disabled){
+      opacity:0.96;
+      transform:translateY(-1px);
+      box-shadow:0 14px 26px rgba(0,0,0,0.18);
+    }
+
+    .access-submit:disabled{opacity:0.6;cursor:not-allowed;box-shadow:none;transform:none}
 
     .inline-msg{
       font-size:13px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:0.2px;
       display:none;
       white-space:nowrap;
@@ -321,7 +385,6 @@
       flex-direction:column;
       gap:10px;
       margin-top:6px;
-
       --sig-pad-h:92px;
       --sig-adopted-h:60px;
       --sig-max-w:480px;
@@ -375,10 +438,10 @@
     .sig-page3 .sig-adopted-stage{inset:5px}
     .sig-page3 .sig-adopted-empty{font-size:9px}
 
-    /* IMPORTANT: stack only when REALLY narrow (Wix often lands around ~800-980) */
-    @media (max-width: 760px){
+    @media (max-width:760px){
       .sig-page3-grid{grid-template-columns:1fr}
       .page-content.page3{padding:32px 26px}
+      .access-center{width:100%;padding-top:54px}
     }
   </style>
 </head>
@@ -420,24 +483,6 @@
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
   <script>
-    // ============================================
-    // EMBED (WIX) DETECTION: give the module more usable width
-    // ============================================
-    (function(){
-      try{
-        if (window.self !== window.top){
-          document.documentElement.style.setProperty("--outer-pad-v","16px");
-          document.documentElement.style.setProperty("--outer-pad-h","10px");
-        }
-      }catch(_){
-        document.documentElement.style.setProperty("--outer-pad-v","16px");
-        document.documentElement.style.setProperty("--outer-pad-h","10px");
-      }
-    })();
-
-    // ============================================
-    // CONFIGURATION
-    // ============================================
     const TOTAL_PAGES = 15;
     const STORAGE_KEY = "carbyne_access_code";
     const CURRENT_PAGE_KEY = "carbyne_current_page";
@@ -449,26 +494,17 @@
 
     const ELECTRONIC_SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
 
-    // ============================================
-    // STATE
-    // ============================================
     let currentPage = 1;
     let isAccessValidated = false;
     let validCodesCache = null;
     let isFetchingCodes = false;
 
-    // ============================================
-    // ELEMENTS
-    // ============================================
     const pageMount = document.getElementById("pageMount");
     const progressBar = document.getElementById("progressBar");
     const pageIndicator = document.getElementById("pageIndicator");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    // ============================================
-    // VALIDATION FUNCTIONS
-    // ============================================
     function normalize(v){ return (v ?? "").toString().trim(); }
 
     function getCachedCodes(){
@@ -483,9 +519,7 @@
             return validCodesCache;
           }
         }
-      }catch(e){
-        console.error("Cache read error:", e);
-      }
+      }catch(e){ console.error("Cache read error:", e); }
       return null;
     }
 
@@ -494,9 +528,7 @@
       try{
         localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
         localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-      }catch(e){
-        console.error("Cache write error:", e);
-      }
+      }catch(e){ console.error("Cache write error:", e); }
     }
 
     function findHeaderIndex(headers){
@@ -539,9 +571,6 @@
 
         setCachedCodes(validCodes);
         return validCodes;
-      }catch(error){
-        console.error("Fetch error:", error);
-        throw error;
       }finally{
         isFetchingCodes = false;
       }
@@ -565,9 +594,6 @@
       }
     }
 
-    // ============================================
-    // PAGE NAVIGATION
-    // ============================================
     function init(){
       const accessCode = localStorage.getItem(STORAGE_KEY);
       isAccessValidated = !!accessCode;
@@ -629,29 +655,39 @@
       }
     }
 
-    // ============================================
-    // ACCESS MODULE
-    // ============================================
     function loadAccessModule(){
       const accessHTML = `
         <div class="access-shell">
           <div class="access-card">
-            <div class="access-title">Enter Access Code</div>
+            <div class="access-center">
+              <div class="access-top">
+                <div class="access-badge" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 3a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-1V8a5 5 0 0 0-5-5Z" stroke="rgba(0,48,91,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M9 11V8a3 3 0 1 1 6 0v3" stroke="rgba(0,48,91,0.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="access-title">Enter Access Code</div>
+                  <div class="access-subtitle">Use the code provided to start onboarding.</div>
+                </div>
+              </div>
 
-            <div class="access-label">Unique Identifier</div>
-            <input
-              type="text"
-              class="access-input"
-              id="accessCode"
-              placeholder="Enter your Unique Identifier"
-              autocomplete="off"
-            >
+              <input
+                type="text"
+                class="access-input"
+                id="accessCode"
+                placeholder="Enter Access Code"
+                autocomplete="off"
+                inputmode="text"
+              >
 
-            <div class="access-row">
-              <button type="button" class="access-submit" id="submitCode">
-                <span id="btnText">Submit</span>
-              </button>
-              <span class="inline-msg" id="inlineMsg">Invalid Access Code</span>
+              <div class="access-row">
+                <button type="button" class="access-submit" id="submitCode">
+                  <span id="btnText">Continue</span>
+                </button>
+                <span class="inline-msg" id="inlineMsg">Invalid Access Code</span>
+              </div>
             </div>
           </div>
         </div>
@@ -679,7 +715,7 @@
 
       function setBusy(isBusy){
         btn.disabled = !!isBusy;
-        btnText.innerHTML = isBusy ? '<span class="spinner"></span>' : "Submit";
+        btnText.innerHTML = isBusy ? '<span class="spinner"></span>' : "Continue";
       }
 
       async function submit(){
@@ -718,9 +754,7 @@
       input.focus();
     }
 
-    // ============================================
-    // PAGE 3: IMPORT COMPONENTS INTO PAGE 3 SLOTS
-    // ============================================
+    // ====== Signature loader kept intact ======
     let __sigKitLoaded = false;
     let __sigKitLoadingPromise = null;
 
@@ -756,16 +790,9 @@
 
     async function mountSignatureOnPage3(headerSlot, inputSlot, statusSlot){
       await loadElectronicSignatureKit();
-      window.CarbyneSignatureKit.mount(document, {
-        header: headerSlot,
-        input: inputSlot,
-        status: statusSlot
-      });
+      window.CarbyneSignatureKit.mount(document, { header:headerSlot, input:inputSlot, status:statusSlot });
     }
 
-    // ============================================
-    // PAGE CONTENT
-    // ============================================
     function loadPageContent(pageNum){
       const content = document.createElement("div");
       const secureCode = localStorage.getItem(STORAGE_KEY) || "";
@@ -777,17 +804,13 @@
           <h2>Electronic Signature</h2>
 
           <div class="sig-page3">
-            <div id="sigHeaderSlot">
-              <span class="sig-loading">Loading signature...</span>
-            </div>
-
+            <div id="sigHeaderSlot"><span class="sig-loading">Loading signature...</span></div>
             <div class="sig-page3-grid">
               <div id="sigInputSlot"></div>
               <div id="sigStatusSlot"></div>
             </div>
           </div>
         `;
-
         pageMount.appendChild(content);
 
         const headerSlot = content.querySelector("#sigHeaderSlot");
@@ -799,7 +822,6 @@
           inputSlot.innerHTML = "";
           statusSlot.innerHTML = "";
         });
-
         return;
       }
 
