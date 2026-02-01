@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
   <style>
     *{box-sizing:border-box}
@@ -166,7 +167,22 @@
       color:#0f172a;
       opacity:.70;
       letter-spacing:.2px;
+      text-align:right;
     }
+
+    /* Review Documents line (Page 4+) */
+    .review-docs{
+      display:inline-block;
+      margin-top:6px;
+      font-size:12px;
+      font-weight:950;
+      letter-spacing:.2px;
+      color:#00305B;
+      text-decoration:none;
+      opacity:.92;
+      cursor:pointer;
+    }
+    .review-docs:hover{opacity:1;text-decoration:underline}
 
     .content{padding:0 2px 2px}
 
@@ -494,13 +510,19 @@
     }
 
     function buildShell(secureCode){
+      const step = getStepNumber();
+      const showReview = (step >= 3); // Page 4+ (Step 3+)
+
       const shell = document.createElement("div");
       shell.className = "shell";
       shell.innerHTML = `
         <div class="shell-inner">
           <div class="scroll">
             <div class="sticky-ref">
-              <div class="reference-number">Reference Number: ${secureCode || ""}</div>
+              <div class="reference-number">
+                Reference Number: ${secureCode || ""}
+                ${showReview ? `<a href="#" class="review-docs" id="carbyneReviewDocsLink">Review Documents</a>` : ``}
+              </div>
             </div>
             <div class="content" id="content"></div>
           </div>
@@ -763,6 +785,112 @@
     }
 
     init();
+  </script>
+
+  <script>
+    (function(){
+      "use strict";
+
+      const PACKET_KEY = "carbyne_packet_docs_v1";
+
+      function safeJsonParse(raw){
+        try{ return JSON.parse(raw); } catch { return null; }
+      }
+
+      function loadPacket(){
+        const raw = sessionStorage.getItem(PACKET_KEY);
+        const obj = safeJsonParse(raw);
+        if (obj && Array.isArray(obj.docs)) return obj;
+        return { version: 1, docs: [] };
+      }
+
+      function fromBase64ToBytes(b64){
+        const bin = atob(b64);
+        const len = bin.length;
+        const out = new Uint8Array(len);
+        for (let i=0;i<len;i++) out[i] = bin.charCodeAt(i);
+        return out;
+      }
+
+      async function mergePacketPdfs(packet){
+        const PDFDocument = window.PDFLib && window.PDFLib.PDFDocument;
+        if (!PDFDocument) throw new Error("pdf-lib not available.");
+
+        const outDoc = await PDFDocument.create();
+
+        for (const doc of packet.docs){
+          if (!doc || !doc.pdf_base64) continue;
+          const bytes = fromBase64ToBytes(doc.pdf_base64);
+          const src = await PDFDocument.load(bytes);
+          const copied = await outDoc.copyPages(src, src.getPageIndices());
+          copied.forEach(p => outDoc.addPage(p));
+        }
+
+        return await outDoc.save();
+      }
+
+      function openPdfInNewTabFromBytes(bytes, tab){
+        const blob = new Blob([bytes], { type: "application/pdf" });
+        const url = URL.createObjectURL(blob);
+
+        if (tab && !tab.closed){
+          tab.location = url;
+        } else {
+          window.open(url, "_blank", "noopener");
+        }
+
+        setTimeout(() => { try{ URL.revokeObjectURL(url); } catch {} }, 60 * 1000);
+      }
+
+      async function handleReviewClick(e){
+        const a = e.target && e.target.closest ? e.target.closest("#carbyneReviewDocsLink") : null;
+        if (!a) return;
+
+        e.preventDefault();
+
+        const tab = window.open("about:blank", "_blank", "noopener");
+        if (tab){
+          try{
+            tab.document.write(
+              '<!doctype html><html><head><meta charset="utf-8"><title>Review Documents</title></head>' +
+              '<body style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; padding:20px;">' +
+              '<div style="font-weight:900;font-size:14px;color:#0f172a;">Preparing documents...</div>' +
+              '</body></html>'
+            );
+            tab.document.close();
+          } catch {}
+        }
+
+        const packet = loadPacket();
+        if (!packet.docs.length){
+          if (tab && !tab.closed){
+            try{
+              tab.document.body.innerHTML =
+                '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; padding:20px;">' +
+                '<div style="font-weight:900;font-size:14px;color:#0f172a;">No documents have been completed yet.</div>' +
+                '</div>';
+            } catch {}
+          }
+          return;
+        }
+
+        try{
+          const merged = await mergePacketPdfs(packet);
+          openPdfInNewTabFromBytes(merged, tab);
+        } catch {
+          if (tab && !tab.closed){
+            try{
+              tab.document.body.innerHTML =
+                '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; padding:20px;">' +
+                '<div style="font-weight:900;font-size:14px;color:#0f172a;">Unable to open documents.</div>' +
+                '</div>';
+            } catch {}
+          }
+        }
+      }
+
+      document.addEventListener("click", handleReviewClick);
+    })();
   </script>
 </body>
 </html>
