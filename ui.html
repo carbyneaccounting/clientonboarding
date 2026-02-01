@@ -158,6 +158,9 @@
       background:linear-gradient(180deg,rgba(255,255,255,.92) 0%,rgba(255,255,255,.72) 70%,rgba(255,255,255,0) 100%);
       backdrop-filter:blur(2px);
       transition:opacity .15s ease;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:8px;
     }
     .sticky-ref.hidden{opacity:0;pointer-events:none}
 
@@ -168,6 +171,27 @@
       opacity:.70;
       letter-spacing:.2px;
     }
+
+    .review-link{
+      display:none;
+      font-size:12px;
+      font-weight:950;
+      color:#00305B;
+      text-decoration:none;
+      border:1px solid rgba(0,48,91,.22);
+      background:rgba(0,48,91,.06);
+      padding:7px 10px;
+      border-radius:10px;
+      box-shadow:0 8px 18px rgba(2,6,23,.08);
+      cursor:pointer;
+      user-select:none;
+      transition:transform .14s ease, opacity .14s ease, box-shadow .14s ease, background-color .14s ease;
+      width:max-content;
+      align-self:flex-end;
+    }
+    .review-link.show{display:inline-flex}
+    .review-link:hover{transform:translateY(-1px);opacity:.97;box-shadow:0 10px 20px rgba(2,6,23,.10)}
+    .review-link:active{transform:translateY(0);opacity:.95}
 
     .content{padding:0 2px 2px}
 
@@ -298,18 +322,6 @@
     .welcome-h{font-size:13px;font-weight:950;color:#0f172a;margin:16px 0 6px;letter-spacing:.2px}
     .welcome-list{padding-left:18px;margin:6px 0 0}
     .welcome-li{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.6;margin:0 0 8px}
-
-    /* Review Documents link (added only) */
-    .review-docs-link{
-      display:inline-block;
-      margin-top:6px;
-      font-size:12px;
-      font-weight:950;
-      color:#00305B;
-      text-decoration:none;
-      opacity:.95;
-    }
-    .review-docs-link:hover{ text-decoration:underline; opacity:1; }
   </style>
 </head>
 
@@ -369,9 +381,12 @@
     const CLIENT_INTAKE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
     const SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
 
-    // PDF packet storage keys (added only)
-    const PDF_PACKET_KEY = "carbyne_pdf_packet_items";
-    const PDF_PACKET_MERGED_KEY = "carbyne_pdf_packet_merged";
+    // PDF Packet store (single packet, multiple docs)
+    const PACKET_KEY = "carbyne_pdf_packet_v1";
+    const PACKET_META_KEY = "carbyne_pdf_packet_meta_v1";
+
+    // Document IDs
+    const DOC_ID_INTAKE = "client_intake_form";
 
     let currentPage = 1;
     let isAccessValidated = false;
@@ -387,139 +402,6 @@
 
     function normalize(v){ return (v ?? "").toString().trim(); }
     function now(){ return Date.now(); }
-
-    // ===== PDF helpers (added only) =====
-    function safeJsonParse(s, fallback){
-      try{ return JSON.parse(s); } catch { return fallback; }
-    }
-
-    function base64ToUint8(b64){
-      const bin = atob(b64);
-      const len = bin.length;
-      const u8 = new Uint8Array(len);
-      for (let i=0;i<len;i++) u8[i] = bin.charCodeAt(i);
-      return u8;
-    }
-
-    function getMergedPdfBytes(){
-      try{
-        const b64 = sessionStorage.getItem(PDF_PACKET_MERGED_KEY) || "";
-        return b64 ? base64ToUint8(b64) : null;
-      } catch {}
-      try{
-        const b64 = localStorage.getItem(PDF_PACKET_MERGED_KEY) || "";
-        return b64 ? base64ToUint8(b64) : null;
-      } catch {}
-      return null;
-    }
-
-    function getPacketItems(){
-      try{
-        const raw = sessionStorage.getItem(PDF_PACKET_KEY) || "";
-        const parsed = safeJsonParse(raw, []);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {}
-      try{
-        const raw2 = localStorage.getItem(PDF_PACKET_KEY) || "";
-        const parsed2 = safeJsonParse(raw2, []);
-        return Array.isArray(parsed2) ? parsed2 : [];
-      } catch {}
-      return [];
-    }
-
-    async function mergePacketPdfs(items){
-      const PDFLib = window.PDFLib;
-      if (!PDFLib || !PDFLib.PDFDocument) return null;
-
-      const merged = await PDFLib.PDFDocument.create();
-      for (const it of (items || [])){
-        if (!it || !it.bytesB64) continue;
-        const u8 = base64ToUint8(it.bytesB64);
-        const src = await PDFLib.PDFDocument.load(u8);
-        const pages = await merged.copyPages(src, src.getPageIndices());
-        for (const p of pages) merged.addPage(p);
-      }
-      const out = await merged.save();
-      return new Uint8Array(out);
-    }
-
-    function openPdfBytesInNewTab(bytesU8){
-      const tab = window.open("about:blank", "_blank");
-      if (!tab) return;
-
-      const blob = new Blob([bytesU8], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-
-      try{
-        tab.location.href = url;
-      } catch {
-        try{
-          tab.document.open();
-          tab.document.write('<iframe style="border:0;width:100%;height:100vh" src="' + url + '"></iframe>');
-          tab.document.close();
-        } catch {}
-      }
-
-      setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60000);
-    }
-
-    async function openReviewDocuments(){
-      const merged = getMergedPdfBytes();
-      if (merged && merged.length){
-        openPdfBytesInNewTab(merged);
-        return;
-      }
-
-      const items = getPacketItems().filter(x=>x && x.bytesB64);
-      if (!items.length){
-        const tab = window.open("about:blank", "_blank");
-        if (tab){
-          try{
-            tab.document.open();
-            tab.document.write('<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px;font-weight:900;color:#0f172a;">No documents yet.</div>');
-            tab.document.close();
-          } catch {}
-        }
-        return;
-      }
-
-      if (items.length === 1){
-        openPdfBytesInNewTab(base64ToUint8(items[0].bytesB64));
-        return;
-      }
-
-      const merged2 = await mergePacketPdfs(items);
-      if (merged2 && merged2.length){
-        openPdfBytesInNewTab(merged2);
-        return;
-      }
-
-      openPdfBytesInNewTab(base64ToUint8(items[items.length-1].bytesB64));
-    }
-
-    function injectReviewDocumentsLink(shell){
-      const step = getStepNumber();
-      if (step < 4) return; // Page 5+ only
-
-      const ref = shell.querySelector(".reference-number");
-      if (!ref) return;
-      if (ref.querySelector("#carbyneReviewDocsLink")) return;
-
-      const br = document.createElement("br");
-      const a = document.createElement("a");
-      a.id = "carbyneReviewDocsLink";
-      a.href = "#";
-      a.className = "review-docs-link";
-      a.textContent = "Review Documents";
-      a.addEventListener("click", (e)=>{
-        e.preventDefault();
-        openReviewDocuments();
-      });
-
-      ref.appendChild(br);
-      ref.appendChild(a);
-    }
-    // ===== end PDF helpers =====
 
     function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
@@ -643,6 +525,121 @@
       onScroll();
     }
 
+    function packetLoad(){
+      try{
+        const raw = sessionStorage.getItem(PACKET_KEY) || "";
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return [];
+        return parsed;
+      } catch {
+        return [];
+      }
+    }
+
+    function packetSave(docs){
+      try{
+        sessionStorage.setItem(PACKET_KEY, JSON.stringify(Array.isArray(docs) ? docs : []));
+      } catch {}
+    }
+
+    function packetUpsert(doc){
+      const id = normalize(doc && doc.id);
+      if (!id) return;
+
+      const docs = packetLoad().filter(d => normalize(d && d.id) !== id);
+      docs.push({
+        id: id,
+        title: normalize(doc.title) || id,
+        b64: normalize(doc.b64) || "",
+        meta: (doc && typeof doc.meta === "object" && doc.meta) ? doc.meta : {}
+      });
+      packetSave(docs);
+    }
+
+    function packetHasAny(){
+      const docs = packetLoad();
+      return docs.some(d => d && d.b64);
+    }
+
+    function bytesFromB64(b64){
+      const bin = atob(b64);
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+      return bytes;
+    }
+
+    function b64FromBytes(bytes){
+      let s = "";
+      const chunk = 0x8000;
+      for (let i=0;i<bytes.length;i+=chunk){
+        s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+      }
+      return btoa(s);
+    }
+
+    async function packetBuildMergedPdfBytes(){
+      const docs = packetLoad().filter(d => d && d.b64);
+      if (!docs.length) return null;
+
+      const { PDFDocument } = window.PDFLib || {};
+      if (!PDFDocument) return null;
+
+      const merged = await PDFDocument.create();
+
+      for (const d of docs){
+        try{
+          const srcBytes = bytesFromB64(d.b64);
+          const srcPdf = await PDFDocument.load(srcBytes);
+          const pages = await merged.copyPages(srcPdf, srcPdf.getPageIndices());
+          pages.forEach(p => merged.addPage(p));
+        } catch {}
+      }
+
+      const outBytes = await merged.save();
+      return outBytes;
+    }
+
+    function openPdfInNewTab(pdfBytes){
+      const blob = new Blob([pdfBytes], { type:"application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const w = window.open(url, "_blank");
+      if (!w){
+        window.location.href = url;
+        return;
+      }
+      setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60 * 1000);
+    }
+
+    async function openReviewDocuments(){
+      const outBytes = await packetBuildMergedPdfBytes();
+      if (!outBytes){
+        const w = window.open("", "_blank");
+        if (w){
+          w.document.open();
+          w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Review Documents</title></head><body style='font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:26px;color:#0f172a;'><div style='font-weight:900;font-size:16px;margin-bottom:10px;'>Review Documents</div><div style='font-weight:800;opacity:.82;'>No documents have been generated yet.</div></body></html>");
+          w.document.close();
+        }
+        return;
+      }
+      openPdfInNewTab(outBytes);
+    }
+
+    async function getPublicIP(){
+      try{
+        const res = await fetch("https://api.ipify.org?format=json", { cache:"no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const j = await res.json();
+        const ip = normalize(j && j.ip);
+        return ip || "Unavailable";
+      } catch {
+        return "Unavailable";
+      }
+    }
+
+    window.carbyne_get_public_ip = getPublicIP;
+
     function buildShell(secureCode){
       const shell = document.createElement("div");
       shell.className = "shell";
@@ -651,13 +648,21 @@
           <div class="scroll">
             <div class="sticky-ref">
               <div class="reference-number">Reference Number: ${secureCode || ""}</div>
+              <a class="review-link" id="reviewDocsLink" href="javascript:void(0)">Review Documents</a>
             </div>
             <div class="content" id="content"></div>
           </div>
         </div>
       `;
       attachRefHideOnScroll(shell);
-      injectReviewDocumentsLink(shell); // added only
+
+      const link = shell.querySelector("#reviewDocsLink");
+      if (link){
+        const showFromPage = (currentPage >= 5);
+        if (showFromPage) link.classList.add("show");
+        link.addEventListener("click", (e)=>{ e.preventDefault(); openReviewDocuments(); });
+      }
+
       return shell;
     }
 
@@ -898,6 +903,14 @@
 
     function prev(){ if (currentPage > 1){ currentPage--; loadPage(currentPage); } }
     function next(){ if (currentPage < TOTAL_PAGES){ currentPage++; loadPage(currentPage); } }
+
+    window.addEventListener("carbyne:pdfdoc:upsert", (e)=>{
+      try{
+        const d = e && e.detail ? e.detail : null;
+        if (!d || !d.id || !d.b64) return;
+        packetUpsert(d);
+      } catch {}
+    });
 
     function init(){
       isAccessValidated = !!localStorage.getItem(STORAGE_KEY_CODE);
