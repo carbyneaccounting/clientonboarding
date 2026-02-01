@@ -1,4 +1,4 @@
-<!-- ui.html -->
+<!-- ui.html - Complete Refactored Client Onboarding System -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -6,352 +6,578 @@
   <title>Client Onboarding</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <!-- External Dependencies -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-
-  <!-- PDFViewer.js - MUST be in same folder as this file -->
+  
+  <!-- PDFViewer.js - Must be in same folder -->
   <script src="./PDFViewer.js"></script>
 
   <style>
-    *{box-sizing:border-box}
+    /* ========================================================================
+       COMPLETE REFACTORED STYLES
+       ======================================================================== */
+    
+    * { box-sizing: border-box; }
 
-    :root{
-      --ink:#0f172a;
-      --muted:#475569;
-      --border:#e5e7eb;
-      --panel:#ffffff;
-      --accent:#00305B;
-      --radius:18px;
-      --shadow:0 12px 30px rgba(2,6,23,.10);
-      --bgTop:#083a66;
-      --bgBottom:#062f56;
+    :root {
+      --ink: #0f172a;
+      --muted: #475569;
+      --border: #e5e7eb;
+      --panel: #ffffff;
+      --accent: #00305B;
+      --radius: 18px;
+      --shadow: 0 12px 30px rgba(2,6,23,.10);
+      --bgTop: #083a66;
+      --bgBottom: #062f56;
     }
 
-    html, body{
-      width:100%;
-      height:100%;
-      margin:0;
-      padding:0;
-      background:linear-gradient(135deg,var(--bgTop),var(--bgBottom));
-      background-color:var(--bgBottom);
-      overflow-x:hidden;
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, var(--bgTop), var(--bgBottom));
+      background-color: var(--bgBottom);
+      overflow-x: hidden;
     }
 
-    body{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:38px 22px 70px;
-      color:var(--ink);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      position:relative;
-      isolation:isolate;
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 38px 22px 70px;
+      color: var(--ink);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      position: relative;
+      isolation: isolate;
     }
 
-    .bg-layer{
-      position:fixed;
-      inset:0;
-      background:linear-gradient(135deg,var(--bgTop),var(--bgBottom));
-      z-index:-1;
-      pointer-events:none;
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--bgTop), var(--bgBottom));
+      z-index: -1;
+      pointer-events: none;
     }
 
-    .brand{
-      position:absolute;
-      top:18px;
-      left:18px;
-      color:#fff;
-      z-index:5;
-      font-weight:700;
-      font-size:13px;
-      line-height:1.35;
-      opacity:.95;
+    /* Brand Header */
+    .brand {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      color: #fff;
+      z-index: 5;
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.35;
+      opacity: .95;
     }
-    .brand .name{font-size:15px;font-weight:900;margin-bottom:2px;}
-
-    .footer{
-      position:absolute;
-      left:18px;
-      bottom:16px;
-      color:#fff;
-      font-size:13px;
-      font-weight:700;
-      opacity:.9;
-      z-index:5;
+    .brand .name {
+      font-size: 15px;
+      font-weight: 900;
+      margin-bottom: 2px;
     }
 
-    .wrap{width:min(1200px,95vw);position:relative;z-index:2;}
-
-    .title{
-      color:#fff;
-      font-weight:900;
-      font-size:22px;
-      margin:0 0 12px 0;
+    /* Footer */
+    .footer {
+      position: absolute;
+      left: 18px;
+      bottom: 16px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      opacity: .9;
+      z-index: 5;
     }
 
-    .card{
-      width:100%;
-      height:clamp(560px,74vh,880px);
-      background:var(--panel);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      display:flex;
-      flex-direction:column;
+    /* Main Container */
+    .wrap {
+      width: min(1200px, 95vw);
+      position: relative;
+      z-index: 2;
     }
 
-    .topbar{
-      padding:18px 26px;
-      border-bottom:1px solid var(--border);
-      background:#fff;
+    .title {
+      color: #fff;
+      font-weight: 900;
+      font-size: 22px;
+      margin: 0 0 12px 0;
     }
 
-    .progress-track{
-      height:8px;
-      border-radius:999px;
-      background:#dedede;
-      overflow:hidden;
-    }
-    .progress-fill{
-      height:100%;
-      width:0%;
-      border-radius:999px;
-      background:linear-gradient(90deg,#00305B,#0A3D6F);
-      transition:width .25s ease;
+    /* Card Container */
+    .card {
+      width: 100%;
+      height: clamp(560px, 74vh, 880px);
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
-    .stage{
-      flex:1;
-      position:relative;
-      overflow:hidden;
-      padding:22px 26px;
+    /* Top Bar with Progress */
+    .topbar {
+      padding: 18px 26px;
+      border-bottom: 1px solid var(--border);
+      background: #fff;
+    }
+
+    .progress-track {
+      height: 8px;
+      border-radius: 999px;
+      background: #dedede;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #00305B, #0A3D6F);
+      transition: width .25s ease;
+    }
+
+    /* Stage Area */
+    .stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      padding: 22px 26px;
       background:
-        linear-gradient(180deg,rgba(0,0,0,.22) 0%,rgba(0,0,0,.18) 55%,rgba(0,0,0,.22) 100%),
+        linear-gradient(180deg, rgba(0,0,0,.22) 0%, rgba(0,0,0,.18) 55%, rgba(0,0,0,.22) 100%),
         url("https://images.unsplash.com/photo-1751780509838-a5cba1fe9e9f?q=80&w=2664&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D");
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .shell{
-      width:min(980px,96%);
-      height:min(520px,100%);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 18px 40px rgba(0,0,0,.20);
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(255,255,255,.90);
-      position:relative;
+    /* Content Shell */
+    .shell {
+      width: min(980px, 96%);
+      height: min(520px, 100%);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.90);
+      position: relative;
     }
 
-    .shell-inner{
-      height:100%;
-      border-radius:18px;
-      overflow:hidden;
-      position:relative;
-      background:transparent;
+    .shell-inner {
+      height: 100%;
+      border-radius: 18px;
+      overflow: hidden;
+      position: relative;
+      background: transparent;
     }
 
-    .scroll{
-      height:100%;
-      overflow:auto;
-      padding:18px 18px 22px 18px;
-      scrollbar-gutter:stable;
+    /* Scrollable Content Area */
+    .scroll {
+      height: 100%;
+      overflow: auto;
+      padding: 18px 18px 22px 18px;
+      scrollbar-gutter: stable;
     }
 
-    .scroll::-webkit-scrollbar{width:12px}
-    .scroll::-webkit-scrollbar-track{background:rgba(0,0,0,.10)}
-    .scroll::-webkit-scrollbar-thumb{background:rgba(0,48,91,.45);border-radius:999px;border:3px solid rgba(255,255,255,.60)}
-    .scroll{scrollbar-width:auto;scrollbar-color:rgba(0,48,91,.45) rgba(0,0,0,.10)}
-
-    .sticky-ref{
-      position:sticky;
-      top:0;
-      z-index:10;
-      display:flex;
-      justify-content:flex-end;
-      padding:6px 2px 10px;
-      background:linear-gradient(180deg,rgba(255,255,255,.92) 0%,rgba(255,255,255,.72) 70%,rgba(255,255,255,0) 100%);
-      backdrop-filter:blur(2px);
-      transition:opacity .15s ease;
-      flex-direction:column;
-      align-items:flex-end;
-      gap:8px;
+    .scroll::-webkit-scrollbar { width: 12px; }
+    .scroll::-webkit-scrollbar-track { background: rgba(0,0,0,.10); }
+    .scroll::-webkit-scrollbar-thumb {
+      background: rgba(0,48,91,.45);
+      border-radius: 999px;
+      border: 3px solid rgba(255,255,255,.60);
     }
-    .sticky-ref.hidden{opacity:0;pointer-events:none}
-
-    .reference-number{
-      font-size:12px;
-      font-weight:900;
-      color:#0f172a;
-      opacity:.70;
-      letter-spacing:.2px;
+    .scroll {
+      scrollbar-width: auto;
+      scrollbar-color: rgba(0,48,91,.45) rgba(0,0,0,.10);
     }
 
-    .review-link{
-      display:none;
-      font-size:12px;
-      font-weight:950;
-      color:#00305B;
-      text-decoration:none;
-      border:1px solid rgba(0,48,91,.22);
-      background:rgba(0,48,91,.06);
-      padding:7px 10px;
-      border-radius:10px;
-      box-shadow:0 8px 18px rgba(2,6,23,.08);
-      cursor:pointer;
-      user-select:none;
-      transition:transform .14s ease, opacity .14s ease, box-shadow .14s ease, background-color .14s ease;
-      width:max-content;
-      align-self:flex-end;
-    }
-    .review-link.show{display:inline-flex}
-    .review-link:hover{transform:translateY(-1px);opacity:.97;box-shadow:0 10px 20px rgba(2,6,23,.10)}
-    .review-link:active{transform:translateY(0);opacity:.95}
-
-    .content{padding:0 2px 2px}
-
-    .bottombar{
-      padding:18px 26px;
-      border-top:1px solid var(--border);
-      background:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+    /* Sticky Reference Bar */
+    .sticky-ref {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 2px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.92) 0%, rgba(255,255,255,.72) 70%, rgba(255,255,255,0) 100%);
+      backdrop-filter: blur(2px);
+      transition: opacity .15s ease;
+      align-items: flex-start;
+      gap: 8px;
     }
 
-    .btn{
-      border:0;
-      border-radius:8px;
-      padding:10px 22px;
-      font-weight:900;
-      cursor:pointer;
-      transition:transform .15s ease, opacity .15s ease;
-      font-size:14px;
-    }
-    .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
-    .btn.prev{background:#f0f0f0;color:#111}
-    .btn.next{background:linear-gradient(90deg,#00305B,#0A3D6F);color:#fff}
-    .btn:hover:not(:disabled){transform:translateY(-1px);opacity:.97}
-
-    .steptext{
-      font-size:14px;
-      font-weight:800;
-      color:#666;
+    .sticky-ref.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
 
-    .access-wrap{
-      width:min(980px,96%);
-      height:min(520px,100%);
-      border-radius:18px;
-      overflow:hidden;
-      box-shadow:0 18px 40px rgba(0,0,0,.20);
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(255,255,255,.90);
-      position:relative;
-      display:flex;
-      align-items:center;
-      padding:36px 40px;
+    .sticky-left {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
     }
+
+    .sticky-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    /* Exit Onboarding Button */
+    .exit-link {
+      font-size: 12px;
+      font-weight: 950;
+      color: #b91c1c;
+      text-decoration: none;
+      border: 1px solid rgba(185,28,28,.22);
+      background: rgba(185,28,28,.06);
+      padding: 7px 10px;
+      border-radius: 10px;
+      box-shadow: 0 8px 18px rgba(2,6,23,.08);
+      cursor: pointer;
+      user-select: none;
+      transition: transform .14s ease, opacity .14s ease, box-shadow .14s ease, background-color .14s ease;
+      width: max-content;
+    }
+
+    .exit-link:hover {
+      transform: translateY(-1px);
+      opacity: .97;
+      box-shadow: 0 10px 20px rgba(2,6,23,.10);
+      background: rgba(185,28,28,.10);
+    }
+
+    .exit-link:active {
+      transform: translateY(0);
+      opacity: .95;
+    }
+
+    /* Reference Number */
+    .reference-number {
+      font-size: 12px;
+      font-weight: 900;
+      color: #0f172a;
+      opacity: .70;
+      letter-spacing: .2px;
+    }
+
+    /* Review Documents Button */
+    .review-link {
+      display: none;
+      font-size: 12px;
+      font-weight: 950;
+      color: #00305B;
+      text-decoration: none;
+      border: 1px solid rgba(0,48,91,.22);
+      background: rgba(0,48,91,.06);
+      padding: 7px 10px;
+      border-radius: 10px;
+      box-shadow: 0 8px 18px rgba(2,6,23,.08);
+      cursor: pointer;
+      user-select: none;
+      transition: transform .14s ease, opacity .14s ease, box-shadow .14s ease, background-color .14s ease;
+      width: max-content;
+    }
+
+    .review-link.show {
+      display: inline-flex;
+    }
+
+    .review-link:hover {
+      transform: translateY(-1px);
+      opacity: .97;
+      box-shadow: 0 10px 20px rgba(2,6,23,.10);
+    }
+
+    .review-link:active {
+      transform: translateY(0);
+      opacity: .95;
+    }
+
+    .content {
+      padding: 0 2px 2px;
+    }
+
+    /* Bottom Navigation Bar */
+    .bottombar {
+      padding: 18px 26px;
+      border-top: 1px solid var(--border);
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 22px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .15s ease, opacity .15s ease;
+      font-size: 14px;
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn.prev {
+      background: #f0f0f0;
+      color: #111;
+    }
+
+    .btn.next {
+      background: linear-gradient(90deg, #00305B, #0A3D6F);
+      color: #fff;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+      opacity: .97;
+    }
+
+    .steptext {
+      font-size: 14px;
+      font-weight: 800;
+      color: #666;
+    }
+
+    /* Access Code Page */
+    .access-wrap {
+      width: min(980px, 96%);
+      height: min(520px, 100%);
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.90);
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 36px 40px;
+    }
+
     .access-wrap::before,
-    .access-wrap::after{
-      content:"";
-      position:absolute;
-      width:420px;height:420px;border-radius:50%;
-      background:radial-gradient(circle at 30% 30%, rgba(0,48,91,.14) 0%, rgba(0,48,91,0) 70%);
-      pointer-events:none;
+    .access-wrap::after {
+      content: "";
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(0,48,91,.14) 0%, rgba(0,48,91,0) 70%);
+      pointer-events: none;
     }
-    .access-wrap::before{left:-160px;bottom:-190px}
-    .access-wrap::after{right:-220px;top:-220px}
 
-    .access-stack{position:relative;width:min(640px,100%);margin-left:16px;padding-top:0;}
-    .access-head{display:flex;align-items:center;gap:14px;margin-bottom:18px}
-    .access-icon{
-      width:46px;height:46px;border-radius:14px;
-      background:rgba(0,48,91,.08);
-      border:1px solid rgba(0,0,0,.06);
-      display:flex;align-items:center;justify-content:center;
-      color:#00305B;
-      box-shadow:0 10px 18px rgba(0,0,0,.08);
-      flex:0 0 auto;
+    .access-wrap::before {
+      left: -160px;
+      bottom: -190px;
     }
-    .access-title{font-size:18px;font-weight:950;color:#0f172a;line-height:1.1}
-    .access-sub{font-size:12px;font-weight:900;color:#334155;opacity:.90;margin-top:4px}
 
-    .access-input{
-      width:100%;
-      padding:14px 16px;
-      font-size:15px;
-      font-weight:900;
-      border:1px solid rgba(0,0,0,.14);
-      border-radius:12px;
-      outline:none;
-      background:#fff;
-      transition:border-color .2s ease, box-shadow .2s ease;
-      box-shadow:0 8px 18px rgba(0,0,0,.06);
+    .access-wrap::after {
+      right: -220px;
+      top: -220px;
     }
-    .access-input:focus{
-      border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 10px 22px rgba(0,0,0,.08);
-    }
-    .access-input.error{border-color:#b91c1c}
 
-    .access-row{display:flex;gap:14px;align-items:center;margin-top:14px;flex-wrap:wrap}
-    .access-submit{
-      padding:11px 22px;
-      font-size:14px;
-      font-weight:950;
-      border-radius:10px;
-      border:1px solid rgba(0,0,0,.10);
-      background:linear-gradient(90deg,#00305B,#0A3D6F);
-      color:#fff;
-      cursor:pointer;
-      min-width:150px;
-      box-shadow:0 10px 20px rgba(0,0,0,.14);
-      transition:opacity .2s ease, transform .15s ease;
+    .access-stack {
+      position: relative;
+      width: min(640px, 100%);
+      margin-left: 16px;
+      padding-top: 0;
     }
-    .access-submit:hover:not(:disabled){opacity:.96;transform:translateY(-1px)}
-    .access-submit:disabled{opacity:.60;cursor:not-allowed;transform:none}
-    .inline-msg{
-      font-size:13px;
-      font-weight:950;
-      letter-spacing:.2px;
-      display:none;
-      white-space:nowrap;
-      color:#b91c1c;
-    }
-    .inline-msg.show{display:inline}
-    .spinner{
-      display:inline-block;width:14px;height:14px;
-      border:2px solid rgba(255,255,255,.30);
-      border-radius:50%;
-      border-top-color:#fff;
-      animation:spin .6s linear infinite;
-    }
-    @keyframes spin{to{transform:rotate(360deg)}}
 
-    .welcome-title{font-size:26px;font-weight:950;color:#00305B;margin:6px 0 12px;letter-spacing:.2px}
-    .welcome-p{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.65;margin:0 0 14px}
-    .welcome-h{font-size:13px;font-weight:950;color:#0f172a;margin:16px 0 6px;letter-spacing:.2px}
-    .welcome-list{padding-left:18px;margin:6px 0 0}
-    .welcome-li{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.6;margin:0 0 8px}
-
-    .fatal{
-      width:min(980px,96%);
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.22);
-      background:rgba(255,255,255,.90);
-      box-shadow:0 18px 40px rgba(0,0,0,.20);
-      padding:18px 18px;
-      color:#0f172a;
+    .access-head {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
     }
-    .fatal .t{font-weight:950;font-size:16px;margin:0 0 8px}
-    .fatal .m{font-weight:800;font-size:13px;opacity:.85;margin:0}
+
+    .access-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: rgba(0,48,91,.08);
+      border: 1px solid rgba(0,0,0,.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #00305B;
+      box-shadow: 0 10px 18px rgba(0,0,0,.08);
+      flex: 0 0 auto;
+    }
+
+    .access-title {
+      font-size: 18px;
+      font-weight: 950;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+
+    .access-sub {
+      font-size: 12px;
+      font-weight: 900;
+      color: #334155;
+      opacity: .90;
+      margin-top: 4px;
+    }
+
+    .access-input {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 900;
+      border: 1px solid rgba(0,0,0,.14);
+      border-radius: 12px;
+      outline: none;
+      background: #fff;
+      transition: border-color .2s ease, box-shadow .2s ease;
+      box-shadow: 0 8px 18px rgba(0,0,0,.06);
+    }
+
+    .access-input:focus {
+      border-color: rgba(0,48,91,.70);
+      box-shadow: 0 0 0 3px rgba(0,48,91,.16), 0 10px 22px rgba(0,0,0,.08);
+    }
+
+    .access-input.error {
+      border-color: #b91c1c;
+    }
+
+    .access-row {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .access-submit {
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 950;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,.10);
+      background: linear-gradient(90deg, #00305B, #0A3D6F);
+      color: #fff;
+      cursor: pointer;
+      min-width: 150px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.14);
+      transition: opacity .2s ease, transform .15s ease;
+    }
+
+    .access-submit:hover:not(:disabled) {
+      opacity: .96;
+      transform: translateY(-1px);
+    }
+
+    .access-submit:disabled {
+      opacity: .60;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .inline-msg {
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: .2px;
+      display: none;
+      white-space: nowrap;
+      color: #b91c1c;
+    }
+
+    .inline-msg.show {
+      display: inline;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255,255,255,.30);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin .6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Welcome Page */
+    .welcome-title {
+      font-size: 26px;
+      font-weight: 950;
+      color: #00305B;
+      margin: 6px 0 12px;
+      letter-spacing: .2px;
+    }
+
+    .welcome-p {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      opacity: .86;
+      line-height: 1.65;
+      margin: 0 0 14px;
+    }
+
+    .welcome-h {
+      font-size: 13px;
+      font-weight: 950;
+      color: #0f172a;
+      margin: 16px 0 6px;
+      letter-spacing: .2px;
+    }
+
+    .welcome-list {
+      padding-left: 18px;
+      margin: 6px 0 0;
+    }
+
+    .welcome-li {
+      font-size: 14px;
+      font-weight: 800;
+      color: #0f172a;
+      opacity: .86;
+      line-height: 1.6;
+      margin: 0 0 8px;
+    }
+
+    /* Fatal Error */
+    .fatal {
+      width: min(980px, 96%);
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.90);
+      box-shadow: 0 18px 40px rgba(0,0,0,.20);
+      padding: 18px 18px;
+      color: #0f172a;
+    }
+
+    .fatal .t {
+      font-weight: 950;
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+
+    .fatal .m {
+      font-weight: 800;
+      font-size: 13px;
+      opacity: .85;
+      margin: 0;
+    }
   </style>
 </head>
 
@@ -388,6 +614,14 @@
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
   <script>
+    /* ========================================================================
+       COMPLETE REFACTORED JAVASCRIPT
+       ======================================================================== */
+
+    // ========================================================================
+    // CONSTANTS
+    // ========================================================================
+    
     const TOTAL_PAGES = 16;
     const TOTAL_STEPS = 15;
 
@@ -398,30 +632,47 @@
     const TARGET_HEADER = "Unique Identifier";
     const CACHE_KEY = "carbyne_valid_codes_cache";
     const CACHE_TS_KEY = "carbyne_valid_codes_timestamp";
-    const CACHE_DURATION = 24 * 60 * 60 * 1000;
+    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
     const CLIENT_INTAKE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
     const SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
 
     const PACKET_KEY = "carbyne_pdf_packet_v1";
 
+    // ========================================================================
+    // STATE
+    // ========================================================================
+    
     let currentPage = 1;
     let isAccessValidated = false;
     let validCodesCache = null;
     let isFetching = false;
     let activeUnmount = null;
 
+    // ========================================================================
+    // DOM ELEMENTS
+    // ========================================================================
+    
     const stage = document.getElementById("stage");
     const progressFill = document.getElementById("progressFill");
     const stepText = document.getElementById("stepText");
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
 
-    function normalize(v){ return (v ?? "").toString().trim(); }
-    function now(){ return Date.now(); }
+    // ========================================================================
+    // UTILITY FUNCTIONS
+    // ========================================================================
+    
+    function normalize(v) {
+      return (v ?? "").toString().trim();
+    }
 
-    function showFatal(msg){
-      try{
+    function now() {
+      return Date.now();
+    }
+
+    function showFatal(msg) {
+      try {
         stage.innerHTML = `
           <div class="fatal">
             <div class="t">Unable to load onboarding</div>
@@ -431,68 +682,83 @@
       } catch {}
     }
 
-    window.addEventListener("error", (e)=>{
-      try{
+    // ========================================================================
+    // ERROR HANDLING
+    // ========================================================================
+    
+    window.addEventListener("error", (e) => {
+      try {
         const m = (e && e.message) ? e.message : "Unknown error";
         showFatal(m);
       } catch {}
     });
 
-    function getCachedCodes(){
+    // ========================================================================
+    // CODE VALIDATION
+    // ========================================================================
+    
+    function getCachedCodes() {
       if (validCodesCache) return validCodesCache;
-      try{
-        const ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || "0",10);
-        if (ts && (now() - ts) < CACHE_DURATION){
+      
+      try {
+        const ts = parseInt(localStorage.getItem(CACHE_TS_KEY) || "0", 10);
+        if (ts && (now() - ts) < CACHE_DURATION) {
           const raw = localStorage.getItem(CACHE_KEY);
-          if (raw){
+          if (raw) {
             validCodesCache = JSON.parse(raw);
             return validCodesCache;
           }
         }
       } catch {}
+      
       return null;
     }
 
-    function setCachedCodes(codes){
+    function setCachedCodes(codes) {
       validCodesCache = codes;
-      try{
+      try {
         localStorage.setItem(CACHE_KEY, JSON.stringify(codes));
         localStorage.setItem(CACHE_TS_KEY, String(now()));
       } catch {}
     }
 
-    function findHeaderIndex(headers){
+    function findHeaderIndex(headers) {
       const target = TARGET_HEADER.toLowerCase();
-      for (let i=0;i<headers.length;i++){
+      for (let i = 0; i < headers.length; i++) {
         if (normalize(headers[i]).toLowerCase() === target) return i;
       }
       return -1;
     }
 
-    async function fetchValidCodes(){
-      if (isFetching){
-        while (isFetching) await new Promise(r=>setTimeout(r,100));
+    async function fetchValidCodes() {
+      if (isFetching) {
+        while (isFetching) await new Promise(r => setTimeout(r, 100));
         return validCodesCache || [];
       }
+      
       isFetching = true;
-      try{
-        const res = await fetch(EXCEL_FILE_URL, { cache:"no-store" });
+      
+      try {
+        const res = await fetch(EXCEL_FILE_URL, { cache: "no-store" });
         if (!res.ok) throw new Error("HTTP " + res.status);
+        
         const ab = await res.arrayBuffer();
-        const wb = XLSX.read(ab, { type:"array" });
+        const wb = XLSX.read(ab, { type: "array" });
         const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, { header:1, raw:false, defval:"" });
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: false, defval: "" });
 
         if (!rows || rows.length < 2) throw new Error("No rows");
+        
         const headers = rows[0] || [];
         const idx = findHeaderIndex(headers);
         if (idx < 0) throw new Error("Missing header");
 
         const codes = [];
-        for (let r=1;r<rows.length;r++){
+        for (let r = 1; r < rows.length; r++) {
           const cell = normalize((rows[r] || [])[idx] || "");
           if (cell) codes.push(cell.toLowerCase());
         }
+        
         setCachedCodes(codes);
         return codes;
       } finally {
@@ -500,14 +766,16 @@
       }
     }
 
-    async function validateCode(code){
+    async function validateCode(code) {
       const needle = normalize(code).toLowerCase();
       const cached = getCachedCodes();
-      if (cached && Array.isArray(cached)){
-        fetchValidCodes().catch(()=>{});
+      
+      if (cached && Array.isArray(cached)) {
+        fetchValidCodes().catch(() => {});
         return cached.includes(needle);
       }
-      try{
+      
+      try {
         const codes = await fetchValidCodes();
         return codes.includes(needle);
       } catch {
@@ -515,14 +783,19 @@
       }
     }
 
-    function getStepNumber(){
+    // ========================================================================
+    // NAVIGATION
+    // ========================================================================
+    
+    function getStepNumber() {
       if (currentPage <= 1) return 0;
       return currentPage - 1;
     }
 
-    function updateNav(){
+    function updateNav() {
       const step = getStepNumber();
-      if (step === 0){
+      
+      if (step === 0) {
         progressFill.style.width = "0%";
         stepText.textContent = "";
       } else {
@@ -530,53 +803,83 @@
         stepText.textContent = "Step " + step + " of " + TOTAL_STEPS;
       }
 
-      prevBtn.disabled = currentPage === 1;
+      // Disable Previous button on page 1 (access code) OR page 2 (welcome)
+      prevBtn.disabled = currentPage === 1 || currentPage === 2;
       nextBtn.disabled = currentPage === TOTAL_PAGES;
       if (currentPage === 1) nextBtn.disabled = true;
 
       localStorage.setItem(STORAGE_KEY_PAGE, String(currentPage));
     }
 
-    function unmountActive(){
-      if (typeof activeUnmount === "function"){
-        try{ activeUnmount(); } catch {}
+    function prev() {
+      if (currentPage > 2) { // Can't go back past page 2 (welcome page)
+        currentPage--;
+        loadPage(currentPage);
+      }
+    }
+
+    function next() {
+      if (currentPage < TOTAL_PAGES) {
+        currentPage++;
+        loadPage(currentPage);
+      }
+    }
+
+    // ========================================================================
+    // MODULE MANAGEMENT
+    // ========================================================================
+    
+    function unmountActive() {
+      if (typeof activeUnmount === "function") {
+        try {
+          activeUnmount();
+        } catch {}
       }
       activeUnmount = null;
     }
 
-    function attachRefHideOnScroll(shell){
+    function attachRefHideOnScroll(shell) {
       const scrollEl = shell.querySelector(".scroll");
       const sticky = shell.querySelector(".sticky-ref");
       if (!scrollEl || !sticky) return;
 
       const onScroll = () => {
-        if (scrollEl.scrollTop > 6){
+        if (scrollEl.scrollTop > 6) {
           sticky.classList.add("hidden");
         } else {
           sticky.classList.remove("hidden");
         }
       };
-      scrollEl.addEventListener("scroll", onScroll, { passive:true });
+      
+      scrollEl.addEventListener("scroll", onScroll, { passive: true });
       onScroll();
     }
 
-    function packetLoad(){
-      try{
+    // ========================================================================
+    // PDF PACKET MANAGEMENT
+    // ========================================================================
+    
+    function packetLoad() {
+      try {
         const raw = sessionStorage.getItem(PACKET_KEY) || "";
         if (!raw) return [];
+        
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
+        
         return parsed;
       } catch {
         return [];
       }
     }
 
-    function packetSave(docs){
-      try{ sessionStorage.setItem(PACKET_KEY, JSON.stringify(Array.isArray(docs) ? docs : [])); } catch {}
+    function packetSave(docs) {
+      try {
+        sessionStorage.setItem(PACKET_KEY, JSON.stringify(Array.isArray(docs) ? docs : []));
+      } catch {}
     }
 
-    function packetUpsert(doc){
+    function packetUpsert(doc) {
       const id = normalize(doc && doc.id);
       if (!id) return;
 
@@ -587,25 +890,26 @@
         b64: normalize(doc.b64) || "",
         meta: (doc && typeof doc.meta === "object" && doc.meta) ? doc.meta : {}
       });
+      
       packetSave(docs);
 
-      try{
+      try {
         const link = document.getElementById("reviewDocsLink");
-        if (link){
+        if (link) {
           if (currentPage >= 5) link.classList.add("show");
         }
       } catch {}
     }
 
-    function bytesFromB64(b64){
+    function bytesFromB64(b64) {
       const bin = atob(b64);
       const len = bin.length;
       const bytes = new Uint8Array(len);
-      for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+      for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
       return bytes;
     }
 
-    async function packetBuildMergedPdfBytes(){
+    async function packetBuildMergedPdfBytes() {
       const docs = packetLoad().filter(d => d && d.b64);
       if (!docs.length) return null;
 
@@ -614,8 +918,8 @@
 
       const merged = await PDFDocument.create();
 
-      for (const d of docs){
-        try{
+      for (const d of docs) {
+        try {
           const srcBytes = bytesFromB64(d.b64);
           const srcPdf = await PDFDocument.load(srcBytes);
           const pages = await merged.copyPages(srcPdf, srcPdf.getPageIndices());
@@ -627,40 +931,77 @@
       return outBytes;
     }
 
-    function openReviewDocumentsFallbackMessage(){
+    // ========================================================================
+    // PDF VIEWING
+    // ========================================================================
+    
+    function openReviewDocumentsFallbackMessage() {
       const w = window.open("", "_blank");
-      if (w){
+      if (w) {
         w.document.open();
         w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Review Documents</title></head><body style='font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:26px;color:#0f172a;'><div style='font-weight:900;font-size:16px;margin-bottom:10px;'>Review Documents</div><div style='font-weight:800;opacity:.82;'>No documents have been generated yet.</div></body></html>");
         w.document.close();
       }
     }
 
-    async function openReviewDocuments(){
+    async function openReviewDocuments() {
       const outBytes = await packetBuildMergedPdfBytes();
-      if (!outBytes){
+      
+      if (!outBytes) {
         openReviewDocumentsFallbackMessage();
         return;
       }
 
-      if (window.PDFViewer && typeof window.PDFViewer.open === "function"){
+      // Try to use PDFViewer overlay
+      if (window.PDFViewer && typeof window.PDFViewer.open === "function") {
         const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
         await window.PDFViewer.open(data, {
           filename: 'client-documents.pdf',
-          onBack: function(){}
+          onBack: function() {}
         });
       } else {
-        const blob = new Blob([outBytes], { type:"application/pdf" });
+        // Fallback to new tab
+        const blob = new Blob([outBytes], { type: "application/pdf" });
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
-        setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60000);
+        setTimeout(() => {
+          try {
+            URL.revokeObjectURL(url);
+          } catch {}
+        }, 60000);
       }
     }
 
-    async function getPublicIP(){
-      try{
-        const res = await fetch("https://api.ipify.org?format=json", { cache:"no-store" });
+    // ========================================================================
+    // STORAGE MANAGEMENT
+    // ========================================================================
+    
+    function clearAllStorage() {
+      try {
+        localStorage.removeItem(STORAGE_KEY_CODE);
+        localStorage.removeItem(STORAGE_KEY_PAGE);
+        localStorage.removeItem(CACHE_KEY);
+        localStorage.removeItem(CACHE_TS_KEY);
+        sessionStorage.removeItem(PACKET_KEY);
+      } catch {}
+    }
+
+    function exitOnboarding() {
+      if (confirm("Are you sure you want to exit? All progress will be lost.")) {
+        clearAllStorage();
+        window.location.reload();
+      }
+    }
+
+    // ========================================================================
+    // IP ADDRESS
+    // ========================================================================
+    
+    async function getPublicIP() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json", { cache: "no-store" });
         if (!res.ok) throw new Error("HTTP " + res.status);
+        
         const j = await res.json();
         const ip = normalize(j && j.ip);
         return ip || "Unavailable";
@@ -671,63 +1012,85 @@
 
     window.carbyne_get_public_ip = getPublicIP;
 
-    function buildShell(secureCode){
+    // ========================================================================
+    // SHELL BUILDER
+    // ========================================================================
+    
+    function buildShell(secureCode) {
       const shell = document.createElement("div");
       shell.className = "shell";
       shell.innerHTML = `
         <div class="shell-inner">
           <div class="scroll">
             <div class="sticky-ref">
-              <div class="reference-number">Reference Number: ${secureCode || ""}</div>
-              <a class="review-link" id="reviewDocsLink" href="javascript:void(0)">Review Documents</a>
+              <div class="sticky-left">
+                <a class="exit-link" href="javascript:void(0)" onclick="exitOnboarding()">Exit Onboarding</a>
+              </div>
+              <div class="sticky-right">
+                <div class="reference-number">Reference Number: ${secureCode || ""}</div>
+                <a class="review-link" id="reviewDocsLink" href="javascript:void(0)">Review Documents</a>
+              </div>
             </div>
             <div class="content" id="content"></div>
           </div>
         </div>
       `;
+      
       attachRefHideOnScroll(shell);
 
       const link = shell.querySelector("#reviewDocsLink");
-      if (link){
+      if (link) {
         if (currentPage >= 5) link.classList.add("show");
-        link.addEventListener("click", (e)=>{ e.preventDefault(); openReviewDocuments(); });
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          openReviewDocuments();
+        });
       }
 
       return shell;
     }
 
+    // ========================================================================
+    // EXTERNAL MODULE LOADING
+    // ========================================================================
+    
     const moduleCache = Object.create(null);
 
-    async function loadExternalModule(url, templateId, mountFnName, hostEl, secureCode){
-      if (!moduleCache[url]){
-        const res = await fetch(url, { cache:"no-store" });
+    async function loadExternalModule(url, templateId, mountFnName, hostEl, secureCode) {
+      if (!moduleCache[url]) {
+        const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
         const text = await res.text();
         const doc = new DOMParser().parseFromString(text, "text/html");
 
+        // Load styles
         const styles = Array.from(doc.querySelectorAll("style"));
         styles.forEach((st, idx) => {
           const css = (st.textContent || "").trim();
-          const key = "carbyne_style_" + btoa(unescape(encodeURIComponent(url + "|" + idx))).replace(/=+$/,"");
+          const key = "carbyne_style_" + btoa(unescape(encodeURIComponent(url + "|" + idx))).replace(/=+$/, "");
           if (document.getElementById(key)) return;
+          
           const s = document.createElement("style");
           s.id = key;
           s.textContent = css;
           document.head.appendChild(s);
         });
 
+        // Load scripts
         const scripts = Array.from(doc.querySelectorAll("script"));
-        for (let i=0;i<scripts.length;i++){
+        for (let i = 0; i < scripts.length; i++) {
           const sc = scripts[i];
-          const key = "carbyne_script_" + btoa(unescape(encodeURIComponent(url + "|" + i))).replace(/=+$/,"");
+          const key = "carbyne_script_" + btoa(unescape(encodeURIComponent(url + "|" + i))).replace(/=+$/, "");
           if (document.getElementById(key)) continue;
+          
           const s = document.createElement("script");
           s.id = key;
-          if (sc.src){
+          
+          if (sc.src) {
             s.src = sc.src;
             s.async = false;
-            await new Promise((resolve, reject)=>{
+            await new Promise((resolve, reject) => {
               s.onload = resolve;
               s.onerror = reject;
               document.body.appendChild(s);
@@ -739,7 +1102,7 @@
         }
 
         const tpl = doc.getElementById(templateId);
-        if (!tpl || tpl.tagName.toLowerCase() !== "template"){
+        if (!tpl || tpl.tagName.toLowerCase() !== "template") {
           throw new Error(`Template #${templateId} not found`);
         }
 
@@ -752,7 +1115,7 @@
       hostEl.appendChild(tplEl.content.cloneNode(true));
 
       const fn = window[mountFnName];
-      if (typeof fn !== "function"){
+      if (typeof fn !== "function") {
         throw new Error(`Mount function ${mountFnName} not found`);
       }
 
@@ -760,8 +1123,13 @@
       if (typeof unmount === "function") activeUnmount = unmount;
     }
 
-    function loadAccessPage(){
+    // ========================================================================
+    // PAGE LOADERS
+    // ========================================================================
+    
+    function loadAccessPage() {
       unmountActive();
+      
       stage.innerHTML = `
         <div class="access-wrap">
           <div class="access-stack">
@@ -793,8 +1161,8 @@
       const btnText = document.getElementById("btnText");
       const msg = document.getElementById("msg");
 
-      function showError(on, text){
-        if (on){
+      function showError(on, text) {
+        if (on) {
           msg.classList.add("show");
           msg.textContent = text || "Invalid Access Code";
           input.classList.add("error");
@@ -804,29 +1172,32 @@
         }
       }
 
-      function setBusy(busy){
+      function setBusy(busy) {
         btn.disabled = !!busy;
         btnText.innerHTML = busy ? '<span class="spinner"></span>' : "Continue";
       }
 
-      async function submit(){
+      async function submit() {
         showError(false);
         const code = normalize(input.value);
         input.value = code;
-        if (!code){
-          showError(true,"Please enter a code");
+        
+        if (!code) {
+          showError(true, "Please enter a code");
           return;
         }
+        
         setBusy(true);
-        try{
+        
+        try {
           const ok = await validateCode(code);
-          if (ok){
+          if (ok) {
             localStorage.setItem(STORAGE_KEY_CODE, code);
             isAccessValidated = true;
             currentPage = 2;
             loadPage(currentPage);
           } else {
-            showError(true,"Invalid Access Code");
+            showError(true, "Invalid Access Code");
           }
         } finally {
           setBusy(false);
@@ -834,12 +1205,15 @@
       }
 
       btn.addEventListener("click", submit);
-      input.addEventListener("keydown", (e)=>{ if (e.key === "Enter") submit(); });
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") submit();
+      });
       input.focus();
     }
 
-    function loadWelcomePage(secureCode){
+    function loadWelcomePage(secureCode) {
       unmountActive();
+      
       const shell = buildShell(secureCode);
       shell.querySelector("#content").innerHTML = `
         <div class="welcome-title">Welcome to Carbyne Accounting</div>
@@ -854,65 +1228,84 @@
         <div class="welcome-h">Questions</div>
         <div class="welcome-p">If you have any questions during this process, please contact Client Services at (502) 632-9444 or Client@CarbyneAccounting.com.</div>
       `;
+      
       stage.innerHTML = "";
       stage.appendChild(shell);
     }
 
-    async function loadClientIntake(secureCode){
+    async function loadClientIntake(secureCode) {
       unmountActive();
+      
       const shell = buildShell(secureCode);
       const content = shell.querySelector("#content");
       content.innerHTML = `<div id="intakeHost"></div>`;
+      
       stage.innerHTML = "";
       stage.appendChild(shell);
 
       const host = content.querySelector("#intakeHost");
-      try{
-        await loadExternalModule(CLIENT_INTAKE_URL, "carbyne_client_intake", "carbyne_client_intake_mount", host, secureCode);
-      } catch(e){
+      try {
+        await loadExternalModule(
+          CLIENT_INTAKE_URL,
+          "carbyne_client_intake",
+          "carbyne_client_intake_mount",
+          host,
+          secureCode
+        );
+      } catch (e) {
         host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load intake form.</div>`;
         console.error("Intake load error:", e);
       }
     }
 
-    async function loadSignature(secureCode){
+    async function loadSignature(secureCode) {
       unmountActive();
+      
       const shell = buildShell(secureCode);
       const content = shell.querySelector("#content");
       content.innerHTML = `<div id="sigHost"></div>`;
+      
       stage.innerHTML = "";
       stage.appendChild(shell);
 
       const host = content.querySelector("#sigHost");
-      try{
-        await loadExternalModule(SIGNATURE_URL, "carbyne_electronic_signature", "carbyne_electronic_signature_mount", host, secureCode);
-      } catch(e){
+      try {
+        await loadExternalModule(
+          SIGNATURE_URL,
+          "carbyne_electronic_signature",
+          "carbyne_electronic_signature_mount",
+          host,
+          secureCode
+        );
+      } catch (e) {
         host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load signature.</div>`;
         console.error("Signature load error:", e);
       }
     }
 
-    function loadPlaceholder(secureCode){
+    function loadPlaceholder(secureCode) {
       unmountActive();
+      
       const shell = buildShell(secureCode);
       const step = getStepNumber();
       shell.querySelector("#content").innerHTML = `
         <div style="font-size:22px;font-weight:950;color:#00305B;margin:6px 0 10px;">Step ${step}</div>
         <div style="font-size:14px;font-weight:800;color:#0f172a;opacity:.80;">Agreement content will be placed on this page.</div>
       `;
+      
       stage.innerHTML = "";
       stage.appendChild(shell);
     }
 
-    async function loadPage(n){
+    async function loadPage(n) {
       updateNav();
 
-      if (n === 1){
+      if (n === 1) {
         loadAccessPage();
         return;
       }
 
-      if (!isAccessValidated){
+      if (!isAccessValidated) {
         currentPage = 1;
         updateNav();
         loadAccessPage();
@@ -921,38 +1314,76 @@
 
       const code = localStorage.getItem(STORAGE_KEY_CODE) || "";
 
-      if (n === 2){ loadWelcomePage(code); return; }
-      if (n === 3){ await loadClientIntake(code); return; }
-      if (n === 4){ await loadSignature(code); return; }
+      if (n === 2) {
+        loadWelcomePage(code);
+        return;
+      }
+      
+      if (n === 3) {
+        await loadClientIntake(code);
+        return;
+      }
+      
+      if (n === 4) {
+        await loadSignature(code);
+        return;
+      }
 
       loadPlaceholder(code);
     }
 
-    function prev(){ if (currentPage > 1){ currentPage--; loadPage(currentPage); } }
-    function next(){ if (currentPage < TOTAL_PAGES){ currentPage++; loadPage(currentPage); } }
-
-    window.addEventListener("carbyne:pdfdoc:upsert", (e)=>{
-      try{
+    // ========================================================================
+    // EVENT LISTENERS
+    // ========================================================================
+    
+    window.addEventListener("carbyne:pdfdoc:upsert", (e) => {
+      try {
         const d = e && e.detail ? e.detail : null;
         if (!d || !d.id || !d.b64) return;
         packetUpsert(d);
       } catch {}
     });
 
-    function init(){
-      isAccessValidated = !!localStorage.getItem(STORAGE_KEY_CODE);
+    // Detect if user is returning to page via back button
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        clearAllStorage();
+        window.location.reload();
+      }
+    });
 
-      const saved = parseInt(localStorage.getItem(STORAGE_KEY_PAGE) || "1", 10) || 1;
-      currentPage = isAccessValidated ? Math.max(2, Math.min(TOTAL_PAGES, saved)) : 1;
+    // ========================================================================
+    // INITIALIZATION
+    // ========================================================================
+    
+    function init() {
+      const hasStoredCode = !!localStorage.getItem(STORAGE_KEY_CODE);
+      
+      if (!hasStoredCode) {
+        // No stored code - start at page 1
+        isAccessValidated = false;
+        currentPage = 1;
+      } else {
+        // Has stored code - resume where they left off (but at least page 2)
+        isAccessValidated = true;
+        const saved = parseInt(localStorage.getItem(STORAGE_KEY_PAGE) || "2", 10) || 2;
+        currentPage = Math.max(2, Math.min(TOTAL_PAGES, saved));
+      }
 
-      if (!getCachedCodes()) fetchValidCodes().catch(()=>{});
+      // Pre-fetch valid codes
+      if (!getCachedCodes()) {
+        fetchValidCodes().catch(() => {});
+      }
 
+      // Attach event listeners
       prevBtn.addEventListener("click", prev);
       nextBtn.addEventListener("click", next);
 
+      // Load initial page
       loadPage(currentPage);
     }
 
+    // Start the application
     init();
   </script>
 </body>
