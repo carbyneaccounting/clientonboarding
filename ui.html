@@ -648,27 +648,51 @@
     }
 
     async function openReviewDocuments(){
+      console.log('openReviewDocuments called');
+      
       const outBytes = await packetBuildMergedPdfBytes();
       if (!outBytes){
+        console.log('No PDF bytes generated');
         openReviewDocumentsFallbackMessage();
         return;
       }
 
-      const viewer = window.PDFViewer || null;
+      console.log('PDF bytes generated:', outBytes.length, 'bytes');
+      console.log('PDFViewer available:', !!window.PDFViewer);
+      console.log('PDFViewer.open available:', !!(window.PDFViewer && window.PDFViewer.open));
 
-      if (viewer && typeof viewer.open === "function"){
+      // Check if PDFViewer is available
+      if (window.PDFViewer && typeof window.PDFViewer.open === "function"){
         try{
+          console.log('Attempting to open with PDFViewer...');
+          
+          // Ensure we have Uint8Array
           const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
-          await viewer.open(data, {
-            onBack: function(){ }
+          
+          console.log('Data prepared as Uint8Array:', data.length, 'bytes');
+          
+          // Open in PDFViewer overlay
+          await window.PDFViewer.open(data, {
+            filename: 'review-documents.pdf',
+            onBack: function(){
+              console.log('PDF Viewer closed via back button');
+            }
           });
+          
+          console.log('PDFViewer opened successfully');
           return;
-        } catch {
+        } catch (error) {
+          console.error('PDFViewer error:', error);
+          // Fallback to new tab if PDFViewer fails
+          alert('PDFViewer failed to open. Opening in new tab instead. Error: ' + error.message);
           openPdfInNewTab(outBytes);
           return;
         }
       }
 
+      // Fallback to new tab if PDFViewer not available
+      console.warn('PDFViewer not available, opening in new tab');
+      alert('PDFViewer is not available. Opening in new tab instead.');
       openPdfInNewTab(outBytes);
     }
 
@@ -705,7 +729,11 @@
       const link = shell.querySelector("#reviewDocsLink");
       if (link){
         if (currentPage >= 5) link.classList.add("show");
-        link.addEventListener("click", (e)=>{ e.preventDefault(); openReviewDocuments(); });
+        link.addEventListener("click", (e)=>{ 
+          e.preventDefault(); 
+          console.log('Review Documents link clicked'); 
+          openReviewDocuments(); 
+        });
       }
 
       return shell;
@@ -955,6 +983,9 @@
     });
 
     function init(){
+      console.log('Initializing UI...');
+      console.log('PDFViewer available at init:', !!window.PDFViewer);
+      
       isAccessValidated = !!localStorage.getItem(STORAGE_KEY_CODE);
 
       const saved = parseInt(localStorage.getItem(STORAGE_KEY_PAGE) || "1", 10) || 1;
@@ -966,6 +997,14 @@
       nextBtn.addEventListener("click", next);
 
       loadPage(currentPage);
+      
+      // Double-check PDFViewer after a moment
+      setTimeout(() => {
+        console.log('PDFViewer check after 1s:', !!window.PDFViewer);
+        if (!window.PDFViewer) {
+          console.error('PDFViewer.js did not load properly!');
+        }
+      }, 1000);
     }
 
     init();
