@@ -18,10 +18,15 @@
 
     .es-pill{
       border:1px solid rgba(0,0,0,.12);
-      background:#fff;color:#0f172a;
-      font-weight:900;font-size:11px;
-      padding:6px 11px;border-radius:999px;
-      cursor:pointer;transition:all .12s ease;white-space:nowrap;
+      background:#fff;
+      color:#0f172a;
+      font-weight:900;
+      font-size:11px;
+      padding:6px 11px;
+      border-radius:999px;
+      cursor:pointer;
+      transition:all .12s ease;
+      white-space:nowrap;
     }
     .es-pill.primary{background:rgba(0,48,91,.08);border-color:rgba(0,48,91,.18);color:#00305B}
     .es-pill.danger{background:rgba(185,28,28,.06);border-color:rgba(185,28,28,.20);color:#b91c1c}
@@ -29,30 +34,11 @@
     .es-pill.active{background:rgba(0,48,91,.14);border-color:rgba(0,48,91,.28)}
 
     .es-main{display:grid;grid-template-columns:1.55fr .45fr;gap:9px}
-
-    .es-card{
-      background:#fff;border:1px solid rgba(0,0,0,.10);
-      border-radius:10px;box-shadow:0 6px 13px rgba(2,6,23,.08);
-      overflow:hidden;
-    }
-
-    .es-card-h{
-      padding:6px 9px;border-bottom:1px solid rgba(0,0,0,.08);
-      font-size:11px;font-weight:950;color:#0f172a;opacity:.90;
-      display:flex;align-items:center;justify-content:space-between;
-    }
-
+    .es-card{background:#fff;border:1px solid rgba(0,0,0,.10);border-radius:10px;box-shadow:0 6px 13px rgba(2,6,23,.08);overflow:hidden}
+    .es-card-h{padding:6px 9px;border-bottom:1px solid rgba(0,0,0,.08);font-size:11px;font-weight:950;color:#0f172a;opacity:.90;display:flex;align-items:center;justify-content:space-between}
     .es-canvas-area{padding:9px}
-    canvas{
-      width:100%;height:135px;border:1px solid rgba(0,0,0,.14);
-      border-radius:8px;background:#fff;display:block;touch-action:none;
-    }
-
-    .es-controls{
-      padding:6px 9px 9px;display:flex;align-items:center;
-      justify-content:space-between;gap:7px;
-    }
-
+    canvas{width:100%;height:135px;border:1px solid rgba(0,0,0,.14);border-radius:8px;background:#fff;display:block;touch-action:none}
+    .es-controls{padding:6px 9px 9px;display:flex;align-items:center;justify-content:space-between;gap:7px}
     .es-slider{display:flex;align-items:center;gap:6px}
     .es-slider label{font-size:10px;font-weight:900;color:#0f172a;opacity:.82}
     .es-slider input{width:85px;height:17px}
@@ -63,24 +49,30 @@
 
     .es-type-area{padding:9px}
     .es-type-input{
-      width:100%;border:1px solid rgba(0,0,0,.14);
-      border-radius:8px;padding:8px 11px;font-size:13px;font-weight:900;
-      outline:none;background:#fff;box-shadow:0 6px 13px rgba(2,6,23,.08);
+      width:100%;
+      border:1px solid rgba(0,0,0,.14);
+      border-radius:8px;
+      padding:8px 11px;
+      font-size:13px;
+      font-weight:900;
+      outline:none;
+      background:#fff;
+      box-shadow:0 6px 13px rgba(2,6,23,.08);
       color:#0f172a;
     }
-    .es-type-preview{
-      margin-top:6px;border:1px dashed rgba(0,0,0,.18);
-      border-radius:8px;padding:9px;min-height:40px;display:flex;
-      align-items:center;justify-content:center;background:rgba(0,0,0,.02);
-    }
+    .es-type-preview{margin-top:6px;border:1px dashed rgba(0,0,0,.18);border-radius:8px;padding:9px;min-height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.02)}
     .es-script{
-      font-family:"Arial Narrow","Arial","system-ui",-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      font-weight:900;font-size:18px;color:#0f172a;line-height:1;user-select:none;white-space:nowrap;
+      font-family:"Arial Narrow", Arial, "Helvetica Neue", Helvetica, sans-serif;
+      font-size:14px;
+      font-weight:700;
+      color:#0f172a;
+      line-height:1;
+      user-select:none;
+      white-space:nowrap;
     }
     .es-type-controls{padding-top:6px;display:flex;justify-content:flex-end}
 
     .es-sidebar{display:flex;flex-direction:column;gap:9px}
-
     .es-info{padding:9px}
     .es-info-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
     .es-info-item{border:1px solid rgba(0,0,0,.10);border-radius:8px;padding:6px 8px;background:#fff}
@@ -90,14 +82,22 @@
     .es-adopted-area{padding:9px}
     .es-adopted-box{
       border:1px dashed rgba(0,0,0,.18);
-      border-radius:8px;background:rgba(0,0,0,.02);
-      min-height:58px;display:flex;align-items:center;justify-content:center;
-      padding:6px;overflow:hidden;
+      border-radius:8px;
+      background:rgba(0,0,0,.02);
+      min-height:58px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:6px;
+      overflow:hidden;
+      text-align:center;
     }
     .es-adopted-img{max-width:100%;max-height:52px;display:block}
     .es-adopted-empty{font-size:10px;font-weight:900;color:#334155;opacity:.80}
 
-    @media (max-width:900px){ .es-main{grid-template-columns:1fr} }
+    @media (max-width:900px){
+      .es-main{grid-template-columns:1fr}
+    }
   </style>
 
   <div class="es-wrap" id="esRoot">
@@ -147,10 +147,22 @@
           <div class="es-card-h">Status</div>
           <div class="es-info">
             <div class="es-info-grid">
-              <div class="es-info-item"><div class="es-info-label">Mode</div><div class="es-info-value" id="esModeVal">Draw</div></div>
-              <div class="es-info-item"><div class="es-info-label">Ready</div><div class="es-info-value" id="esHasVal">No</div></div>
-              <div class="es-info-item"><div class="es-info-label">Adopt</div><div class="es-info-value" id="esAdoptVal">No</div></div>
-              <div class="es-info-item"><div class="es-info-label">Time</div><div class="es-info-value" id="esLastVal">—</div></div>
+              <div class="es-info-item">
+                <div class="es-info-label">Mode</div>
+                <div class="es-info-value" id="esModeVal">Draw</div>
+              </div>
+              <div class="es-info-item">
+                <div class="es-info-label">Ready</div>
+                <div class="es-info-value" id="esHasVal">No</div>
+              </div>
+              <div class="es-info-item">
+                <div class="es-info-label">Adopt</div>
+                <div class="es-info-value" id="esAdoptVal">No</div>
+              </div>
+              <div class="es-info-item">
+                <div class="es-info-label">Time</div>
+                <div class="es-info-value" id="esLastVal">—</div>
+              </div>
             </div>
           </div>
         </div>
@@ -165,7 +177,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -173,11 +184,7 @@
   (function(){
     const SIG_KEY = "carbyne_adopted_signature_dataurl";
     const SIG_META_KEY = "carbyne_adopted_signature_meta";
-
-    const PDF_PACKET_KEY = "carbyne_pdf_packet_items";
-    const PDF_PACKET_MERGED_KEY = "carbyne_pdf_packet_merged";
-
-    const PUBLIC_IP_KEY = "carbyne_public_ip";
+    const DOC_ID_SIG = "electronic_signature";
 
     function nowStamp(){
       const d = new Date();
@@ -189,121 +196,7 @@
       return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
     }
 
-    function auditStamp(){
-      const d = new Date();
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const dd = String(d.getDate()).padStart(2,"0");
-      const yy = d.getFullYear();
-      const hh = String(d.getHours()).padStart(2,"0");
-      const mi = String(d.getMinutes()).padStart(2,"0");
-      const ss = String(d.getSeconds()).padStart(2,"0");
-      return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi + ":" + ss;
-    }
-
-    async function getPublicIPCached(){
-      let existing = "";
-      try{ existing = sessionStorage.getItem(PUBLIC_IP_KEY) || ""; } catch {}
-      if (existing) return existing;
-
-      const controller = new AbortController();
-      const t = setTimeout(()=>controller.abort(), 3500);
-      try{
-        const res = await fetch("https://api.ipify.org?format=json", { signal: controller.signal, cache: "no-store" });
-        const j = await res.json();
-        const ip = (j && j.ip) ? String(j.ip) : "";
-        if (ip){
-          try{ sessionStorage.setItem(PUBLIC_IP_KEY, ip); } catch {}
-          return ip;
-        }
-      } catch {}
-      finally{ clearTimeout(t); }
-
-      return "Unavailable (client-side)";
-    }
-
-    function safeJsonParse(s, fallback){
-      try{ return JSON.parse(s); } catch { return fallback; }
-    }
-
-    function bytesToBase64(u8){
-      let bin = "";
-      const chunk = 0x8000;
-      for (let i=0;i<u8.length;i+=chunk){
-        bin += String.fromCharCode.apply(null, u8.subarray(i,i+chunk));
-      }
-      return btoa(bin);
-    }
-
-    function getPacketItems(){
-      try{
-        const raw = sessionStorage.getItem(PDF_PACKET_KEY) || "";
-        const parsed = safeJsonParse(raw, []);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {}
-      try{
-        const raw2 = localStorage.getItem(PDF_PACKET_KEY) || "";
-        const parsed2 = safeJsonParse(raw2, []);
-        return Array.isArray(parsed2) ? parsed2 : [];
-      } catch {}
-      return [];
-    }
-
-    function setPacketItems(items){
-      const payload = JSON.stringify(items || []);
-      try{ sessionStorage.setItem(PDF_PACKET_KEY, payload); }
-      catch { try{ localStorage.setItem(PDF_PACKET_KEY, payload); } catch {} }
-    }
-
-    function setMergedPdfB64(b64){
-      try{ sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64); }
-      catch { try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {} }
-    }
-
-    function addOrReplacePacketItem(item){
-      const items = getPacketItems()
-        .filter(x => x && x.id !== item.id && x.title !== item.title);
-
-      items.push(item);
-      setPacketItems(items);
-    }
-
-    function wrapTextToWidth(text, font, size, maxWidth){
-      const out = [];
-      const raw = (text || "").toString();
-      if (!raw) return [""];
-      const lines = raw.split(/\r?\n/);
-      for (const line of lines){
-        const words = line.split(/\s+/).filter(Boolean);
-        if (!words.length){ out.push(""); continue; }
-        let cur = words[0];
-        for (let i=1;i<words.length;i++){
-          const next = cur + " " + words[i];
-          const w = font.widthOfTextAtSize(next, size);
-          if (w <= maxWidth) cur = next;
-          else { out.push(cur); cur = words[i]; }
-        }
-        out.push(cur);
-      }
-      return out;
-    }
-
-    async function mergeAllPacketPdfs(){
-      const PDFLib = window.PDFLib;
-      if (!PDFLib || !PDFLib.PDFDocument) return;
-
-      const items = getPacketItems().filter(x => x && x.bytesB64);
-      if (!items.length) return;
-
-      const merged = await PDFLib.PDFDocument.create();
-      for (const it of items){
-        const srcBytes = Uint8Array.from(atob(it.bytesB64), c => c.charCodeAt(0));
-        const src = await PDFLib.PDFDocument.load(srcBytes);
-        const pages = await merged.copyPages(src, src.getPageIndices());
-        for (const p of pages) merged.addPage(p);
-      }
-      const out = await merged.save();
-      setMergedPdfB64(bytesToBase64(new Uint8Array(out)));
-    }
+    function normalize(v){ return (v ?? "").toString().trim(); }
 
     function clearStored(){
       try{ sessionStorage.removeItem(SIG_KEY); sessionStorage.removeItem(SIG_META_KEY); } catch {}
@@ -380,116 +273,147 @@
       return { x, y };
     }
 
-    function renderStatus(root, mode, hasSig, adoptEnabled, last){
+    function renderStatus(root, mode, hasSig, last){
       root.querySelector("#esModeVal").textContent = mode;
       root.querySelector("#esHasVal").textContent = hasSig ? "Yes" : "No";
-      root.querySelector("#esAdoptVal").textContent = adoptEnabled ? "Yes" : "No";
+      root.querySelector("#esAdoptVal").textContent = hasSig ? "Yes" : "No";
       root.querySelector("#esLastVal").textContent = last || "—";
     }
 
-    function normalizeTypedSig(name){
-      const t = (name || "").toString().trim();
-      if (!t) return "";
-      if (/^\/s\//i.test(t)) return "/s/ " + t.replace(/^\/s\/\s*/i,"").trim();
-      return "/s/ " + t;
+    function bytesToB64(bytes){
+      let s = "";
+      const chunk = 0x8000;
+      for (let i=0;i<bytes.length;i+=chunk){
+        s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+      }
+      return btoa(s);
     }
 
-    async function buildSignaturePdf(referenceNumber, stored){
-      const PDFLib = window.PDFLib;
-      if (!PDFLib || !PDFLib.PDFDocument) throw new Error("pdf-lib missing");
+    async function getPublicIP(){
+      try{
+        if (typeof window.carbyne_get_public_ip === "function"){
+          const ip = await window.carbyne_get_public_ip();
+          return normalize(ip) || "Unavailable";
+        }
+      } catch {}
+      try{
+        const res = await fetch("https://api.ipify.org?format=json", { cache:"no-store" });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const j = await res.json();
+        const ip = normalize(j && j.ip);
+        return ip || "Unavailable";
+      } catch {
+        return "Unavailable";
+      }
+    }
 
-      const ip = await getPublicIPCached();
+    function stamp(){
+      const d = new Date();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      const yy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mi = String(d.getMinutes()).padStart(2,"0");
+      return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
+    }
 
-      const pdf = await PDFLib.PDFDocument.create();
-      const page = pdf.addPage([612, 792]);
-      const { width, height } = page.getSize();
+    async function buildSignaturePdfB64(referenceNumber, dataUrl, meta){
+      const lib = window.PDFLib;
+      if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
 
-      const helv = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
-      const helvBold = await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold);
+      const { PDFDocument, StandardFonts } = lib;
 
-      const baseSize = 10;
-      const line = 12;
+      const pdfDoc = await PDFDocument.create();
+      const page = pdfDoc.addPage([612, 792]);
 
-      const marginL = 44;
-      const marginR = 44;
-      const top = height - 54;
-      const maxW = width - marginL - marginR;
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
-      let y = top;
+      const marginX = 54;
+      let y = 742;
 
-      page.drawText("Electronic Signature", { x: marginL, y, size: 16, font: helvBold });
-      y -= 20;
+      function line(text, bold){
+        page.drawText(text, { x: marginX, y: y, size:10, font: bold ? fontBold : font });
+        y -= 14;
+      }
 
-      page.drawText("Reference Number: " + (referenceNumber || ""), { x: marginL, y, size: 10, font: helv });
-      y -= 18;
+      line("Electronic Signature", true);
+      line("Reference Number: " + (referenceNumber || ""), false);
+      line(" ", false);
 
-      const meta = stored && stored.meta ? stored.meta : {};
-      const mode = meta.mode || "";
-      const last = meta.lastAdopted || "";
+      line("Signature", true);
 
-      page.drawText("Signature", { x: marginL, y, size: 12, font: helvBold });
-      y -= 16;
+      const mode = normalize(meta && meta.mode);
+      const typedText = normalize(meta && meta.typedText);
+      const displayTyped = typedText ? ("/s/ " + typedText) : "";
 
-      if ((mode || "").toLowerCase() === "type"){
-        const typed = normalizeTypedSig(meta.typedTextRaw || meta.typedText || "");
-        page.drawText(typed || "—", { x: marginL, y, size: 10, font: helvBold });
-        y -= 18;
-      } else {
-        if (stored && stored.dataUrl){
-          const pngBytes = await fetch(stored.dataUrl).then(r=>r.arrayBuffer());
-          const png = await pdf.embedPng(pngBytes);
-          const sigW = Math.min(420, png.width);
-          const scale = sigW / png.width;
-          const sigH = png.height * scale;
+      if (mode === "Type" && displayTyped){
+        page.drawText(displayTyped, { x: marginX, y: y, size:10, font: fontBold });
+        y -= 20;
+      }
 
-          const boxH = 90;
-          const yTop = y;
+      if (dataUrl){
+        try{
+          const isPng = dataUrl.startsWith("data:image/png");
+          const bytes = Uint8Array.from(atob(dataUrl.split(",")[1] || ""), c => c.charCodeAt(0));
+          const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
+          const iw = img.width, ih = img.height;
 
-          page.drawRectangle({
-            x: marginL, y: yTop - boxH, width: maxW, height: boxH,
-            borderWidth: 1, borderColor: PDFLib.rgb(0.75,0.75,0.75)
-          });
+          const maxW = 504;
+          const maxH = 160;
 
-          page.drawImage(png, {
-            x: marginL + 10,
-            y: (yTop - boxH) + (boxH - sigH) / 2,
-            width: png.width * scale,
-            height: sigH
-          });
+          const scale = Math.min(maxW / iw, maxH / ih, 1);
+          const w = iw * scale;
+          const h = ih * scale;
 
-          y = yTop - boxH - 10;
+          page.drawImage(img, { x: marginX, y: y - h, width: w, height: h });
+          y = y - h - 18;
+        } catch {}
+      }
+
+      line(" ", false);
+      line("Audit Log", true);
+
+      const audit = {
+        timestamp: normalize(meta && meta.lastAdopted) || "",
+        publicIP: normalize(meta && meta.publicIP) || "",
+        timezone: normalize(meta && meta.timezone) || "",
+        platform: normalize(meta && meta.platform) || "",
+        userAgent: normalize(meta && meta.userAgent) || ""
+      };
+
+      line("Timestamp: " + audit.timestamp, false);
+      line("Public IP: " + audit.publicIP, false);
+      line("Time Zone: " + audit.timezone, false);
+      line("Platform: " + audit.platform, false);
+
+      line("User Agent:", false);
+      const ua = audit.userAgent || "";
+      const words = ua.split(/\s+/).filter(Boolean);
+      const maxWidth = 504;
+      const size = 10;
+
+      let cur = "";
+      for (const w of words){
+        const test = cur ? (cur + " " + w) : w;
+        const width = font.widthOfTextAtSize(test, size);
+        if (width <= maxWidth){
+          cur = test;
         } else {
-          page.drawText("—", { x: marginL, y, size: baseSize, font: helv });
-          y -= 18;
+          if (cur){
+            page.drawText(cur, { x: marginX, y: y, size, font });
+            y -= 14;
+          }
+          cur = w;
         }
       }
-
-      y -= 6;
-      page.drawText("Audit Log", { x: marginL, y, size: 12, font: helvBold });
-      y -= 14;
-
-      const auditLines = [
-        "Event: Signature Adopted",
-        "Timestamp: " + auditStamp(),
-        "Reference Number: " + (referenceNumber || ""),
-        "Mode: " + (mode || ""),
-        "Adopted Time: " + (last || ""),
-        "Timezone: " + (Intl.DateTimeFormat().resolvedOptions().timeZone || ""),
-        "User Agent: " + (navigator.userAgent || ""),
-        "Public IP: " + ip
-      ];
-
-      for (const ln of auditLines){
-        const wrapped = wrapTextToWidth(ln, helv, baseSize, maxW);
-        for (const w of wrapped){
-          page.drawText(w, { x: marginL, y, size: baseSize, font: helv });
-          y -= line;
-        }
-        y -= 1;
+      if (cur){
+        page.drawText(cur, { x: marginX, y: y, size, font });
+        y -= 14;
       }
 
-      const bytes = await pdf.save();
-      return new Uint8Array(bytes);
+      const outBytes = await pdfDoc.save();
+      return bytesToB64(outBytes);
     }
 
     window.carbyne_electronic_signature_mount = function(args){
@@ -566,43 +490,24 @@
 
         const stored = getStored();
         const last = stored.meta && stored.meta.lastAdopted ? stored.meta.lastAdopted : "—";
-        renderStatus(root, mode, hasSig, hasSig, last);
+        renderStatus(root, mode, hasSig, last);
 
         setAdoptedUI(root, stored.dataUrl || "");
-      }
-
-      async function writeSignaturePdfToPacket(stored){
-        const PDFLib = window.PDFLib;
-        if (!PDFLib || !PDFLib.PDFDocument) return;
-
-        const bytesU8 = await buildSignaturePdf(referenceNumber, stored);
-        const item = {
-          id: "electronic_signature",
-          title: "Electronic Signature",
-          referenceNumber: referenceNumber || "",
-          createdAt: Date.now(),
-          bytesB64: bytesToBase64(bytesU8)
-        };
-
-        addOrReplacePacketItem(item);
-        await mergeAllPacketPdfs();
-
-        window.dispatchEvent(new CustomEvent("carbyne:pdf:updated", { detail: { id: item.id } }));
       }
 
       async function adopt(){
         if (!currentHasSignature()) return;
 
         let dataUrl = "";
-        let meta = { mode, lastAdopted: nowStamp() };
+        const meta = { mode, lastAdopted: nowStamp() };
 
         if (mode === "Draw"){
           dataUrl = canvas.toDataURL("image/png");
         } else {
-          const name = (typeInput.value || "").trim();
-          const sig = normalizeTypedSig(name);
-          meta.typedTextRaw = name;
-          meta.typedText = sig;
+          const typed = normalize(typeInput.value);
+          const val = typed ? ("/s/ " + typed) : "";
+          typePreview.textContent = val;
+          hasTypeInk = !!typed;
 
           const off = document.createElement("canvas");
           off.width = 900;
@@ -615,17 +520,36 @@
           octx.fillStyle = "#0f172a";
           octx.textAlign = "center";
           octx.textBaseline = "middle";
-          octx.font = "bold 56px Arial Narrow, Arial, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
-          octx.fillText(sig, off.width/2, off.height/2);
+          octx.font = "bold 28px Arial Narrow, Arial, Helvetica, sans-serif";
+          octx.fillText(val, off.width/2, off.height/2);
 
           dataUrl = off.toDataURL("image/png");
+          meta.typedText = typed;
         }
+
+        meta.timezone = (Intl && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || "") : "";
+        meta.platform = (navigator && navigator.platform) ? navigator.platform : "";
+        meta.userAgent = (navigator && navigator.userAgent) ? navigator.userAgent : "";
+        meta.publicIP = await getPublicIP();
 
         setStored(dataUrl, meta);
         refreshUI();
 
-        const stored = getStored();
-        await writeSignaturePdfToPacket(stored);
+        try{
+          const b64 = await buildSignaturePdfB64(referenceNumber, dataUrl, meta);
+          window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+            detail: {
+              id: DOC_ID_SIG,
+              title: "Electronic Signature",
+              b64: b64,
+              meta: {
+                referenceNumber: referenceNumber || "",
+                createdAt: stamp(),
+                publicIP: meta.publicIP || ""
+              }
+            }
+          }));
+        } catch {}
 
         window.dispatchEvent(new CustomEvent("carbyne:signature:adopted", { detail: { dataUrl, meta } }));
       }
@@ -640,10 +564,10 @@
       }
 
       function onTypeInput(){
-        const raw = (typeInput.value || "").trim();
-        const val = normalizeTypedSig(raw);
+        const typed = normalize(typeInput.value);
+        const val = typed ? ("/s/ " + typed) : "";
         typePreview.textContent = val;
-        hasTypeInk = !!raw;
+        hasTypeInk = !!typed;
         refreshUI();
       }
 
@@ -705,12 +629,7 @@
 
         clearTop.addEventListener("click", clearAll);
         clearDraw.addEventListener("click", ()=>{ clearCanvas(); refreshUI(); });
-        clearType.addEventListener("click", ()=>{
-          typeInput.value = "";
-          typePreview.textContent = "";
-          hasTypeInk = false;
-          refreshUI();
-        });
+        clearType.addEventListener("click", ()=>{ typeInput.value=""; typePreview.textContent=""; hasTypeInk=false; refreshUI(); });
 
         adoptTop.addEventListener("click", ()=>{ adopt(); });
 
@@ -725,7 +644,9 @@
         window.addEventListener("resize", onResize);
 
         const stored = getStored();
-        if (stored && stored.dataUrl){ setAdoptedUI(root, stored.dataUrl); }
+        if (stored && stored.dataUrl){
+          setAdoptedUI(root, stored.dataUrl);
+        }
 
         refreshUI();
       }
@@ -733,6 +654,22 @@
       init();
 
       return function unmount(){
+        modeDrawBtn.replaceWith(modeDrawBtn.cloneNode(true));
+        modeTypeBtn.replaceWith(modeTypeBtn.cloneNode(true));
+        clearTop.replaceWith(clearTop.cloneNode(true));
+        adoptTop.replaceWith(adoptTop.cloneNode(true));
+        clearDraw.replaceWith(clearDraw.cloneNode(true));
+        clearType.replaceWith(clearType.cloneNode(true));
+        typeInput.replaceWith(typeInput.cloneNode(true));
+
+        canvas.removeEventListener("mousedown", startDraw);
+        canvas.removeEventListener("mousemove", moveDraw);
+        window.removeEventListener("mouseup", endDraw);
+
+        canvas.removeEventListener("touchstart", startDraw);
+        canvas.removeEventListener("touchmove", moveDraw);
+        window.removeEventListener("touchend", endDraw);
+
         window.removeEventListener("resize", onResize);
       };
     };
