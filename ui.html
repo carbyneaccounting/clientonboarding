@@ -167,11 +167,10 @@
       color:#0f172a;
       opacity:.70;
       letter-spacing:.2px;
-      text-align:right;
     }
 
-    /* Review Documents line (Page 4+) */
-    .review-docs{
+    /* Added: Review Documents link */
+    .review-docs-link{
       display:inline-block;
       margin-top:6px;
       font-size:12px;
@@ -182,7 +181,7 @@
       opacity:.92;
       cursor:pointer;
     }
-    .review-docs:hover{opacity:1;text-decoration:underline}
+    .review-docs-link:hover{opacity:1;text-decoration:underline}
 
     .content{padding:0 2px 2px}
 
@@ -509,26 +508,39 @@
       onScroll();
     }
 
-    function buildShell(secureCode){
+    function injectReviewDocumentsLink(shell){
       const step = getStepNumber();
-      const showReview = (step >= 3); // Page 4+ (Step 3+)
+      if (step < 3) return; // Page 4+ only
+      const ref = shell.querySelector(".reference-number");
+      if (!ref) return;
+      if (ref.querySelector("#carbyneReviewDocsLink")) return;
 
+      const br = document.createElement("br");
+      const a = document.createElement("a");
+      a.id = "carbyneReviewDocsLink";
+      a.href = "#";
+      a.className = "review-docs-link";
+      a.textContent = "Review Documents";
+
+      ref.appendChild(br);
+      ref.appendChild(a);
+    }
+
+    function buildShell(secureCode){
       const shell = document.createElement("div");
       shell.className = "shell";
       shell.innerHTML = `
         <div class="shell-inner">
           <div class="scroll">
             <div class="sticky-ref">
-              <div class="reference-number">
-                Reference Number: ${secureCode || ""}
-                ${showReview ? `<a href="#" class="review-docs" id="carbyneReviewDocsLink">Review Documents</a>` : ``}
-              </div>
+              <div class="reference-number">Reference Number: ${secureCode || ""}</div>
             </div>
             <div class="content" id="content"></div>
           </div>
         </div>
       `;
       attachRefHideOnScroll(shell);
+      injectReviewDocumentsLink(shell);
       return shell;
     }
 
