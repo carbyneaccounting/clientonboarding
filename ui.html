@@ -9,6 +9,9 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
+  <!-- PDFViewer.js (your local file). If you host it elsewhere, swap the src to that URL. -->
+  <script src="./PDFViewer.js"></script>
+
   <style>
     *{box-sizing:border-box}
 
@@ -339,6 +342,18 @@
     .welcome-h{font-size:13px;font-weight:950;color:#0f172a;margin:16px 0 6px;letter-spacing:.2px}
     .welcome-list{padding-left:18px;margin:6px 0 0}
     .welcome-li{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.6;margin:0 0 8px}
+
+    .fatal{
+      width:min(980px,96%);
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.22);
+      background:rgba(255,255,255,.90);
+      box-shadow:0 18px 40px rgba(0,0,0,.20);
+      padding:18px 18px;
+      color:#0f172a;
+    }
+    .fatal .t{font-weight:950;font-size:16px;margin:0 0 8px}
+    .fatal .m{font-weight:800;font-size:13px;opacity:.85;margin:0}
   </style>
 </head>
 
@@ -374,9 +389,7 @@
 
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
-  <script type="module">
-    import * as PDFViewer from "./PDFViewer.js";
-
+  <script>
     // ==========================================================
     // Pages:
     // Page 1 = Access Code (no step)
@@ -417,6 +430,24 @@
 
     function normalize(v){ return (v ?? "").toString().trim(); }
     function now(){ return Date.now(); }
+
+    function showFatal(msg){
+      try{
+        stage.innerHTML = `
+          <div class="fatal">
+            <div class="t">Unable to load onboarding</div>
+            <div class="m">${String(msg || "Unknown error")}</div>
+          </div>
+        `;
+      } catch {}
+    }
+
+    window.addEventListener("error", (e)=>{
+      try{
+        const m = (e && e.message) ? e.message : "Unknown error";
+        showFatal(m);
+      } catch {}
+    });
 
     function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
@@ -618,20 +649,36 @@
       setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60 * 1000);
     }
 
+    function openReviewDocumentsFallbackMessage(){
+      const w = window.open("", "_blank");
+      if (w){
+        w.document.open();
+        w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Review Documents</title></head><body style='font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:26px;color:#0f172a;'><div style='font-weight:900;font-size:16px;margin-bottom:10px;'>Review Documents</div><div style='font-weight:800;opacity:.82;'>No documents have been generated yet.</div></body></html>");
+        w.document.close();
+      }
+    }
+
     async function openReviewDocuments(){
       const outBytes = await packetBuildMergedPdfBytes();
       if (!outBytes){
-        const w = window.open("", "_blank");
-        if (w){
-          w.document.open();
-          w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Review Documents</title></head><body style='font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:26px;color:#0f172a;'><div style='font-weight:900;font-size:16px;margin-bottom:10px;'>Review Documents</div><div style='font-weight:800;opacity:.82;'>No documents have been generated yet.</div></body></html>");
-          w.document.close();
-        }
+        openReviewDocumentsFallbackMessage();
         return;
       }
 
-      const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
-      await PDFViewer.open(data, {});
+      const viewer = window.PDFViewer || window.pdfViewer || null;
+
+      if (viewer && typeof viewer.open === "function"){
+        try{
+          const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
+          await viewer.open(data, {});
+          return;
+        } catch {
+          openPdfInNewTab(outBytes);
+          return;
+        }
+      }
+
+      openPdfInNewTab(outBytes);
     }
 
     async function getPublicIP(){
@@ -684,11 +731,9 @@
         const doc = new DOMParser().parseFromString(text, "text/html");
 
         const styles = Array.from(doc.querySelectorAll("style"));
-        const styleIds = [];
         styles.forEach((st, idx) => {
           const css = (st.textContent || "").trim();
           const key = "carbyne_style_" + btoa(unescape(encodeURIComponent(url + "|" + idx))).replace(/=+$/,"");
-          styleIds.push(key);
           if (document.getElementById(key)) return;
           const s = document.createElement("style");
           s.id = key;
@@ -722,9 +767,7 @@
           throw new Error(`Template #${templateId} not found`);
         }
 
-        moduleCache[url] = {
-          templateHTML: tpl.innerHTML
-        };
+        moduleCache[url] = { templateHTML: tpl.innerHTML };
       }
 
       hostEl.innerHTML = "";
