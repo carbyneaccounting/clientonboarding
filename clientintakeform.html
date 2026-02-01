@@ -1223,28 +1223,6 @@
       return bytesToB64(bytes);
     }
 
-    function upsertToReviewDocuments(payload){
-      try{
-        window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", { detail: payload }));
-      } catch (e){
-        console.error("window dispatch failed", e);
-      }
-
-      try{
-        document.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", { detail: payload }));
-      } catch (e){
-        console.error("document dispatch failed", e);
-      }
-
-      try{
-        if (window.parent && window.parent !== window){
-          window.parent.postMessage({ type: "carbyne:pdfdoc:upsert", detail: payload }, "*");
-        }
-      } catch (e){
-        console.error("postMessage failed", e);
-      }
-    }
-
     window.carbyne_client_intake_mount = function(args){
       const root = args && args.root ? args.root : document;
       const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
@@ -1536,20 +1514,19 @@
 
           const b64 = await buildIntakePdfB64(referenceNumber, data, audit);
 
-          const payload = {
-            id: DOC_ID_INTAKE,
-            title: "Client Intake Form",
-            b64: b64,
-            meta: {
-              referenceNumber: referenceNumber || "",
-              createdAt: audit.timestamp,
-              publicIP: audit.publicIP
+          window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+            detail: {
+              id: DOC_ID_INTAKE,
+              title: "Client Intake Form",
+              b64: b64,
+              meta: {
+                referenceNumber: referenceNumber || "",
+                createdAt: audit.timestamp,
+                publicIP: audit.publicIP
+              }
             }
-          };
-
-          upsertToReviewDocuments(payload);
-        } catch (e){
-          console.error(e);
+          }));
+        } catch {
           if (submitMsg){
             submitMsg.textContent = "Unable to generate document.";
             submitMsg.classList.add("show");
