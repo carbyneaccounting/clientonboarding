@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
-  <!-- PDFViewer.js (your local file). If you host it elsewhere, swap the src to that URL. -->
+  <!-- PDFViewer.js -->
   <script src="./PDFViewer.js"></script>
 
   <style>
@@ -245,7 +245,6 @@
       color:#666;
     }
 
-    /* Access code page (Page 1 only) */
     .access-wrap{
       width:min(980px,96%);
       height:min(520px,100%);
@@ -336,7 +335,6 @@
     }
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* Welcome */
     .welcome-title{font-size:26px;font-weight:950;color:#00305B;margin:6px 0 12px;letter-spacing:.2px}
     .welcome-p{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.65;margin:0 0 14px}
     .welcome-h{font-size:13px;font-weight:950;color:#0f172a;margin:16px 0 6px;letter-spacing:.2px}
@@ -390,15 +388,6 @@
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
   <script>
-    // ==========================================================
-    // Pages:
-    // Page 1 = Access Code (no step)
-    // Page 2 = Step 1 of 15 (Welcome)
-    // Page 3 = Step 2 of 15 (Client Intake Form)  -> PDF doc #1
-    // Page 4 = Step 3 of 15 (Electronic Signature) -> PDF doc #2
-    // Page 5..16 = Step 4..15 placeholders (Review Documents link appears on page 5+)
-    // ==========================================================
-
     const TOTAL_PAGES = 16;
     const TOTAL_STEPS = 15;
 
@@ -638,6 +627,15 @@
       return outBytes;
     }
 
+    function openReviewDocumentsFallbackMessage(){
+      const w = window.open("", "_blank");
+      if (w){
+        w.document.open();
+        w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Review Documents</title></head><body style='font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:26px;color:#0f172a;'><div style='font-weight:900;font-size:16px;margin-bottom:10px;'>Review Documents</div><div style='font-weight:800;opacity:.82;'>No documents have been generated yet.</div></body></html>");
+        w.document.close();
+      }
+    }
+
     function openPdfInNewTab(pdfBytes){
       const blob = new Blob([pdfBytes], { type:"application/pdf" });
       const url = URL.createObjectURL(blob);
@@ -649,15 +647,6 @@
       setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60 * 1000);
     }
 
-    function openReviewDocumentsFallbackMessage(){
-      const w = window.open("", "_blank");
-      if (w){
-        w.document.open();
-        w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Review Documents</title></head><body style='font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:26px;color:#0f172a;'><div style='font-weight:900;font-size:16px;margin-bottom:10px;'>Review Documents</div><div style='font-weight:800;opacity:.82;'>No documents have been generated yet.</div></body></html>");
-        w.document.close();
-      }
-    }
-
     async function openReviewDocuments(){
       const outBytes = await packetBuildMergedPdfBytes();
       if (!outBytes){
@@ -665,12 +654,14 @@
         return;
       }
 
-      const viewer = window.PDFViewer || window.pdfViewer || null;
+      const viewer = window.PDFViewer || null;
 
       if (viewer && typeof viewer.open === "function"){
         try{
           const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
-          await viewer.open(data, {});
+          await viewer.open(data, {
+            onBack: function(){ }
+          });
           return;
         } catch {
           openPdfInNewTab(outBytes);
