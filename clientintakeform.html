@@ -179,7 +179,7 @@
       opacity: 1;
     }
 
-    .ci-input:disabled, .ci-select:disabled{
+    .ci-input:disabled{
       background:#f1f5f9;
       color:#64748b;
       box-shadow:none;
@@ -400,7 +400,8 @@
             No EIN
           </label>
         </div>
-        <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10" data-required="true">
+        <!-- EIN is optional -->
+        <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10">
       </div>
     </div>
 
@@ -583,26 +584,27 @@
       </div>
     </div>
 
+    <!-- These three are now ALWAYS optional (blank allowed), regardless of Yes/No -->
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Accountant Name</div>
         </div>
-        <input class="ci-input" id="ai_accountant_name" type="text" placeholder="Accountant Name" autocomplete="name" disabled data-required-when="ai_other_acct_yes">
+        <input class="ci-input" id="ai_accountant_name" type="text" placeholder="Accountant Name" autocomplete="name" disabled>
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Phone Number</div>
         </div>
-        <input class="ci-input" id="ai_accountant_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" disabled data-required-when="ai_other_acct_yes">
+        <input class="ci-input" id="ai_accountant_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" disabled>
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Email Address</div>
         </div>
-        <input class="ci-input" id="ai_accountant_email" type="email" placeholder="Email Address" autocomplete="email" disabled data-required-when="ai_other_acct_yes">
+        <input class="ci-input" id="ai_accountant_email" type="email" placeholder="Email Address" autocomplete="email" disabled>
       </div>
     </div>
 
@@ -623,9 +625,10 @@
             No
           </label>
 
+          <!-- This is now ALWAYS optional (blank allowed), regardless of Yes/No -->
           <div class="ci-other-wrap" style="min-width:320px;">
             <div class="ci-label" style="font-size:13px;font-weight:950;opacity:.92;white-space:nowrap;">If yes, specify</div>
-            <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled data-required-when="ai_sw_yes">
+            <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled>
           </div>
         </div>
       </div>
@@ -872,14 +875,6 @@
 
     function normalize(v){ return (v ?? "").toString().trim(); }
 
-    function isEffectivelyDisabled(el){
-      if (!el) return true;
-      if (el.disabled) return true;
-      if (el.getAttribute("aria-disabled") === "true") return true;
-      if (el.hasAttribute("readonly")) return true;
-      return false;
-    }
-
     function injectAsterisks(root){
       const labels = Array.from(root.querySelectorAll(".ci-label"));
       labels.forEach(l=>{
@@ -1039,9 +1034,7 @@
       const requiredFields = Array.from(root.querySelectorAll("[data-required='true']"));
       requiredFields.forEach(el=>{
         if (!el) return;
-
-        if (isEffectivelyDisabled(el)) { el.classList.remove("ci-error"); return; }
-
+        if (el.disabled) { el.classList.remove("ci-error"); return; }
         const v = normalize(el.value);
         if (!v || (el.tagName.toLowerCase()==="select" && !v)){
           el.classList.add("ci-error");
@@ -1050,23 +1043,6 @@
           el.classList.remove("ci-error");
         }
       });
-
-      const fein = root.querySelector("#bi_fein");
-      const noFein = root.querySelector("#bi_no_fein");
-      if (fein){
-        const needFein = !(noFein && noFein.checked);
-        if (!needFein){
-          fein.classList.remove("ci-error");
-        } else if (!isEffectivelyDisabled(fein)){
-          const fv = normalize(fein.value);
-          if (!fv || fv.toLowerCase()==="unavailable"){
-            fein.classList.add("ci-error");
-            ok = false;
-          } else {
-            fein.classList.remove("ci-error");
-          }
-        }
-      }
 
       const radioGroups = Array.from(root.querySelectorAll("[data-required-radio]"))
         .map(el => el.getAttribute("data-required-radio"))
@@ -1081,15 +1057,12 @@
       conditional.forEach(el=>{
         const condId = el.getAttribute("data-required-when");
         const condEl = condId ? root.querySelector("#"+condId) : null;
-
-        const active = !!(condEl && (condEl.checked === true));
+        const active = !!(condEl && condEl.checked);
         if (!active){
           el.classList.remove("ci-error");
           return;
         }
-
-        if (isEffectivelyDisabled(el)) { el.classList.remove("ci-error"); return; }
-
+        if (el.disabled) return;
         const v = normalize(el.value);
         if (!v){
           el.classList.add("ci-error");
@@ -1100,7 +1073,7 @@
       });
 
       const payExp = root.querySelector("#pay_card_exp");
-      if (payExp && !isEffectivelyDisabled(payExp)){
+      if (payExp){
         const v = normalize(payExp.value);
         if (v && !isExpNotExpired(v)){
           payExp.classList.add("ci-error");
@@ -1153,10 +1126,7 @@
 
       drawLine("Business Information", true);
       drawKV("Name of Business", formData.bi_name);
-
-      const feinNo = !!formData.bi_no_fein;
-      drawKV("Employer Identification Number (EIN)", feinNo ? "No EIN" : (formData.bi_fein || ""));
-
+      drawKV("Employer Identification Number (EIN)", formData.bi_fein);
       drawKV("Business Formation Date", formData.bi_formation_date);
       drawKV("Full Name of Person Completing this Agreement", formData.bi_fullname);
       drawKV("Title", formData.bi_title);
@@ -1176,18 +1146,15 @@
       drawLine("Accounting Information", true);
       drawKV("Basis of Accounting", formData.boa_basis === "Other" ? ("Other: " + (formData.boa_other_text || "")) : (formData.boa_basis || ""));
       drawKV("Do you have another accountant?", formData.ai_other_accountant);
-
       if ((formData.ai_other_accountant || "") === "Yes"){
         drawKV("Accountant Name", formData.ai_accountant_name);
         drawKV("Accountant Phone Number", formData.ai_accountant_phone);
         drawKV("Accountant Email Address", formData.ai_accountant_email);
       }
-
       drawKV("Do you currently use an accounting software?", formData.ai_use_accounting_software);
       if ((formData.ai_use_accounting_software || "") === "Yes"){
         drawKV("Accounting Software", formData.ai_sw_specify);
       }
-
       drawKV("Do you have accounting records for the full life of the business?", formData.ai_records_full_history);
 
       drawLine(" ", false);
@@ -1287,7 +1254,7 @@
 
       const onFeinInput = () => {
         if (!fein) return;
-        if (noFein && noFein.checked) return;
+        if (fein.disabled) return;
         fein.value = formatFein(fein.value);
         save(root);
       };
@@ -1296,10 +1263,13 @@
         if (!fein || !noFein) return;
         if (noFein.checked){
           fein.value = "Unavailable";
-          fein.setAttribute("readonly","readonly");
+          fein.disabled = true;
         } else {
-          fein.removeAttribute("readonly");
-          fein.value = "";
+          const wasDisabled = fein.disabled;
+          fein.disabled = false;
+          if (wasDisabled && (normalize(fein.value).toLowerCase() === "unavailable")){
+            fein.value = "";
+          }
         }
         save(root);
       };
@@ -1318,6 +1288,7 @@
 
       const onAcctPhoneInput = () => {
         if (!acctPhone) return;
+        if (acctPhone.disabled) return;
         acctPhone.value = formatPhone(acctPhone.value);
         save(root);
       };
@@ -1508,8 +1479,6 @@
             const el = root.querySelector("#"+id);
             data[id] = el ? (el.value || "") : "";
           });
-
-          data["bi_no_fein"] = !!(noFein && noFein.checked);
 
           data["boa_basis"] = getSelectedValue(root, "boa_basis");
           const otherText = root.querySelector("#boa_other_text");
