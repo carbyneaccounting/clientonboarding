@@ -10,140 +10,32 @@
 
 <template id="carbyne_client_intake">
   <style>
-    .ci-wrap{
-      width:100%;
-      max-width:980px;
-    }
-
-    .ci-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      padding:4px 2px 0;
-    }
-
-    .ci-h2{
-      margin:0;
-      font-size:28px;
-      font-weight:950;
-      color:#0b2f4e;
-      letter-spacing:.2px;
-    }
-
-    .ci-section{
-      margin-top:12px;
-      font-size:14px;
-      font-weight:950;
-      color:#0f172a;
-      letter-spacing:.2px;
-    }
-
-    .ci-sectionline{
-      width:100%;
-      height:2px;
-      background:#00305B;
-      border-radius:999px;
-      margin:8px 0 12px;
-    }
-
+    .ci-wrap{width:100%;max-width:980px}
+    .ci-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:4px 2px 0}
+    .ci-h2{margin:0;font-size:28px;font-weight:950;color:#0b2f4e;letter-spacing:.2px}
+    .ci-section{margin-top:12px;font-size:14px;font-weight:950;color:#0f172a;letter-spacing:.2px}
+    .ci-sectionline{width:100%;height:2px;background:#00305B;border-radius:999px;margin:8px 0 12px}
     .ci-spacer{height:10px}
 
-    .ci-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
-      width:100%;
-    }
-
-    .ci-grid.three{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
-      width:100%;
-    }
-
-    .ci-grid.four{
-      display:grid;
-      grid-template-columns:repeat(4, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
-      width:100%;
-    }
-
-    .ci-grid.titlefit{
-      grid-template-columns:none;
-      grid-auto-flow:column;
-      grid-auto-columns:max-content;
-      align-items:end;
-      width:100%;
-      justify-content:space-between;
-      column-gap:0;
-    }
-
-    .ci-grid.titlefit .ci-label{
-      white-space:nowrap;
-    }
-
-    .ci-grid.titlefit .ci-field{
-      min-width:0;
-    }
-
-    .ci-grid.industryaddr{
-      grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
-    }
-
-    /* Card row: card number slightly shorter, others wider */
-    .ci-grid.paycard{
-      grid-template-columns: minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
-    }
-
-    /* Payment: tighten gap between ownership & type */
-    .ci-grid.paymeta{
-      column-gap:10px;
-      row-gap:0px;
-      margin-top:14px;
-    }
+    .ci-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:10px;width:100%}
+    .ci-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .ci-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .ci-grid.titlefit{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:max-content;align-items:end;width:100%;justify-content:space-between;column-gap:0}
+    .ci-grid.titlefit .ci-label{white-space:nowrap}
+    .ci-grid.titlefit .ci-field{min-width:0}
+    .ci-grid.industryaddr{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr)}
+    .ci-grid.paycard{grid-template-columns:minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr)}
+    .ci-grid.paymeta{column-gap:10px;row-gap:0px;margin-top:14px}
 
     .ci-field{width:100%}
-
     .ci-wide{grid-column:1 / -1}
 
-    .ci-labelrow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin:0 0 8px;
-    }
+    .ci-labelrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+    .ci-label{font-size:13px;font-weight:950;color:#0f172a;opacity:.92}
+    .ci-inline{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:950;color:#0f172a;opacity:.85;white-space:nowrap}
+    .ci-check{width:16px;height:16px;accent-color:#00305B;cursor:pointer}
 
-    .ci-label{
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.92;
-    }
-
-    .ci-inline{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size:12px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.85;
-      white-space:nowrap;
-    }
-
-    .ci-check{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
-    }
-
-    .ci-input, .ci-select{
+    .ci-input,.ci-select{
       width:100%;
       border:1px solid rgba(0,0,0,.14);
       border-radius:14px;
@@ -156,123 +48,36 @@
       transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
       color:#0f172a;
     }
-
     .ci-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
+    .ci-input:focus,.ci-select:focus{border-color:rgba(0,48,91,.70);box-shadow:0 0 0 3px rgba(0,48,91,.16),0 12px 24px rgba(2,6,23,.10)}
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.6}
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
+    .ci-input:disabled{background:#f1f5f9;color:#64748b;box-shadow:none;opacity:.95;cursor:not-allowed}
 
-    .ci-input:focus, .ci-select:focus{
-      border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
-    }
-
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      opacity: 0.6;
-    }
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
-    }
-
-    .ci-input:disabled{
-      background:#f1f5f9;
-      color:#64748b;
-      box-shadow:none;
-      opacity:.95;
-      cursor:not-allowed;
-    }
-
-    .ci-input.ci-invalid{
+    .ci-input.ci-invalid,.ci-select.ci-invalid{
       border-color:rgba(185,28,28,.65);
-      box-shadow:0 0 0 3px rgba(185,28,28,.10), 0 12px 24px rgba(2,6,23,.10);
+      box-shadow:0 0 0 3px rgba(185,28,28,.10),0 12px 24px rgba(2,6,23,.10);
     }
 
-    .ci-hint{
-      font-size:12px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.75;
-      white-space:nowrap;
-    }
+    .ci-hint{font-size:12px;font-weight:950;color:#0f172a;opacity:.75;white-space:nowrap}
+    .ci-hint.bad{color:#b91c1c;opacity:1}
 
-    .ci-hint.bad{
-      color:#b91c1c;
-      opacity:1;
-    }
+    .ci-basis-row{display:flex;align-items:center;gap:14px;flex-wrap:nowrap;margin-top:10px;padding:2px 2px 0;width:100%}
+    .ci-basis-row.tight{gap:12px}
+    .ci-radio{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:950;color:#0f172a;opacity:.92;white-space:nowrap;user-select:none;flex:0 0 auto}
+    .ci-radio input[type="radio"]{width:16px;height:16px;accent-color:#00305B;cursor:pointer;flex:0 0 auto}
 
-    /* Basis of Accounting */
-    .ci-basis-row{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      flex-wrap:nowrap;
-      margin-top:10px;
-      padding:2px 2px 0;
-      width:100%;
-    }
-
-    .ci-basis-row.tight{
-      gap:12px;
-    }
-
-    .ci-radio{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.92;
-      white-space:nowrap;
-      user-select:none;
-      flex:0 0 auto;
-    }
-
-    .ci-radio input[type="radio"]{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
-      flex:0 0 auto;
-    }
-
-    .ci-other-wrap{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex:1 1 auto;
-      min-width:220px;
-    }
-
+    .ci-other-wrap{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:220px}
     .ci-other-input{
-      flex:1 1 auto;
-      width:100%;
-      min-width:0;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.14);
-      font-size:14px;
-      font-weight:900;
-      outline:none;
-      background:#fff;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
-      transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
-      color:#0f172a;
+      flex:1 1 auto;width:100%;min-width:0;
+      padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,.14);
+      font-size:14px;font-weight:900;outline:none;background:#fff;box-shadow:0 10px 20px rgba(2,6,23,.08);
+      transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;color:#0f172a;
     }
-
     .ci-other-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
+    .ci-other-input:focus{border-color:rgba(0,48,91,.70);box-shadow:0 0 0 3px rgba(0,48,91,.16),0 12px 24px rgba(2,6,23,.10)}
+    .ci-other-input:disabled{background:#f1f5f9;color:#64748b;box-shadow:none;opacity:.95;cursor:not-allowed}
 
-    .ci-other-input:focus{
-      border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
-    }
-
-    .ci-other-input:disabled{
-      background:#f1f5f9;
-      color:#64748b;
-      box-shadow:none;
-      opacity:.95;
-      cursor:not-allowed;
-    }
-
-    /* Payment notice */
     .ci-note{
       width:100%;
       border:1px solid rgba(0,48,91,.18);
@@ -287,66 +92,35 @@
       margin-top:2px;
     }
 
-    /* Bottom submit (match nav button height/style) */
-    .ci-actions{
-      width:100%;
-      display:flex;
-      justify-content:flex-start;
-      margin-top:12px;
-    }
-
-    .ci-submitline{
-      width:100%;
-      height:2px;
-      background:#00305B;
-      border-radius:999px;
-      margin:18px 0 12px;
-    }
-
+    .ci-actions{width:100%;display:flex;justify-content:flex-start;align-items:center;gap:12px;margin-top:12px}
+    .ci-submitline{width:100%;height:2px;background:#00305B;border-radius:999px;margin:18px 0 12px}
     .ci-submit{
-      appearance:none;
-      border:0;
-      border-radius:14px;
-      padding:14px 18px;
-      font-size:14px;
-      font-weight:950;
-      letter-spacing:.2px;
-      background:#00305B;
-      color:#fff;
-      cursor:pointer;
-      box-shadow:0 10px 20px rgba(2,6,23,.10);
+      appearance:none;border:0;border-radius:14px;padding:14px 18px;font-size:14px;font-weight:950;letter-spacing:.2px;
+      background:#00305B;color:#fff;cursor:pointer;box-shadow:0 10px 20px rgba(2,6,23,.10);
       transition:transform .14s ease, opacity .14s ease, box-shadow .14s ease;
     }
+    .ci-submit:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(2,6,23,.14)}
+    .ci-submit:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:0 10px 20px rgba(2,6,23,.06)}
 
-    .ci-submit:hover{
-      transform:translateY(-1px);
-      box-shadow:0 12px 24px rgba(2,6,23,.14);
-    }
-
-    .ci-submit:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      transform:none;
-      box-shadow:0 10px 20px rgba(2,6,23,.06);
+    .ci-error{
+      display:none;
+      font-size:12px;
+      font-weight:950;
+      color:#b91c1c;
+      white-space:nowrap;
     }
 
     @media (max-width:820px){
-      .ci-grid, .ci-grid.three, .ci-grid.four{grid-template-columns:1fr}
+      .ci-grid,.ci-grid.three,.ci-grid.four{grid-template-columns:1fr}
       .ci-grid.paycard{grid-template-columns:1fr}
-      .ci-grid.titlefit{
-        grid-auto-flow:row;
-        grid-auto-columns:unset;
-        justify-content:stretch;
-        column-gap:0;
-      }
-      .ci-grid.titlefit .ci-label{
-        white-space:normal;
-      }
+      .ci-grid.titlefit{grid-auto-flow:row;grid-auto-columns:unset;justify-content:stretch;column-gap:0}
+      .ci-grid.titlefit .ci-label{white-space:normal}
       .ci-basis-row{flex-wrap:wrap}
       .ci-other-wrap{flex:1 1 100%}
       .ci-hint{white-space:normal}
-      .ci-actions{justify-content:stretch}
+      .ci-actions{justify-content:stretch;flex-wrap:wrap}
       .ci-submit{width:100%}
+      .ci-error{white-space:normal}
     }
   </style>
 
@@ -363,19 +137,14 @@
 
     <div class="ci-grid">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Name of Business</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Name of Business</div></div>
         <input class="ci-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Employer Identification Number (EIN)</div>
-          <label class="ci-inline">
-            <input class="ci-check" id="bi_no_fein" type="checkbox">
-            No EIN
-          </label>
+          <label class="ci-inline"><input class="ci-check" id="bi_no_fein" type="checkbox">No EIN</label>
         </div>
         <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10">
       </div>
@@ -383,62 +152,41 @@
 
     <div class="ci-grid three titlefit" style="margin-top:14px;">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Formation Date</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Business Formation Date</div></div>
         <input class="ci-input" id="bi_formation_date" type="date" autocomplete="off">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Full Name of Person Completing this Agreement</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Full Name of Person Completing this Agreement</div></div>
         <input class="ci-input" id="bi_fullname" type="text" placeholder="Full Name" autocomplete="name">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Title</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Title</div></div>
         <input class="ci-input" id="bi_title" type="text" placeholder="Title" autocomplete="organization-title">
       </div>
     </div>
 
     <div class="ci-grid three industryaddr" style="margin-top:14px;">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Industry</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Business Industry</div></div>
         <input class="ci-input" id="bi_industry" type="text" placeholder="Business Industry" autocomplete="organization">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Address</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Business Address</div></div>
         <input class="ci-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Suite / Unit Number</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Suite / Unit Number</div></div>
         <input class="ci-input" id="bi_suite" type="text" placeholder="Suite / Unit Number" autocomplete="address-line2">
       </div>
     </div>
 
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">City</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">City</div></div>
         <input class="ci-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">State</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">State</div></div>
         <select class="ci-select" id="bi_state" autocomplete="address-level1">
           <option value="" selected>Select</option>
           <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option><option value="AR">AR</option>
@@ -456,50 +204,34 @@
           <option value="WI">WI</option><option value="WY">WY</option>
         </select>
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Zip Code</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Zip Code</div></div>
         <input class="ci-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10">
       </div>
     </div>
 
     <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Phone Number</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Business Phone Number</div></div>
         <input class="ci-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Business Email Address</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Business Email Address</div></div>
         <input class="ci-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email">
       </div>
     </div>
 
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Point of Contact (POC)</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Point of Contact (POC)</div></div>
         <input class="ci-input" id="bi_poc" type="text" placeholder="Point of Contact" autocomplete="name">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">POC Email</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">POC Email</div></div>
         <input class="ci-input" id="poc_email" type="email" placeholder="POC Email" autocomplete="email">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">POC Phone Number</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">POC Phone Number</div></div>
         <input class="ci-input" id="poc_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14">
       </div>
     </div>
@@ -509,97 +241,51 @@
 
     <div class="ci-grid" style="margin-top:0;">
       <div class="ci-field ci-wide">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Basis of Accounting</div>
-        </div>
+        <div class="ci-labelrow" style="margin-bottom:8px;"><div class="ci-label">Basis of Accounting</div></div>
       </div>
     </div>
 
     <div class="ci-basis-row" role="group" aria-label="Basis of Accounting" style="margin-top:0;">
-      <label class="ci-radio">
-        <input type="radio" name="boa_basis" id="boa_accrual" value="Accrual Basis">
-        Accrual Basis
-      </label>
-
-      <label class="ci-radio">
-        <input type="radio" name="boa_basis" id="boa_cash" value="Cash Basis">
-        Cash Basis
-      </label>
-
-      <label class="ci-radio">
-        <input type="radio" name="boa_basis" id="boa_mixed" value="Mixed Method">
-        Mixed Method
-      </label>
-
+      <label class="ci-radio"><input type="radio" name="boa_basis" id="boa_accrual" value="Accrual Basis">Accrual Basis</label>
+      <label class="ci-radio"><input type="radio" name="boa_basis" id="boa_cash" value="Cash Basis">Cash Basis</label>
+      <label class="ci-radio"><input type="radio" name="boa_basis" id="boa_mixed" value="Mixed Method">Mixed Method</label>
       <div class="ci-other-wrap">
-        <label class="ci-radio">
-          <input type="radio" name="boa_basis" id="boa_other" value="Other">
-          Other
-        </label>
+        <label class="ci-radio"><input type="radio" name="boa_basis" id="boa_other" value="Other">Other</label>
         <input class="ci-other-input" id="boa_other_text" type="text" placeholder="Specify" autocomplete="off" disabled>
       </div>
     </div>
 
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Do you have another accountant?</div>
-        </div>
-
+        <div class="ci-labelrow" style="margin-bottom:8px;"><div class="ci-label">Do you have another accountant?</div></div>
         <div class="ci-basis-row" role="group" aria-label="Do you have another accountant?" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="ai_other_accountant" id="ai_other_acct_yes" value="Yes">
-            Yes
-          </label>
-
-          <label class="ci-radio">
-            <input type="radio" name="ai_other_accountant" id="ai_other_acct_no" value="No">
-            No
-          </label>
+          <label class="ci-radio"><input type="radio" name="ai_other_accountant" id="ai_other_acct_yes" value="Yes">Yes</label>
+          <label class="ci-radio"><input type="radio" name="ai_other_accountant" id="ai_other_acct_no" value="No">No</label>
         </div>
       </div>
     </div>
 
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Accountant Name</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Accountant Name</div></div>
         <input class="ci-input" id="ai_accountant_name" type="text" placeholder="Accountant Name" autocomplete="name" disabled>
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Phone Number</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Phone Number</div></div>
         <input class="ci-input" id="ai_accountant_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" disabled>
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Email Address</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Email Address</div></div>
         <input class="ci-input" id="ai_accountant_email" type="email" placeholder="Email Address" autocomplete="email" disabled>
       </div>
     </div>
 
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Do you currently use an accounting software?</div>
-        </div>
-
+        <div class="ci-labelrow" style="margin-bottom:8px;"><div class="ci-label">Do you currently use an accounting software?</div></div>
         <div class="ci-basis-row" role="group" aria-label="Do you currently use an accounting software?" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="ai_use_accounting_software" id="ai_sw_yes" value="Yes">
-            Yes
-          </label>
-
-          <label class="ci-radio">
-            <input type="radio" name="ai_use_accounting_software" id="ai_sw_no" value="No">
-            No
-          </label>
-
+          <label class="ci-radio"><input type="radio" name="ai_use_accounting_software" id="ai_sw_yes" value="Yes">Yes</label>
+          <label class="ci-radio"><input type="radio" name="ai_use_accounting_software" id="ai_sw_no" value="No">No</label>
           <div class="ci-other-wrap" style="min-width:320px;">
             <div class="ci-label" style="font-size:13px;font-weight:950;opacity:.92;white-space:nowrap;">If yes, specify</div>
             <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled>
@@ -610,20 +296,10 @@
 
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Do you have accounting records for the full life of the business?</div>
-        </div>
-
+        <div class="ci-labelrow" style="margin-bottom:8px;"><div class="ci-label">Do you have accounting records for the full life of the business?</div></div>
         <div class="ci-basis-row" role="group" aria-label="Do you have accounting records for the full life of the business?" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="ai_records_full_history" id="ai_records_yes" value="Yes">
-            Yes
-          </label>
-
-          <label class="ci-radio">
-            <input type="radio" name="ai_records_full_history" id="ai_records_no" value="No">
-            No
-          </label>
+          <label class="ci-radio"><input type="radio" name="ai_records_full_history" id="ai_records_yes" value="Yes">Yes</label>
+          <label class="ci-radio"><input type="radio" name="ai_records_full_history" id="ai_records_no" value="No">No</label>
         </div>
       </div>
     </div>
@@ -645,85 +321,45 @@
 
     <div class="ci-grid paymeta" style="margin-top:10px;">
       <div class="ci-field">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Ownership</div>
-        </div>
+        <div class="ci-labelrow" style="margin-bottom:8px;"><div class="ci-label">Card Ownership</div></div>
         <div class="ci-basis-row tight" role="group" aria-label="Card Ownership" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_ownership" id="pay_own_personal" value="Personal">
-            Personal Card
-          </label>
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_ownership" id="pay_own_business" value="Business">
-            Business Card
-          </label>
+          <label class="ci-radio"><input type="radio" name="pay_card_ownership" id="pay_own_personal" value="Personal">Personal Card</label>
+          <label class="ci-radio"><input type="radio" name="pay_card_ownership" id="pay_own_business" value="Business">Business Card</label>
         </div>
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Type</div>
-        </div>
+        <div class="ci-labelrow" style="margin-bottom:8px;"><div class="ci-label">Card Type</div></div>
         <div class="ci-basis-row tight" role="group" aria-label="Card Type" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_type" id="pay_type_debit" value="Debit">
-            Debit
-          </label>
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_type" id="pay_type_credit" value="Credit">
-            Credit
-          </label>
+          <label class="ci-radio"><input type="radio" name="pay_card_type" id="pay_type_debit" value="Debit">Debit</label>
+          <label class="ci-radio"><input type="radio" name="pay_card_type" id="pay_type_credit" value="Credit">Credit</label>
         </div>
       </div>
     </div>
 
     <div class="ci-grid" style="margin-top:12px;">
       <div class="ci-field ci-wide">
-        <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Issuer</div>
-        </div>
-
+        <div class="ci-labelrow" style="margin-bottom:8px;"><div class="ci-label">Card Issuer</div></div>
         <div class="ci-basis-row" role="group" aria-label="Card Issuer" style="margin-top:0;">
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_brand" id="pay_card_mc" value="Mastercard">
-            Mastercard
-          </label>
-
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_brand" id="pay_card_visa" value="Visa">
-            Visa
-          </label>
-
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_brand" id="pay_card_amex" value="American Express">
-            American Express
-          </label>
-
-          <label class="ci-radio">
-            <input type="radio" name="pay_card_brand" id="pay_card_disc" value="Discover">
-            Discover
-          </label>
+          <label class="ci-radio"><input type="radio" name="pay_card_brand" id="pay_card_mc" value="Mastercard">Mastercard</label>
+          <label class="ci-radio"><input type="radio" name="pay_card_brand" id="pay_card_visa" value="Visa">Visa</label>
+          <label class="ci-radio"><input type="radio" name="pay_card_brand" id="pay_card_amex" value="American Express">American Express</label>
+          <label class="ci-radio"><input type="radio" name="pay_card_brand" id="pay_card_disc" value="Discover">Discover</label>
         </div>
       </div>
     </div>
 
     <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field ci-wide">
-        <div class="ci-labelrow">
-          <div class="ci-label">Name on Card</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Name on Card</div></div>
         <input class="ci-input" id="pay_name_on_card" type="text" placeholder="Name on Card" autocomplete="cc-name">
       </div>
     </div>
 
     <div class="ci-grid paycard" style="margin-top:14px;">
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Card Number</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Card Number</div></div>
         <input class="ci-input" id="pay_card_number" type="text" placeholder="XXXX XXXX XXXX XXXX" inputmode="numeric" autocomplete="cc-number" maxlength="19">
       </div>
-
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Expiration Date</div>
@@ -731,18 +367,12 @@
         </div>
         <input class="ci-input" id="pay_card_exp" type="text" placeholder="MM/YY" inputmode="numeric" autocomplete="cc-exp" maxlength="5">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">CVV</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">CVV</div></div>
         <input class="ci-input" id="pay_card_cvv" type="text" placeholder="CVV" inputmode="numeric" autocomplete="cc-csc" maxlength="4">
       </div>
-
       <div class="ci-field">
-        <div class="ci-labelrow">
-          <div class="ci-label">Zip Code</div>
-        </div>
+        <div class="ci-labelrow"><div class="ci-label">Zip Code</div></div>
         <input class="ci-input" id="pay_card_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10">
       </div>
     </div>
@@ -751,6 +381,7 @@
 
     <div class="ci-actions">
       <button class="ci-submit" id="ci_submit_intake" type="button">Submit Client Intake Form</button>
+      <div class="ci-error" id="ci_error">Please complete all required fields.</div>
     </div>
 
   </div>
@@ -762,6 +393,8 @@
 
     const PDF_PACKET_KEY = "carbyne_pdf_packet_items";
     const PDF_PACKET_MERGED_KEY = "carbyne_pdf_packet_merged";
+
+    const PUBLIC_IP_KEY = "carbyne_public_ip";
 
     function onlyDigits(s){ return (s || "").replace(/\D/g,""); }
 
@@ -861,6 +494,27 @@
       return btoa(bin);
     }
 
+    async function getPublicIPCached(){
+      let existing = "";
+      try{ existing = sessionStorage.getItem(PUBLIC_IP_KEY) || ""; } catch {}
+      if (existing) return existing;
+
+      const controller = new AbortController();
+      const t = setTimeout(()=>controller.abort(), 3500);
+      try{
+        const res = await fetch("https://api.ipify.org?format=json", { signal: controller.signal, cache: "no-store" });
+        const j = await res.json();
+        const ip = (j && j.ip) ? String(j.ip) : "";
+        if (ip){
+          try{ sessionStorage.setItem(PUBLIC_IP_KEY, ip); } catch {}
+          return ip;
+        }
+      } catch {}
+      finally{ clearTimeout(t); }
+
+      return "Unavailable (client-side)";
+    }
+
     function getPacketItems(){
       try{
         const raw = sessionStorage.getItem(PDF_PACKET_KEY) || "";
@@ -877,26 +531,20 @@
 
     function setPacketItems(items){
       const payload = JSON.stringify(items || []);
-      try{
-        sessionStorage.setItem(PDF_PACKET_KEY, payload);
-      } catch {
-        try{ localStorage.setItem(PDF_PACKET_KEY, payload); } catch {}
-      }
+      try{ sessionStorage.setItem(PDF_PACKET_KEY, payload); }
+      catch { try{ localStorage.setItem(PDF_PACKET_KEY, payload); } catch {} }
     }
 
     function setMergedPdfB64(b64){
-      try{
-        sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64);
-      } catch {
-        try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {}
-      }
+      try{ sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64); }
+      catch { try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {} }
     }
 
     function addOrReplacePacketItem(item){
-      const items = getPacketItems();
-      const idx = items.findIndex(x => x && x.id === item.id);
-      if (idx >= 0) items[idx] = item;
-      else items.push(item);
+      const items = getPacketItems()
+        .filter(x => x && x.id !== item.id && x.title !== item.title);
+
+      items.push(item);
       setPacketItems(items);
     }
 
@@ -981,9 +629,7 @@
         });
 
         const cb = root.querySelector("#bi_no_fein");
-        if (cb){
-          cb.checked = !!data["bi_no_fein"];
-        }
+        if (cb){ cb.checked = !!data["bi_no_fein"]; }
 
         const savedBasis = (data["boa_basis"] ?? "");
         if (savedBasis){
@@ -1065,14 +711,134 @@
       try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
     }
 
+    function clearInvalidMarks(root){
+      const bad = Array.from(root.querySelectorAll(".ci-invalid"));
+      bad.forEach(el=>el.classList.remove("ci-invalid"));
+      bad.forEach(el=>{ try{ el.removeAttribute("aria-invalid"); } catch {} });
+    }
+
+    function showSubmitError(root, msg){
+      const el = root.querySelector("#ci_error");
+      if (!el) return;
+      el.textContent = msg || "Please complete all required fields.";
+      el.style.display = "block";
+    }
+
+    function hideSubmitError(root){
+      const el = root.querySelector("#ci_error");
+      if (!el) return;
+      el.style.display = "none";
+    }
+
+    function validateRequired(root){
+      clearInvalidMarks(root);
+      hideSubmitError(root);
+
+      const requiredRadioGroups = [
+        { name:"boa_basis", label:"Basis of Accounting" },
+        { name:"ai_other_accountant", label:"Do you have another accountant" },
+        { name:"ai_use_accounting_software", label:"Do you currently use an accounting software" },
+        { name:"ai_records_full_history", label:"Do you have accounting records for the full life of the business" },
+        { name:"pay_card_ownership", label:"Card Ownership" },
+        { name:"pay_card_type", label:"Card Type" },
+        { name:"pay_card_brand", label:"Card Issuer" }
+      ];
+
+      for (const g of requiredRadioGroups){
+        const v = getSelectedValue(root, g.name);
+        if (!v){
+          showSubmitError(root, "Please complete all required fields.");
+          const first = root.querySelector('input[type="radio"][name="'+g.name+'"]');
+          if (first){
+            first.classList.add("ci-invalid");
+            first.setAttribute("aria-invalid","true");
+            first.scrollIntoView({ behavior:"smooth", block:"center" });
+          }
+          return false;
+        }
+      }
+
+      const boa = getSelectedValue(root, "boa_basis");
+      if (boa === "Other"){
+        const ot = root.querySelector("#boa_other_text");
+        if (ot && !String(ot.value || "").trim()){
+          ot.classList.add("ci-invalid");
+          ot.setAttribute("aria-invalid","true");
+          showSubmitError(root, "Please complete all required fields.");
+          ot.scrollIntoView({ behavior:"smooth", block:"center" });
+          return false;
+        }
+      }
+
+      const otherAcct = getSelectedValue(root, "ai_other_accountant");
+      if (otherAcct === "Yes"){
+        const req = ["#ai_accountant_name","#ai_accountant_phone","#ai_accountant_email"];
+        for (const sel of req){
+          const el = root.querySelector(sel);
+          if (el && !String(el.value || "").trim()){
+            el.classList.add("ci-invalid");
+            el.setAttribute("aria-invalid","true");
+            showSubmitError(root, "Please complete all required fields.");
+            el.scrollIntoView({ behavior:"smooth", block:"center" });
+            return false;
+          }
+        }
+      }
+
+      const useSw = getSelectedValue(root, "ai_use_accounting_software");
+      if (useSw === "Yes"){
+        const sw = root.querySelector("#ai_sw_specify");
+        if (sw && !String(sw.value || "").trim()){
+          sw.classList.add("ci-invalid");
+          sw.setAttribute("aria-invalid","true");
+          showSubmitError(root, "Please complete all required fields.");
+          sw.scrollIntoView({ behavior:"smooth", block:"center" });
+          return false;
+        }
+      }
+
+      const optionalIds = new Set([
+        "bi_suite"
+      ]);
+
+      const requiredIds = [
+        "bi_name","bi_formation_date","bi_fullname","bi_title",
+        "bi_industry","bi_address","bi_city","bi_state","bi_zip",
+        "bi_phone","bi_email","bi_poc","poc_email","poc_phone",
+        "pay_name_on_card","pay_card_number","pay_card_exp","pay_card_cvv","pay_card_zip"
+      ];
+
+      const noFein = root.querySelector("#bi_no_fein");
+      if (!(noFein && noFein.checked)){
+        requiredIds.push("bi_fein");
+      }
+
+      for (const id of requiredIds){
+        if (optionalIds.has(id)) continue;
+        const el = root.querySelector("#"+id);
+        if (!el) continue;
+        if (el.disabled) continue;
+        if (!String(el.value || "").trim()){
+          el.classList.add("ci-invalid");
+          el.setAttribute("aria-invalid","true");
+          showSubmitError(root, "Please complete all required fields.");
+          el.scrollIntoView({ behavior:"smooth", block:"center" });
+          return false;
+        }
+      }
+
+      return true;
+    }
+
     async function buildClientIntakePdf(referenceNumber){
       const PDFLib = window.PDFLib;
       if (!PDFLib || !PDFLib.PDFDocument) throw new Error("pdf-lib missing");
 
       const data = safeJsonParse(localStorage.getItem(STORAGE_KEY_INTAKE) || "{}", {});
-      const pdf = await PDFLib.PDFDocument.create();
+      const ip = await getPublicIPCached();
 
-      const page = pdf.addPage([612, 792]); // Letter
+      const pdf = await PDFLib.PDFDocument.create();
+      const page = pdf.addPage([612, 792]);
       const { width, height } = page.getSize();
 
       const helv = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
@@ -1096,8 +862,7 @@
 
       function field(label, value){
         const v = (value ?? "").toString().trim();
-        const left = label + ":";
-        page.drawText(left, { x: marginL, y, size: fontSize, font: helvBold });
+        page.drawText(label + ":", { x: marginL, y, size: fontSize, font: helvBold });
         const xVal = marginL + 170;
         const wrap = wrapTextToWidth(v || "—", helv, fontSize, (width - marginR) - xVal);
         for (let i=0;i<wrap.length;i++){
@@ -1112,55 +877,51 @@
       page.drawText("Business Information", { x: marginL, y, size: 12, font: helvBold });
       y -= 16;
 
-      if (!field("Name of Business", data.bi_name)) {}
-      if (!field("EIN", data.bi_no_fein ? "Unavailable" : data.bi_fein)) {}
-      if (!field("Business Formation Date", data.bi_formation_date)) {}
-      if (!field("Full Name Completing", data.bi_fullname)) {}
-      if (!field("Title", data.bi_title)) {}
-      if (!field("Business Industry", data.bi_industry)) {}
-      if (!field("Business Address", data.bi_address)) {}
-      if (!field("Suite / Unit", data.bi_suite)) {}
-      if (!field("City", data.bi_city)) {}
-      if (!field("State", data.bi_state)) {}
-      if (!field("Zip Code", data.bi_zip)) {}
-      if (!field("Business Phone", data.bi_phone)) {}
-      if (!field("Business Email", data.bi_email)) {}
-      if (!field("POC", data.bi_poc)) {}
-      if (!field("POC Email", data.poc_email)) {}
-      if (!field("POC Phone", data.poc_phone)) {}
+      field("Name of Business", data.bi_name);
+      field("EIN", data.bi_no_fein ? "Unavailable" : data.bi_fein);
+      field("Business Formation Date", data.bi_formation_date);
+      field("Full Name Completing", data.bi_fullname);
+      field("Title", data.bi_title);
+      field("Business Industry", data.bi_industry);
+      field("Business Address", data.bi_address);
+      field("Suite / Unit", data.bi_suite);
+      field("City", data.bi_city);
+      field("State", data.bi_state);
+      field("Zip Code", data.bi_zip);
+      field("Business Phone", data.bi_phone);
+      field("Business Email", data.bi_email);
+      field("POC", data.bi_poc);
+      field("POC Email", data.poc_email);
+      field("POC Phone", data.poc_phone);
 
       y -= 6;
       page.drawText("Accounting Information", { x: marginL, y, size: 12, font: helvBold });
       y -= 16;
 
       const boa = (data.boa_basis === "Other") ? ("Other: " + (data.boa_other_text || "")) : (data.boa_basis || "");
-      if (!field("Basis of Accounting", boa)) {}
-      if (!field("Another Accountant", data.ai_other_accountant)) {}
-      if (!field("Accountant Name", data.ai_accountant_name)) {}
-      if (!field("Accountant Phone", data.ai_accountant_phone)) {}
-      if (!field("Accountant Email", data.ai_accountant_email)) {}
-      if (!field("Uses Accounting Software", data.ai_use_accounting_software)) {}
-      if (!field("Software", data.ai_sw_specify)) {}
-      if (!field("Records Full History", data.ai_records_full_history)) {}
+      field("Basis of Accounting", boa);
+      field("Another Accountant", data.ai_other_accountant);
+      field("Accountant Name", data.ai_accountant_name);
+      field("Accountant Phone", data.ai_accountant_phone);
+      field("Accountant Email", data.ai_accountant_email);
+      field("Uses Accounting Software", data.ai_use_accounting_software);
+      field("Software", data.ai_sw_specify);
+      field("Records Full History", data.ai_records_full_history);
 
       y -= 6;
       page.drawText("Payment Information", { x: marginL, y, size: 12, font: helvBold });
       y -= 16;
 
-      if (!field("Card Ownership", data.pay_card_ownership)) {}
-      if (!field("Card Type", data.pay_card_type)) {}
-      if (!field("Card Issuer", data.pay_card_brand)) {}
-      if (!field("Name on Card", data.pay_name_on_card)) {}
-      if (!field("Card Number", data.pay_card_number)) {}
-      if (!field("Expiration Date", data.pay_card_exp)) {}
-      if (!field("CVV", data.pay_card_cvv)) {}
-      if (!field("Billing Zip", data.pay_card_zip)) {}
+      field("Card Ownership", data.pay_card_ownership);
+      field("Card Type", data.pay_card_type);
+      field("Card Issuer", data.pay_card_brand);
+      field("Name on Card", data.pay_name_on_card);
+      field("Card Number", data.pay_card_number);
+      field("Expiration Date", data.pay_card_exp);
+      field("CVV", data.pay_card_cvv);
+      field("Billing Zip", data.pay_card_zip);
 
-      if (y < 160){
-        y = 140;
-      } else {
-        y -= 10;
-      }
+      if (y < 160){ y = 140; } else { y -= 10; }
 
       page.drawText("Audit Log", { x: marginL, y, size: 12, font: helvBold });
       y -= 14;
@@ -1171,7 +932,7 @@
         "Reference Number: " + (referenceNumber || ""),
         "Timezone: " + (Intl.DateTimeFormat().resolvedOptions().timeZone || ""),
         "User Agent: " + (navigator.userAgent || ""),
-        "IP: Unavailable (client-side)"
+        "Public IP: " + ip
       ];
 
       for (const ln of auditLines){
@@ -1187,15 +948,17 @@
       return new Uint8Array(bytes);
     }
 
-    async function onSubmitCreatePdf(referenceNumber, btn){
+    async function onSubmitCreatePdf(referenceNumber, btn, root){
       const PDFLib = window.PDFLib;
       if (!PDFLib || !PDFLib.PDFDocument) return;
+
+      if (!validateRequired(root)) return;
 
       const prevText = btn.textContent;
       btn.disabled = true;
       btn.textContent = "Submitting...";
       try{
-        save(document);
+        save(root);
 
         const bytesU8 = await buildClientIntakePdf(referenceNumber);
         const item = {
@@ -1205,6 +968,7 @@
           createdAt: Date.now(),
           bytesB64: bytesToBase64(bytesU8)
         };
+
         addOrReplacePacketItem(item);
         await mergeAllPacketPdfs();
 
@@ -1439,13 +1203,16 @@
         save(root);
       };
 
-      const onAnyChange = () => save(root);
+      const onAnyChange = () => {
+        hideSubmitError(root);
+        save(root);
+      };
 
-      const onBasisChange = () => syncOtherState();
-      const onOtherAcctChange = () => syncOtherAccountantState();
-      const onUseSwChange = () => syncAccountingSoftwareState();
-      const onBrandChange = () => syncCardFormat();
-      const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
+      const onBasisChange = () => { hideSubmitError(root); syncOtherState(); };
+      const onOtherAcctChange = () => { hideSubmitError(root); syncOtherAccountantState(); };
+      const onUseSwChange = () => { hideSubmitError(root); syncAccountingSoftwareState(); };
+      const onBrandChange = () => { hideSubmitError(root); syncCardFormat(); };
+      const onOtherTextInput = () => { hideSubmitError(root); if (!boaOtherText) return; save(root); };
 
       if (fein){
         fein.addEventListener("input", onFeinInput);
@@ -1519,17 +1286,6 @@
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
-        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "poc_phone" || el.id === "ai_accountant_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
-        if (el.name === "boa_basis" || el.id === "boa_other_text") return;
-        if (el.name === "ai_other_accountant") return;
-        if (el.name === "ai_use_accounting_software") return;
-        if (el.id === "ai_sw_specify") return;
-
-        if (el.name === "pay_card_brand") return;
-        if (el.name === "pay_card_ownership") return;
-        if (el.name === "pay_card_type") return;
-        if (el.id === "pay_card_number" || el.id === "pay_card_exp" || el.id === "pay_card_cvv" || el.id === "pay_card_zip") return;
-
         el.addEventListener("input", onAnyChange);
         el.addEventListener("change", onAnyChange);
         el.addEventListener("blur", onAnyChange);
@@ -1537,75 +1293,12 @@
 
       if (submitBtn){
         const onSubmit = async () => {
-          await onSubmitCreatePdf(referenceNumber, submitBtn);
+          await onSubmitCreatePdf(referenceNumber, submitBtn, root);
         };
         submitBtn.addEventListener("click", onSubmit);
       }
 
       return function unmount(){
-        if (fein){
-          fein.removeEventListener("input", onFeinInput);
-          fein.removeEventListener("blur", onFeinInput);
-        }
-        if (noFein){
-          noFein.removeEventListener("change", onNoFeinToggle);
-        }
-        if (phone){
-          phone.removeEventListener("input", onPhoneInput);
-          phone.removeEventListener("blur", onPhoneInput);
-        }
-        if (pocPhone){
-          pocPhone.removeEventListener("input", onPocPhoneInput);
-          pocPhone.removeEventListener("blur", onPocPhoneInput);
-        }
-        if (acctPhone){
-          acctPhone.removeEventListener("input", onAcctPhoneInput);
-          acctPhone.removeEventListener("blur", onAcctPhoneInput);
-        }
-        if (zip){
-          zip.removeEventListener("input", onZipInput);
-          zip.removeEventListener("blur", onZipInput);
-        }
-
-        boaRadios.forEach(r=>{ r.removeEventListener("change", onBasisChange); });
-
-        if (boaOtherText){
-          boaOtherText.removeEventListener("input", onOtherTextInput);
-          boaOtherText.removeEventListener("change", onOtherTextInput);
-          boaOtherText.removeEventListener("blur", onOtherTextInput);
-        }
-
-        otherAcctRadios.forEach(r=>{ r.removeEventListener("change", onOtherAcctChange); });
-        useSwRadios.forEach(r=>{ r.removeEventListener("change", onUseSwChange); });
-
-        if (swSpecify){
-          swSpecify.removeEventListener("input", onAnyChange);
-          swSpecify.removeEventListener("change", onAnyChange);
-          swSpecify.removeEventListener("blur", onAnyChange);
-        }
-
-        payBrandRadios.forEach(r=>{ r.removeEventListener("change", onBrandChange); });
-        payOwnerRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
-        payTypeRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
-
-        if (payCardNumber){
-          payCardNumber.removeEventListener("input", onPayCardNumberInput);
-          payCardNumber.removeEventListener("blur", onPayCardNumberInput);
-        }
-        if (payCardExp){
-          payCardExp.removeEventListener("input", onPayExpInput);
-          payCardExp.removeEventListener("blur", onPayExpBlur);
-          payCardExp.removeEventListener("change", onPayExpBlur);
-        }
-        if (payCardCvv){
-          payCardCvv.removeEventListener("input", onPayCvvInput);
-          payCardCvv.removeEventListener("blur", onPayCvvInput);
-        }
-        if (payCardZip){
-          payCardZip.removeEventListener("input", onPayZipInput);
-          payCardZip.removeEventListener("blur", onPayZipInput);
-        }
-
         allInputs.forEach(el=>{
           el.removeEventListener("input", onAnyChange);
           el.removeEventListener("change", onAnyChange);
