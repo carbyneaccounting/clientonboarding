@@ -11,78 +11,46 @@
 <template id="carbyne_electronic_signature">
   <style>
     .es-wrap{width:100%}
-    
-    .es-header{
-      display:flex;align-items:center;justify-content:space-between;gap:10px;
-      padding:0 2px 7px;margin-bottom:7px;
-    }
-    .es-title{
-      margin:0;font-size:18px;font-weight:950;color:#0b2f4e;letter-spacing:.2px;
-    }
-    
+    .es-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px 7px;margin-bottom:7px}
+    .es-title{margin:0;font-size:18px;font-weight:950;color:#0b2f4e;letter-spacing:.2px}
     .es-header-actions{display:flex;align-items:center;gap:6px}
     .es-mode-toggle{display:flex;gap:5px;margin-right:7px}
-    
+
     .es-pill{
       border:1px solid rgba(0,0,0,.12);
-      background:#fff;
-      color:#0f172a;
-      font-weight:900;
-      font-size:11px;
-      padding:6px 11px;
-      border-radius:999px;
-      cursor:pointer;
-      transition:all .12s ease;
-      white-space:nowrap;
+      background:#fff;color:#0f172a;
+      font-weight:900;font-size:11px;
+      padding:6px 11px;border-radius:999px;
+      cursor:pointer;transition:all .12s ease;white-space:nowrap;
     }
     .es-pill.primary{background:rgba(0,48,91,.08);border-color:rgba(0,48,91,.18);color:#00305B}
     .es-pill.danger{background:rgba(185,28,28,.06);border-color:rgba(185,28,28,.20);color:#b91c1c}
     .es-pill:hover{transform:translateY(-1px);opacity:.96}
     .es-pill.active{background:rgba(0,48,91,.14);border-color:rgba(0,48,91,.28)}
 
-    .es-main{
-      display:grid;
-      grid-template-columns:1.55fr .45fr;
-      gap:9px;
-    }
+    .es-main{display:grid;grid-template-columns:1.55fr .45fr;gap:9px}
 
     .es-card{
-      background:#fff;
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:10px;
-      box-shadow:0 6px 13px rgba(2,6,23,.08);
+      background:#fff;border:1px solid rgba(0,0,0,.10);
+      border-radius:10px;box-shadow:0 6px 13px rgba(2,6,23,.08);
       overflow:hidden;
     }
 
     .es-card-h{
-      padding:6px 9px;
-      border-bottom:1px solid rgba(0,0,0,.08);
-      font-size:11px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.90;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
+      padding:6px 9px;border-bottom:1px solid rgba(0,0,0,.08);
+      font-size:11px;font-weight:950;color:#0f172a;opacity:.90;
+      display:flex;align-items:center;justify-content:space-between;
     }
 
     .es-canvas-area{padding:9px}
     canvas{
-      width:100%;
-      height:135px;
-      border:1px solid rgba(0,0,0,.14);
-      border-radius:8px;
-      background:#fff;
-      display:block;
-      touch-action:none;
+      width:100%;height:135px;border:1px solid rgba(0,0,0,.14);
+      border-radius:8px;background:#fff;display:block;touch-action:none;
     }
 
     .es-controls{
-      padding:6px 9px 9px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:7px;
+      padding:6px 9px 9px;display:flex;align-items:center;
+      justify-content:space-between;gap:7px;
     }
 
     .es-slider{display:flex;align-items:center;gap:6px}
@@ -95,75 +63,41 @@
 
     .es-type-area{padding:9px}
     .es-type-input{
-      width:100%;
-      border:1px solid rgba(0,0,0,.14);
-      border-radius:8px;
-      padding:8px 11px;
-      font-size:13px;
-      font-weight:900;
-      outline:none;
-      background:#fff;
-      box-shadow:0 6px 13px rgba(2,6,23,.08);
+      width:100%;border:1px solid rgba(0,0,0,.14);
+      border-radius:8px;padding:8px 11px;font-size:13px;font-weight:900;
+      outline:none;background:#fff;box-shadow:0 6px 13px rgba(2,6,23,.08);
       color:#0f172a;
     }
     .es-type-preview{
-      margin-top:6px;
-      border:1px dashed rgba(0,0,0,.18);
-      border-radius:8px;
-      padding:9px;
-      min-height:40px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:rgba(0,0,0,.02);
+      margin-top:6px;border:1px dashed rgba(0,0,0,.18);
+      border-radius:8px;padding:9px;min-height:40px;display:flex;
+      align-items:center;justify-content:center;background:rgba(0,0,0,.02);
     }
     .es-script{
       font-family:"Arial Narrow","Arial","system-ui",-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      font-weight:900;
-      font-size:18px;
-      color:#0f172a;
-      line-height:1;
-      user-select:none;
-      white-space:nowrap;
+      font-weight:900;font-size:18px;color:#0f172a;line-height:1;user-select:none;white-space:nowrap;
     }
     .es-type-controls{padding-top:6px;display:flex;justify-content:flex-end}
 
     .es-sidebar{display:flex;flex-direction:column;gap:9px}
 
     .es-info{padding:9px}
-    .es-info-grid{
-      display:grid;
-      grid-template-columns:1fr;
-      gap:6px;
-      margin-top:6px;
-    }
-    .es-info-item{
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:8px;
-      padding:6px 8px;
-      background:#fff;
-    }
+    .es-info-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
+    .es-info-item{border:1px solid rgba(0,0,0,.10);border-radius:8px;padding:6px 8px;background:#fff}
     .es-info-label{font-size:8px;font-weight:900;color:#0f172a;opacity:.65;text-transform:uppercase;letter-spacing:.3px}
     .es-info-value{margin-top:2px;font-size:11px;font-weight:900;color:#0f172a}
 
     .es-adopted-area{padding:9px}
     .es-adopted-box{
       border:1px dashed rgba(0,0,0,.18);
-      border-radius:8px;
-      background:rgba(0,0,0,.02);
-      min-height:58px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px;
-      overflow:hidden;
+      border-radius:8px;background:rgba(0,0,0,.02);
+      min-height:58px;display:flex;align-items:center;justify-content:center;
+      padding:6px;overflow:hidden;
     }
     .es-adopted-img{max-width:100%;max-height:52px;display:block}
     .es-adopted-empty{font-size:10px;font-weight:900;color:#334155;opacity:.80}
 
-    @media (max-width:900px){
-      .es-main{grid-template-columns:1fr}
-    }
+    @media (max-width:900px){ .es-main{grid-template-columns:1fr} }
   </style>
 
   <div class="es-wrap" id="esRoot">
@@ -213,22 +147,10 @@
           <div class="es-card-h">Status</div>
           <div class="es-info">
             <div class="es-info-grid">
-              <div class="es-info-item">
-                <div class="es-info-label">Mode</div>
-                <div class="es-info-value" id="esModeVal">Draw</div>
-              </div>
-              <div class="es-info-item">
-                <div class="es-info-label">Ready</div>
-                <div class="es-info-value" id="esHasVal">No</div>
-              </div>
-              <div class="es-info-item">
-                <div class="es-info-label">Adopt</div>
-                <div class="es-info-value" id="esAdoptVal">No</div>
-              </div>
-              <div class="es-info-item">
-                <div class="es-info-label">Time</div>
-                <div class="es-info-value" id="esLastVal">—</div>
-              </div>
+              <div class="es-info-item"><div class="es-info-label">Mode</div><div class="es-info-value" id="esModeVal">Draw</div></div>
+              <div class="es-info-item"><div class="es-info-label">Ready</div><div class="es-info-value" id="esHasVal">No</div></div>
+              <div class="es-info-item"><div class="es-info-label">Adopt</div><div class="es-info-value" id="esAdoptVal">No</div></div>
+              <div class="es-info-item"><div class="es-info-label">Time</div><div class="es-info-value" id="esLastVal">—</div></div>
             </div>
           </div>
         </div>
@@ -243,6 +165,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -253,6 +176,8 @@
 
     const PDF_PACKET_KEY = "carbyne_pdf_packet_items";
     const PDF_PACKET_MERGED_KEY = "carbyne_pdf_packet_merged";
+
+    const PUBLIC_IP_KEY = "carbyne_public_ip";
 
     function nowStamp(){
       const d = new Date();
@@ -273,6 +198,27 @@
       const mi = String(d.getMinutes()).padStart(2,"0");
       const ss = String(d.getSeconds()).padStart(2,"0");
       return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi + ":" + ss;
+    }
+
+    async function getPublicIPCached(){
+      let existing = "";
+      try{ existing = sessionStorage.getItem(PUBLIC_IP_KEY) || ""; } catch {}
+      if (existing) return existing;
+
+      const controller = new AbortController();
+      const t = setTimeout(()=>controller.abort(), 3500);
+      try{
+        const res = await fetch("https://api.ipify.org?format=json", { signal: controller.signal, cache: "no-store" });
+        const j = await res.json();
+        const ip = (j && j.ip) ? String(j.ip) : "";
+        if (ip){
+          try{ sessionStorage.setItem(PUBLIC_IP_KEY, ip); } catch {}
+          return ip;
+        }
+      } catch {}
+      finally{ clearTimeout(t); }
+
+      return "Unavailable (client-side)";
     }
 
     function safeJsonParse(s, fallback){
@@ -304,26 +250,20 @@
 
     function setPacketItems(items){
       const payload = JSON.stringify(items || []);
-      try{
-        sessionStorage.setItem(PDF_PACKET_KEY, payload);
-      } catch {
-        try{ localStorage.setItem(PDF_PACKET_KEY, payload); } catch {}
-      }
+      try{ sessionStorage.setItem(PDF_PACKET_KEY, payload); }
+      catch { try{ localStorage.setItem(PDF_PACKET_KEY, payload); } catch {} }
     }
 
     function setMergedPdfB64(b64){
-      try{
-        sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64);
-      } catch {
-        try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {}
-      }
+      try{ sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64); }
+      catch { try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {} }
     }
 
     function addOrReplacePacketItem(item){
-      const items = getPacketItems();
-      const idx = items.findIndex(x => x && x.id === item.id);
-      if (idx >= 0) items[idx] = item;
-      else items.push(item);
+      const items = getPacketItems()
+        .filter(x => x && x.id !== item.id && x.title !== item.title);
+
+      items.push(item);
       setPacketItems(items);
     }
 
@@ -334,20 +274,13 @@
       const lines = raw.split(/\r?\n/);
       for (const line of lines){
         const words = line.split(/\s+/).filter(Boolean);
-        if (!words.length){
-          out.push("");
-          continue;
-        }
+        if (!words.length){ out.push(""); continue; }
         let cur = words[0];
         for (let i=1;i<words.length;i++){
           const next = cur + " " + words[i];
           const w = font.widthOfTextAtSize(next, size);
-          if (w <= maxWidth){
-            cur = next;
-          } else {
-            out.push(cur);
-            cur = words[i];
-          }
+          if (w <= maxWidth) cur = next;
+          else { out.push(cur); cur = words[i]; }
         }
         out.push(cur);
       }
@@ -465,8 +398,10 @@
       const PDFLib = window.PDFLib;
       if (!PDFLib || !PDFLib.PDFDocument) throw new Error("pdf-lib missing");
 
+      const ip = await getPublicIPCached();
+
       const pdf = await PDFLib.PDFDocument.create();
-      const page = pdf.addPage([612, 792]); // Letter
+      const page = pdf.addPage([612, 792]);
       const { width, height } = page.getSize();
 
       const helv = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
@@ -496,7 +431,7 @@
       y -= 16;
 
       if ((mode || "").toLowerCase() === "type"){
-        const typed = normalizeTypedSig(meta.typedText || meta.typedTextRaw || "");
+        const typed = normalizeTypedSig(meta.typedTextRaw || meta.typedText || "");
         page.drawText(typed || "—", { x: marginL, y, size: 10, font: helvBold });
         y -= 18;
       } else {
@@ -509,13 +444,10 @@
 
           const boxH = 90;
           const yTop = y;
+
           page.drawRectangle({
-            x: marginL,
-            y: yTop - boxH,
-            width: maxW,
-            height: boxH,
-            borderWidth: 1,
-            borderColor: PDFLib.rgb(0.75,0.75,0.75)
+            x: marginL, y: yTop - boxH, width: maxW, height: boxH,
+            borderWidth: 1, borderColor: PDFLib.rgb(0.75,0.75,0.75)
           });
 
           page.drawImage(png, {
@@ -538,13 +470,13 @@
 
       const auditLines = [
         "Event: Signature Adopted",
-        "Timestamp: " + (auditStamp()),
+        "Timestamp: " + auditStamp(),
         "Reference Number: " + (referenceNumber || ""),
         "Mode: " + (mode || ""),
         "Adopted Time: " + (last || ""),
         "Timezone: " + (Intl.DateTimeFormat().resolvedOptions().timeZone || ""),
         "User Agent: " + (navigator.userAgent || ""),
-        "IP: Unavailable (client-side)"
+        "Public IP: " + ip
       ];
 
       for (const ln of auditLines){
@@ -651,6 +583,7 @@
           createdAt: Date.now(),
           bytesB64: bytesToBase64(bytesU8)
         };
+
         addOrReplacePacketItem(item);
         await mergeAllPacketPdfs();
 
@@ -707,9 +640,10 @@
       }
 
       function onTypeInput(){
-        const val = normalizeTypedSig((typeInput.value || "").trim());
+        const raw = (typeInput.value || "").trim();
+        const val = normalizeTypedSig(raw);
         typePreview.textContent = val;
-        hasTypeInk = !!val.replace(/^\/s\/\s*/i,"").trim();
+        hasTypeInk = !!raw;
         refreshUI();
       }
 
@@ -770,10 +704,7 @@
         typeInput.addEventListener("input", onTypeInput);
 
         clearTop.addEventListener("click", clearAll);
-        clearDraw.addEventListener("click", ()=>{
-          clearCanvas();
-          refreshUI();
-        });
+        clearDraw.addEventListener("click", ()=>{ clearCanvas(); refreshUI(); });
         clearType.addEventListener("click", ()=>{
           typeInput.value = "";
           typePreview.textContent = "";
@@ -791,16 +722,10 @@
         canvas.addEventListener("touchmove", moveDraw, { passive:false });
         window.addEventListener("touchend", endDraw);
 
-        stroke.addEventListener("input", ()=>{});
-
         window.addEventListener("resize", onResize);
 
         const stored = getStored();
-        if (stored && stored.dataUrl){
-          setAdoptedUI(root, stored.dataUrl);
-          const last = stored.meta && stored.meta.lastAdopted ? stored.meta.lastAdopted : "—";
-          renderStatus(root, mode, currentHasSignature(), currentHasSignature(), last);
-        }
+        if (stored && stored.dataUrl){ setAdoptedUI(root, stored.dataUrl); }
 
         refreshUI();
       }
@@ -808,18 +733,6 @@
       init();
 
       return function unmount(){
-        typeInput.removeEventListener("input", onTypeInput);
-
-        clearTop.removeEventListener("click", clearAll);
-
-        canvas.removeEventListener("mousedown", startDraw);
-        canvas.removeEventListener("mousemove", moveDraw);
-        window.removeEventListener("mouseup", endDraw);
-
-        canvas.removeEventListener("touchstart", startDraw);
-        canvas.removeEventListener("touchmove", moveDraw);
-        window.removeEventListener("touchend", endDraw);
-
         window.removeEventListener("resize", onResize);
       };
     };
