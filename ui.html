@@ -359,7 +359,7 @@
     // ==========================================================
     // Pages:
     // Page 1 = Access Code (no step)
-    // Page 2 = Step 1 of 15 (Welcome)  <-- numbering starts here
+    // Page 2 = Step 1 of 15 (Welcome)
     // Page 3 = Step 2 of 15 (Client Intake Form)
     // Page 4 = Step 3 of 15 (Electronic Signature)
     // Page 5..16 = Step 4..15 placeholders
@@ -383,10 +383,6 @@
 
     // PDF Packet store (single packet, multiple docs)
     const PACKET_KEY = "carbyne_pdf_packet_v1";
-    const PACKET_META_KEY = "carbyne_pdf_packet_meta_v1";
-
-    // Document IDs
-    const DOC_ID_INTAKE = "client_intake_form";
 
     let currentPage = 1;
     let isAccessValidated = false;
@@ -525,9 +521,34 @@
       onScroll();
     }
 
+    // --------------------------
+    // Packet (docs) persistence
+    // --------------------------
+    function packetReadRaw(){
+      try{
+        const raw = sessionStorage.getItem(PACKET_KEY);
+        if (raw) return raw;
+      } catch {}
+      try{
+        const raw2 = localStorage.getItem(PACKET_KEY);
+        if (raw2) return raw2;
+      } catch {}
+      return "";
+    }
+
+    function packetWriteRaw(raw){
+      let wrote = false;
+      try{
+        sessionStorage.setItem(PACKET_KEY, raw);
+        wrote = true;
+      } catch {}
+      if (wrote) return;
+      try{ localStorage.setItem(PACKET_KEY, raw); } catch {}
+    }
+
     function packetLoad(){
       try{
-        const raw = sessionStorage.getItem(PACKET_KEY) || "";
+        const raw = packetReadRaw();
         if (!raw) return [];
         const parsed = JSON.parse(raw);
         if (!Array.isArray(parsed)) return [];
@@ -538,8 +559,9 @@
     }
 
     function packetSave(docs){
+      const safe = Array.isArray(docs) ? docs : [];
       try{
-        sessionStorage.setItem(PACKET_KEY, JSON.stringify(Array.isArray(docs) ? docs : []));
+        packetWriteRaw(JSON.stringify(safe));
       } catch {}
     }
 
@@ -547,19 +569,37 @@
       const id = normalize(doc && doc.id);
       if (!id) return;
 
-      const docs = packetLoad().filter(d => normalize(d && d.id) !== id);
-      docs.push({
-        id: id,
-        title: normalize(doc.title) || id,
-        b64: normalize(doc.b64) || "",
-        meta: (doc && typeof doc.meta === "object" && doc.meta) ? doc.meta : {}
+      const next = [];
+      const existing = packetLoad();
+      for (const d of existing){
+        if (normalize(d && d.id) !== id) next.push(d);
+      }
+
+      const title = normalize(doc && doc.title) || id;
+      const b64 = normalize(doc && doc.b64) || "";
+      const metaIn = (doc && typeof doc.meta === "object" && doc.meta) ? doc.meta : {};
+
+      const createdAt = normalize(metaIn.createdAt) || normalize(metaIn.timestamp) || "";
+      const updatedAt = new Date().toISOString();
+
+      next.push({
+        id,
+        title,
+        b64,
+        meta: {
+          ...metaIn,
+          createdAt: metaIn.createdAt || createdAt || updatedAt,
+          updatedAt
+        }
       });
-      packetSave(docs);
+
+      packetSave(next);
+      refreshReviewLinkVisibility();
     }
 
     function packetHasAny(){
       const docs = packetLoad();
-      return docs.some(d => d && d.b64);
+      return docs.some(d => d && normalize(d.b64));
     }
 
     function bytesFromB64(b64){
@@ -570,17 +610,8 @@
       return bytes;
     }
 
-    function b64FromBytes(bytes){
-      let s = "";
-      const chunk = 0x8000;
-      for (let i=0;i<bytes.length;i+=chunk){
-        s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
-      }
-      return btoa(s);
-    }
-
     async function packetBuildMergedPdfBytes(){
-      const docs = packetLoad().filter(d => d && d.b64);
+      const docs = packetLoad().filter(d => d && normalize(d.b64));
       if (!docs.length) return null;
 
       const { PDFDocument } = window.PDFLib || {};
@@ -612,19 +643,115 @@
       setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60 * 1000);
     }
 
+    function escapeHtml(s){
+      return (s ?? "").toString()
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+    }
+
+    function openDocListTab(){
+      const docs = packetLoad().filter(d => d && normalize(d.b64));
+      const title = "Review Documents";
+
+      const w = window.open("", "_blank");
+      if (!w) return;
+
+      const rows = docs.map((d, i) => {
+        const t = escapeHtml(normalize(d.title) || normalize(d.id) || ("Document " + (i+1)));
+        const id = escapeHtml(normalize(d.id));
+        const createdAt = escapeHtml(normalize(d.meta && d.meta.createdAt) || "");
+        return `
+          <div style="border:1px solid rgba(0,0,0,.10);border-radius:12px;padding:12px 12px;margin:10px 0;background:#fff;box-shadow:0 8px 18px rgba(2,6,23,.06);">
+            <div style="font-weight:950;color:#0f172a;font-size:14px;letter-spacing:.2px;">${t}</div>
+            <div style="margin-top:4px;font-weight:800;color:#334155;opacity:.85;font-size:12px;">
+              ID: ${id}${createdAt ? " · Created: " + createdAt : ""}
+            </div>
+            <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
+              <button data-open-one="${escapeHtml(normalize(d.id))}" style="border:0;border-radius:10px;padding:10px 12px;font-weight:950;cursor:pointer;background:rgba(0,48,91,.10);color:#00305B;">
+                Open
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      w.document.open();
+      w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${escapeHtml(title)}</title></head>
+        <body style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:22px;background:#f8fafc;color:#0f172a;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div style="font-weight:950;font-size:18px;letter-spacing:.2px;">${escapeHtml(title)}</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button id="openMerged" style="border:0;border-radius:10px;padding:10px 12px;font-weight:950;cursor:pointer;background:linear-gradient(90deg,#00305B,#0A3D6F);color:#fff;">
+                Open Combined PDF
+              </button>
+            </div>
+          </div>
+
+          <div style="margin-top:12px;font-weight:800;opacity:.85;">Documents generated in this session:</div>
+
+          <div id="list" style="margin-top:10px;">
+            ${docs.length ? rows : `<div style="margin-top:12px;font-weight:800;opacity:.82;">No documents have been generated yet.</div>`}
+          </div>
+
+          <script>
+            (function(){
+              const docs = ${JSON.stringify(docs)};
+              function bytesFromB64(b64){
+                const bin = atob(b64);
+                const len = bin.length;
+                const bytes = new Uint8Array(len);
+                for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i);
+                return bytes;
+              }
+              function openBytes(bytes){
+                const blob = new Blob([bytes], { type:"application/pdf" });
+                const url = URL.createObjectURL(blob);
+                const w = window.open(url, "_blank");
+                if (!w) window.location.href = url;
+                setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch(e){} }, 60000);
+              }
+
+              document.addEventListener("click", (e)=>{
+                const btn = e.target && e.target.closest ? e.target.closest("button[data-open-one]") : null;
+                if (!btn) return;
+                const id = btn.getAttribute("data-open-one") || "";
+                const d = docs.find(x => (x && x.id) === id);
+                if (!d || !d.b64) return;
+                openBytes(bytesFromB64(d.b64));
+              });
+
+              const openMerged = document.getElementById("openMerged");
+              openMerged.addEventListener("click", ()=>{
+                // Merged PDF is built in the main window; fallback: open docs one-by-one here if blocked.
+                try{
+                  if (window.opener && typeof window.opener.openReviewDocuments === "function"){
+                    window.opener.openReviewDocuments();
+                    return;
+                  }
+                } catch(e){}
+                // fallback: open first doc
+                if (docs[0] && docs[0].b64) openBytes(bytesFromB64(docs[0].b64));
+              });
+            })();
+          </script>
+        </body></html>`);
+      w.document.close();
+    }
+
     async function openReviewDocuments(){
       const outBytes = await packetBuildMergedPdfBytes();
       if (!outBytes){
-        const w = window.open("", "_blank");
-        if (w){
-          w.document.open();
-          w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Review Documents</title></head><body style='font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:26px;color:#0f172a;'><div style='font-weight:900;font-size:16px;margin-bottom:10px;'>Review Documents</div><div style='font-weight:800;opacity:.82;'>No documents have been generated yet.</div></body></html>");
-          w.document.close();
-        }
+        openDocListTab();
         return;
       }
       openPdfInNewTab(outBytes);
     }
+
+    // Make accessible to the new-tab list fallback
+    window.openReviewDocuments = openReviewDocuments;
 
     async function getPublicIP(){
       try{
@@ -639,6 +766,17 @@
     }
 
     window.carbyne_get_public_ip = getPublicIP;
+
+    let currentShellReviewLink = null;
+
+    function refreshReviewLinkVisibility(){
+      if (!currentShellReviewLink) return;
+      if (packetHasAny()){
+        currentShellReviewLink.classList.add("show");
+      } else {
+        currentShellReviewLink.classList.remove("show");
+      }
+    }
 
     function buildShell(secureCode){
       const shell = document.createElement("div");
@@ -657,10 +795,11 @@
       attachRefHideOnScroll(shell);
 
       const link = shell.querySelector("#reviewDocsLink");
+      currentShellReviewLink = link;
+
       if (link){
-        const showFromPage = (currentPage >= 5);
-        if (showFromPage) link.classList.add("show");
-        link.addEventListener("click", (e)=>{ e.preventDefault(); openReviewDocuments(); });
+        refreshReviewLinkVisibility();
+        link.addEventListener("click", (e)=>{ e.preventDefault(); openDocListTab(); });
       }
 
       return shell;
@@ -673,20 +812,30 @@
       const text = await res.text();
       const doc = new DOMParser().parseFromString(text, "text/html");
 
-      // Append styles
+      // Append styles (dedupe by content hash)
       const styles = Array.from(doc.querySelectorAll("style"));
       styles.forEach(st => {
+        const css = st.textContent || "";
+        const key = "carbyne_style_" + String(css.length) + "_" + (css.slice(0,64).replace(/\s+/g," ").trim());
+        if (document.getElementById(key)) return;
         const s = document.createElement("style");
-        s.textContent = st.textContent || "";
+        s.id = key;
+        s.textContent = css;
         document.head.appendChild(s);
       });
 
-      // Append scripts
+      // Append scripts (only once per module url+index)
       const scripts = Array.from(doc.querySelectorAll("script"));
-      for (const sc of scripts){
+      for (let i=0;i<scripts.length;i++){
+        const sc = scripts[i];
+        const src = sc.src ? sc.src : "";
+        const key = "carbyne_script_" + btoa(unescape(encodeURIComponent(url + "|" + i + "|" + src))).replace(/=+$/,"");
+        if (document.getElementById(key)) continue;
+
         const s = document.createElement("script");
-        if (sc.src){
-          s.src = sc.src;
+        s.id = key;
+        if (src){
+          s.src = src;
           s.async = false;
         } else {
           s.textContent = sc.textContent || "";
@@ -904,6 +1053,7 @@
     function prev(){ if (currentPage > 1){ currentPage--; loadPage(currentPage); } }
     function next(){ if (currentPage < TOTAL_PAGES){ currentPage++; loadPage(currentPage); } }
 
+    // Listen for doc upserts from external modules (Client Intake, Signature, etc.)
     window.addEventListener("carbyne:pdfdoc:upsert", (e)=>{
       try{
         const d = e && e.detail ? e.detail : null;
