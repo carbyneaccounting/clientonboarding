@@ -510,21 +510,22 @@
 
     function injectReviewDocumentsLink(shell){
       const step = getStepNumber();
-      if (step < 3) return; // Page 4+ only
+      if (step < 4) return; // Page 5+ only
       const ref = shell.querySelector(".reference-number");
       if (!ref) return;
       if (ref.querySelector("#carbyneReviewDocsLink")) return;
-
+    
       const br = document.createElement("br");
       const a = document.createElement("a");
       a.id = "carbyneReviewDocsLink";
       a.href = "#";
       a.className = "review-docs-link";
       a.textContent = "Review Documents";
-
+    
       ref.appendChild(br);
       ref.appendChild(a);
     }
+
 
     function buildShell(secureCode){
       const shell = document.createElement("div");
