@@ -171,13 +171,8 @@
       box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
     }
 
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      opacity: 0.6;
-    }
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
-    }
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator { cursor:pointer; opacity:.6; }
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover { opacity:1; }
 
     .ci-input:disabled{
       background:#f1f5f9;
@@ -200,10 +195,7 @@
       white-space:nowrap;
     }
 
-    .ci-hint.bad{
-      color:#b91c1c;
-      opacity:1;
-    }
+    .ci-hint.bad{ color:#b91c1c; opacity:1; }
 
     .ci-input.ci-error, .ci-select.ci-error{
       border-color:rgba(185,28,28,.65);
@@ -220,9 +212,7 @@
       width:100%;
     }
 
-    .ci-basis-row.tight{
-      gap:12px;
-    }
+    .ci-basis-row.tight{ gap:12px; }
 
     .ci-radio{
       display:inline-flex;
@@ -361,15 +351,13 @@
         justify-content:stretch;
         column-gap:0;
       }
-      .ci-grid.titlefit .ci-label{
-        white-space:normal;
-      }
-      .ci-basis-row{flex-wrap:wrap}
-      .ci-other-wrap{flex:1 1 100%}
-      .ci-hint{white-space:normal}
-      .ci-actions{justify-content:stretch}
-      .ci-submit{width:100%}
-      .ci-submit-msg{white-space:normal}
+      .ci-grid.titlefit .ci-label{ white-space:normal; }
+      .ci-basis-row{ flex-wrap:wrap; }
+      .ci-other-wrap{ flex:1 1 100%; }
+      .ci-hint{ white-space:normal; }
+      .ci-actions{ justify-content:stretch; }
+      .ci-submit{ width:100%; }
+      .ci-submit-msg{ white-space:normal; }
     }
   </style>
 
@@ -400,7 +388,6 @@
             No EIN
           </label>
         </div>
-        <!-- EIN is optional -->
         <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10">
       </div>
     </div>
@@ -584,7 +571,6 @@
       </div>
     </div>
 
-    <!-- These three are now ALWAYS optional (blank allowed), regardless of Yes/No -->
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
@@ -625,7 +611,6 @@
             No
           </label>
 
-          <!-- This is now ALWAYS optional (blank allowed), regardless of Yes/No -->
           <div class="ci-other-wrap" style="min-width:320px;">
             <div class="ci-label" style="font-size:13px;font-weight:950;opacity:.92;white-space:nowrap;">If yes, specify</div>
             <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled>
@@ -789,6 +774,7 @@
     const DOC_ID_INTAKE = "client_intake_form";
 
     function onlyDigits(s){ return (s || "").replace(/\D/g,""); }
+    function normalize(v){ return (v ?? "").toString().trim(); }
 
     function formatPhone(raw){
       const d = onlyDigits(raw).slice(0,10);
@@ -834,9 +820,7 @@
       } else {
         const x = d.slice(0,16);
         const parts = [];
-        for (let i=0;i<x.length;i+=4){
-          parts.push(x.slice(i,i+4));
-        }
+        for (let i=0;i<x.length;i+=4) parts.push(x.slice(i,i+4));
         return parts.join(" ");
       }
     }
@@ -869,18 +853,13 @@
       return p.mm >= curMonth;
     }
 
-    function maxCvvLen(brand){
-      return (brand === "American Express") ? 4 : 3;
-    }
-
-    function normalize(v){ return (v ?? "").toString().trim(); }
+    function maxCvvLen(brand){ return (brand === "American Express") ? 4 : 3; }
 
     function injectAsterisks(root){
       const labels = Array.from(root.querySelectorAll(".ci-label"));
       labels.forEach(l=>{
         if (!l) return;
         if (l.querySelector(".ci-req")) return;
-
         const star = document.createElement("span");
         star.className = "ci-req";
         star.textContent = "*";
@@ -913,9 +892,7 @@
         });
 
         const cb = root.querySelector("#bi_no_fein");
-        if (cb){
-          cb.checked = !!data["bi_no_fein"];
-        }
+        if (cb) cb.checked = !!data["bi_no_fein"];
 
         const savedBasis = (data["boa_basis"] ?? "");
         if (savedBasis){
@@ -973,6 +950,7 @@
         "pay_name_on_card",
         "pay_card_number","pay_card_exp","pay_card_cvv","pay_card_zip"
       ];
+
       ids.forEach(id=>{
         const el = root.querySelector("#"+id);
         if (!el) return;
@@ -1085,6 +1063,21 @@
       return ok;
     }
 
+    async function ensurePdfLib(){
+      if (window.PDFLib && window.PDFLib.PDFDocument) return true;
+
+      await new Promise((resolve, reject)=>{
+        const s = document.createElement("script");
+        s.src = "https://unpkg.com/pdf-lib/dist/pdf-lib.min.js";
+        s.async = true;
+        s.onload = () => resolve(true);
+        s.onerror = () => reject(new Error("Unable to load PDFLib"));
+        document.head.appendChild(s);
+      });
+
+      return !!(window.PDFLib && window.PDFLib.PDFDocument);
+    }
+
     function bytesToB64(bytes){
       let s = "";
       const chunk = 0x8000;
@@ -1094,10 +1087,35 @@
       return btoa(s);
     }
 
-    async function buildIntakePdfB64(referenceNumber, formData, audit){
-      const lib = window.PDFLib;
-      if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
+    function b64ToBytes(b64){
+      const bin = atob(b64 || "");
+      const len = bin.length;
+      const bytes = new Uint8Array(len);
+      for (let i=0;i<len;i++) bytes[i] = bin.charCodeAt(i) & 0xff;
+      return bytes;
+    }
 
+    function openPdfFromB64(b64, filename){
+      const bytes = b64ToBytes(b64);
+      const blob = new Blob([bytes], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const w = window.open(url, "_blank", "noopener,noreferrer");
+      setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60_000);
+      if (!w){
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename || "Client-Intake-Form.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+    }
+
+    async function buildIntakePdfB64(referenceNumber, formData, audit){
+      const okLib = await ensurePdfLib();
+      if (!okLib) throw new Error("PDFLib unavailable");
+
+      const lib = window.PDFLib;
       const { PDFDocument, StandardFonts } = lib;
 
       const pdfDoc = await PDFDocument.create();
@@ -1267,7 +1285,7 @@
         } else {
           const wasDisabled = fein.disabled;
           fein.disabled = false;
-          if (wasDisabled && (normalize(fein.value).toLowerCase() === "unavailable")){
+          if (wasDisabled && normalize(fein.value).toLowerCase() === "unavailable"){
             fein.value = "";
           }
         }
@@ -1454,7 +1472,10 @@
       const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
 
       async function onSubmit(){
-        if (submitMsg) submitMsg.classList.remove("show");
+        if (submitMsg){
+          submitMsg.textContent = "Please complete all required fields.";
+          submitMsg.classList.remove("show");
+        }
 
         const ok = validateRequired(root);
         if (!ok) return;
@@ -1493,7 +1514,6 @@
           data["pay_card_type"] = getSelectedValue(root, "pay_card_type");
 
           const ip = await getPublicIP();
-
           const audit = {
             timestamp: stamp(),
             publicIP: ip,
@@ -1504,21 +1524,35 @@
 
           const b64 = await buildIntakePdfB64(referenceNumber, data, audit);
 
-          window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
-            detail: {
-              id: DOC_ID_INTAKE,
-              title: "Client Intake Form",
-              b64: b64,
-              meta: {
-                referenceNumber: referenceNumber || "",
-                createdAt: audit.timestamp,
-                publicIP: audit.publicIP
+          try{
+            window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+              detail: {
+                id: DOC_ID_INTAKE,
+                title: "Client Intake Form",
+                b64: b64,
+                meta: {
+                  referenceNumber: referenceNumber || "",
+                  createdAt: audit.timestamp,
+                  publicIP: audit.publicIP
+                }
               }
-            }
-          }));
-        } catch {
+            }));
+          } catch (e){
+            console.error("carbyne:pdfdoc:upsert dispatch failed", e);
+          }
+
+          // Always open a preview so you can confirm the PDF was created.
+          // If your UI also captures the event, you’ll still get the stored version.
+          openPdfFromB64(b64, "Client-Intake-Form.pdf");
+
           if (submitMsg){
-            submitMsg.textContent = "Unable to generate document.";
+            submitMsg.textContent = "";
+            submitMsg.classList.remove("show");
+          }
+        } catch (e){
+          console.error("Client Intake PDF generation failed:", e);
+          if (submitMsg){
+            submitMsg.textContent = (e && e.message) ? ("Unable to generate document: " + e.message) : "Unable to generate document.";
             submitMsg.classList.add("show");
           }
         } finally {
@@ -1590,9 +1624,14 @@
         payCardZip.addEventListener("blur", onPayZipInput);
       }
 
-      syncOtherState();
-      syncOtherAccountantState();
-      syncAccountingSoftwareState();
+      function initDisabledStatesFromSaved(){
+        // Make dependent fields align to saved radios after loadSaved()
+        syncOtherState();
+        syncOtherAccountantState();
+        syncAccountingSoftwareState();
+      }
+
+      initDisabledStatesFromSaved();
       syncCardFormat();
       validateExp();
 
