@@ -9,7 +9,7 @@
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 
-  <!-- PDFViewer.js -->
+  <!-- PDFViewer.js - MUST be in same folder as this file -->
   <script src="./PDFViewer.js"></script>
 
   <style>
@@ -636,64 +636,25 @@
       }
     }
 
-    function openPdfInNewTab(pdfBytes){
-      const blob = new Blob([pdfBytes], { type:"application/pdf" });
-      const url = URL.createObjectURL(blob);
-      const w = window.open(url, "_blank");
-      if (!w){
-        window.location.href = url;
-        return;
-      }
-      setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60 * 1000);
-    }
-
     async function openReviewDocuments(){
-      console.log('openReviewDocuments called');
-      
       const outBytes = await packetBuildMergedPdfBytes();
       if (!outBytes){
-        console.log('No PDF bytes generated');
         openReviewDocumentsFallbackMessage();
         return;
       }
 
-      console.log('PDF bytes generated:', outBytes.length, 'bytes');
-      console.log('PDFViewer available:', !!window.PDFViewer);
-      console.log('PDFViewer.open available:', !!(window.PDFViewer && window.PDFViewer.open));
-
-      // Check if PDFViewer is available
       if (window.PDFViewer && typeof window.PDFViewer.open === "function"){
-        try{
-          console.log('Attempting to open with PDFViewer...');
-          
-          // Ensure we have Uint8Array
-          const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
-          
-          console.log('Data prepared as Uint8Array:', data.length, 'bytes');
-          
-          // Open in PDFViewer overlay
-          await window.PDFViewer.open(data, {
-            filename: 'review-documents.pdf',
-            onBack: function(){
-              console.log('PDF Viewer closed via back button');
-            }
-          });
-          
-          console.log('PDFViewer opened successfully');
-          return;
-        } catch (error) {
-          console.error('PDFViewer error:', error);
-          // Fallback to new tab if PDFViewer fails
-          alert('PDFViewer failed to open. Opening in new tab instead. Error: ' + error.message);
-          openPdfInNewTab(outBytes);
-          return;
-        }
+        const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
+        await window.PDFViewer.open(data, {
+          filename: 'client-documents.pdf',
+          onBack: function(){}
+        });
+      } else {
+        const blob = new Blob([outBytes], { type:"application/pdf" });
+        const url = URL.createObjectURL(blob);
+        window.open(url, "_blank");
+        setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60000);
       }
-
-      // Fallback to new tab if PDFViewer not available
-      console.warn('PDFViewer not available, opening in new tab');
-      alert('PDFViewer is not available. Opening in new tab instead.');
-      openPdfInNewTab(outBytes);
     }
 
     async function getPublicIP(){
@@ -729,11 +690,7 @@
       const link = shell.querySelector("#reviewDocsLink");
       if (link){
         if (currentPage >= 5) link.classList.add("show");
-        link.addEventListener("click", (e)=>{ 
-          e.preventDefault(); 
-          console.log('Review Documents link clicked'); 
-          openReviewDocuments(); 
-        });
+        link.addEventListener("click", (e)=>{ e.preventDefault(); openReviewDocuments(); });
       }
 
       return shell;
@@ -983,9 +940,6 @@
     });
 
     function init(){
-      console.log('Initializing UI...');
-      console.log('PDFViewer available at init:', !!window.PDFViewer);
-      
       isAccessValidated = !!localStorage.getItem(STORAGE_KEY_CODE);
 
       const saved = parseInt(localStorage.getItem(STORAGE_KEY_PAGE) || "1", 10) || 1;
@@ -997,14 +951,6 @@
       nextBtn.addEventListener("click", next);
 
       loadPage(currentPage);
-      
-      // Double-check PDFViewer after a moment
-      setTimeout(() => {
-        console.log('PDFViewer check after 1s:', !!window.PDFViewer);
-        if (!window.PDFViewer) {
-          console.error('PDFViewer.js did not load properly!');
-        }
-      }, 1000);
     }
 
     init();
