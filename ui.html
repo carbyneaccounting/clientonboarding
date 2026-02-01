@@ -374,7 +374,9 @@
 
   <div class="footer">Carbyne Accounting™ - Confidential &amp; Proprietary System</div>
 
-  <script>
+  <script type="module">
+    import * as PDFViewer from "./PDFViewer.js";
+
     // ==========================================================
     // Pages:
     // Page 1 = Access Code (no step)
@@ -627,7 +629,9 @@
         }
         return;
       }
-      openPdfInNewTab(outBytes);
+
+      const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
+      await PDFViewer.open(data, {});
     }
 
     async function getPublicIP(){
