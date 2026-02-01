@@ -179,7 +179,7 @@
       opacity: 1;
     }
 
-    .ci-input:disabled{
+    .ci-input:disabled, .ci-select:disabled{
       background:#f1f5f9;
       color:#64748b;
       box-shadow:none;
@@ -877,7 +877,6 @@
       labels.forEach(l=>{
         if (!l) return;
         if (l.querySelector(".ci-req")) return;
-
         const star = document.createElement("span");
         star.className = "ci-req";
         star.textContent = "*";
@@ -1031,7 +1030,9 @@
       const requiredFields = Array.from(root.querySelectorAll("[data-required='true']"));
       requiredFields.forEach(el=>{
         if (!el) return;
+
         if (el.disabled) { el.classList.remove("ci-error"); return; }
+
         const v = normalize(el.value);
         if (!v || (el.tagName.toLowerCase()==="select" && !v)){
           el.classList.add("ci-error");
@@ -1072,11 +1073,14 @@
         const condId = el.getAttribute("data-required-when");
         const condEl = condId ? root.querySelector("#"+condId) : null;
         const active = !!(condEl && condEl.checked);
+
         if (!active){
           el.classList.remove("ci-error");
           return;
         }
+
         if (el.disabled) return;
+
         const v = normalize(el.value);
         if (!v){
           el.classList.add("ci-error");
@@ -1275,12 +1279,15 @@
 
       const onNoFeinToggle = () => {
         if (!fein || !noFein) return;
+
         if (noFein.checked){
           fein.value = "Unavailable";
           fein.setAttribute("readonly","readonly");
         } else {
           fein.removeAttribute("readonly");
-          fein.value = "";
+          if (normalize(fein.value).toLowerCase() === "unavailable"){
+            fein.value = "";
+          }
         }
         save(root);
       };
