@@ -10,34 +10,147 @@
 
 <template id="carbyne_client_intake">
   <style>
-    .ci-wrap{width:100%;max-width:980px}
-    .ci-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:4px 2px 0}
-    .ci-h2{margin:0;font-size:28px;font-weight:950;color:#0b2f4e;letter-spacing:.2px}
-    .ci-section{margin-top:12px;font-size:14px;font-weight:950;color:#0f172a;letter-spacing:.2px}
-    .ci-sectionline{width:100%;height:2px;background:#00305B;border-radius:999px;margin:8px 0 12px}
+    .ci-wrap{
+      width:100%;
+      max-width:980px;
+    }
+
+    .ci-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      padding:4px 2px 0;
+    }
+
+    .ci-h2{
+      margin:0;
+      font-size:28px;
+      font-weight:950;
+      color:#0b2f4e;
+      letter-spacing:.2px;
+    }
+
+    .ci-section{
+      margin-top:12px;
+      font-size:14px;
+      font-weight:950;
+      color:#0f172a;
+      letter-spacing:.2px;
+    }
+
+    .ci-sectionline{
+      width:100%;
+      height:2px;
+      background:#00305B;
+      border-radius:999px;
+      margin:8px 0 12px;
+    }
+
     .ci-spacer{height:10px}
 
-    .ci-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:10px;width:100%}
-    .ci-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .ci-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
-    .ci-grid.titlefit{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:max-content;align-items:end;width:100%;justify-content:space-between;column-gap:0}
-    .ci-grid.titlefit .ci-label{white-space:nowrap}
-    .ci-grid.titlefit .ci-field{min-width:0}
-    .ci-grid.industryaddr{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr)}
-    .ci-grid.paycard{grid-template-columns:minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr)}
-    .ci-grid.paymeta{column-gap:10px;row-gap:0px;margin-top:14px}
+    .ci-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:14px;
+      margin-top:10px;
+      width:100%;
+    }
+
+    .ci-grid.three{
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:14px;
+      margin-top:10px;
+      width:100%;
+    }
+
+    .ci-grid.four{
+      display:grid;
+      grid-template-columns:repeat(4, minmax(0,1fr));
+      gap:14px;
+      margin-top:10px;
+      width:100%;
+    }
+
+    .ci-grid.titlefit{
+      grid-template-columns:none;
+      grid-auto-flow:column;
+      grid-auto-columns:max-content;
+      align-items:end;
+      width:100%;
+      justify-content:space-between;
+      column-gap:0;
+    }
+
+    .ci-grid.titlefit .ci-label{
+      white-space:nowrap;
+    }
+
+    .ci-grid.titlefit .ci-field{
+      min-width:0;
+    }
+
+    .ci-grid.industryaddr{
+      grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
+    }
+
+    .ci-grid.paycard{
+      grid-template-columns: minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
+    }
+
+    .ci-grid.paymeta{
+      column-gap:10px;
+      row-gap:0px;
+      margin-top:14px;
+    }
 
     .ci-field{width:100%}
     .ci-wide{grid-column:1 / -1}
 
-    .ci-labelrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
-    .ci-label{font-size:13px;font-weight:950;color:#0f172a;opacity:.92;display:inline-flex;align-items:center;gap:4px}
-    .ci-req{color:#b91c1c;font-weight:950;margin-left:2px;line-height:1}
+    .ci-labelrow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin:0 0 8px;
+    }
 
-    .ci-inline{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:950;color:#0f172a;opacity:.85;white-space:nowrap}
-    .ci-check{width:16px;height:16px;accent-color:#00305B;cursor:pointer}
+    .ci-label{
+      font-size:13px;
+      font-weight:950;
+      color:#0f172a;
+      opacity:.92;
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+    }
 
-    .ci-input,.ci-select{
+    .ci-req{
+      color:#b91c1c;
+      font-weight:950;
+      margin-left:2px;
+      line-height:1;
+    }
+
+    .ci-inline{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:12px;
+      font-weight:950;
+      color:#0f172a;
+      opacity:.85;
+      white-space:nowrap;
+    }
+
+    .ci-check{
+      width:16px;height:16px;
+      accent-color:#00305B;
+      cursor:pointer;
+    }
+
+    .ci-input, .ci-select{
       width:100%;
       border:1px solid rgba(0,0,0,.14);
       border-radius:14px;
@@ -50,17 +163,23 @@
       transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
       color:#0f172a;
     }
+
     .ci-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
 
-    .ci-input:focus,.ci-select:focus{
+    .ci-input:focus, .ci-select:focus{
       border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16),0 12px 24px rgba(2,6,23,.10);
+      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
     }
 
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.6}
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.6;
+    }
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover {
+      opacity: 1;
+    }
 
-    .ci-input:disabled,.ci-select:disabled{
+    .ci-input:disabled{
       background:#f1f5f9;
       color:#64748b;
       box-shadow:none;
@@ -68,18 +187,71 @@
       cursor:not-allowed;
     }
 
-    .ci-input.ci-invalid{border-color:rgba(185,28,28,.65);box-shadow:0 0 0 3px rgba(185,28,28,.10),0 12px 24px rgba(2,6,23,.10)}
-    .ci-hint{font-size:12px;font-weight:950;color:#0f172a;opacity:.75;white-space:nowrap}
-    .ci-hint.bad{color:#b91c1c;opacity:1}
-    .ci-input.ci-error,.ci-select.ci-error{border-color:rgba(185,28,28,.65);box-shadow:0 0 0 3px rgba(185,28,28,.10),0 12px 24px rgba(2,6,23,.10)}
+    .ci-input.ci-invalid{
+      border-color:rgba(185,28,28,.65);
+      box-shadow:0 0 0 3px rgba(185,28,28,.10), 0 12px 24px rgba(2,6,23,.10);
+    }
 
-    .ci-basis-row{display:flex;align-items:center;gap:14px;flex-wrap:nowrap;margin-top:10px;padding:2px 2px 0;width:100%}
-    .ci-basis-row.tight{gap:12px}
+    .ci-hint{
+      font-size:12px;
+      font-weight:950;
+      color:#0f172a;
+      opacity:.75;
+      white-space:nowrap;
+    }
 
-    .ci-radio{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:950;color:#0f172a;opacity:.92;white-space:nowrap;user-select:none;flex:0 0 auto}
-    .ci-radio input[type="radio"]{width:16px;height:16px;accent-color:#00305B;cursor:pointer;flex:0 0 auto}
+    .ci-hint.bad{
+      color:#b91c1c;
+      opacity:1;
+    }
 
-    .ci-other-wrap{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:220px}
+    .ci-input.ci-error, .ci-select.ci-error{
+      border-color:rgba(185,28,28,.65);
+      box-shadow:0 0 0 3px rgba(185,28,28,.10), 0 12px 24px rgba(2,6,23,.10);
+    }
+
+    .ci-basis-row{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:nowrap;
+      margin-top:10px;
+      padding:2px 2px 0;
+      width:100%;
+    }
+
+    .ci-basis-row.tight{
+      gap:12px;
+    }
+
+    .ci-radio{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:13px;
+      font-weight:950;
+      color:#0f172a;
+      opacity:.92;
+      white-space:nowrap;
+      user-select:none;
+      flex:0 0 auto;
+    }
+
+    .ci-radio input[type="radio"]{
+      width:16px;height:16px;
+      accent-color:#00305B;
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+
+    .ci-other-wrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex:1 1 auto;
+      min-width:220px;
+    }
+
     .ci-other-input{
       flex:1 1 auto;
       width:100%;
@@ -95,9 +267,21 @@
       transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
       color:#0f172a;
     }
+
     .ci-other-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
-    .ci-other-input:focus{border-color:rgba(0,48,91,.70);box-shadow:0 0 0 3px rgba(0,48,91,.16),0 12px 24px rgba(2,6,23,.10)}
-    .ci-other-input:disabled{background:#f1f5f9;color:#64748b;box-shadow:none;opacity:.95;cursor:not-allowed}
+
+    .ci-other-input:focus{
+      border-color:rgba(0,48,91,.70);
+      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
+    }
+
+    .ci-other-input:disabled{
+      background:#f1f5f9;
+      color:#64748b;
+      box-shadow:none;
+      opacity:.95;
+      cursor:not-allowed;
+    }
 
     .ci-note{
       width:100%;
@@ -113,25 +297,73 @@
       margin-top:2px;
     }
 
-    .ci-actions{width:100%;display:flex;justify-content:flex-start;margin-top:12px;align-items:center;gap:12px;flex-wrap:wrap}
-    .ci-submitline{width:100%;height:2px;background:#00305B;border-radius:999px;margin:18px 0 12px}
+    .ci-actions{
+      width:100%;
+      display:flex;
+      justify-content:flex-start;
+      margin-top:12px;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .ci-submitline{
+      width:100%;
+      height:2px;
+      background:#00305B;
+      border-radius:999px;
+      margin:18px 0 12px;
+    }
 
     .ci-submit{
-      appearance:none;border:0;border-radius:14px;padding:14px 18px;font-size:14px;font-weight:950;letter-spacing:.2px;
-      background:#00305B;color:#fff;cursor:pointer;box-shadow:0 10px 20px rgba(2,6,23,.10);
+      appearance:none;
+      border:0;
+      border-radius:14px;
+      padding:14px 18px;
+      font-size:14px;
+      font-weight:950;
+      letter-spacing:.2px;
+      background:#00305B;
+      color:#fff;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(2,6,23,.10);
       transition:transform .14s ease, opacity .14s ease, box-shadow .14s ease;
     }
-    .ci-submit:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(2,6,23,.14)}
-    .ci-submit:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:0 10px 20px rgba(2,6,23,.06)}
 
-    .ci-submit-msg{display:none;font-size:13px;font-weight:950;color:#b91c1c;letter-spacing:.2px;white-space:nowrap}
+    .ci-submit:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 24px rgba(2,6,23,.14);
+    }
+
+    .ci-submit:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      transform:none;
+      box-shadow:0 10px 20px rgba(2,6,23,.06);
+    }
+
+    .ci-submit-msg{
+      display:none;
+      font-size:13px;
+      font-weight:950;
+      color:#b91c1c;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
     .ci-submit-msg.show{display:inline}
 
     @media (max-width:820px){
-      .ci-grid,.ci-grid.three,.ci-grid.four{grid-template-columns:1fr}
+      .ci-grid, .ci-grid.three, .ci-grid.four{grid-template-columns:1fr}
       .ci-grid.paycard{grid-template-columns:1fr}
-      .ci-grid.titlefit{grid-auto-flow:row;grid-auto-columns:unset;justify-content:stretch;column-gap:0}
-      .ci-grid.titlefit .ci-label{white-space:normal}
+      .ci-grid.titlefit{
+        grid-auto-flow:row;
+        grid-auto-columns:unset;
+        justify-content:stretch;
+        column-gap:0;
+      }
+      .ci-grid.titlefit .ci-label{
+        white-space:normal;
+      }
       .ci-basis-row{flex-wrap:wrap}
       .ci-other-wrap{flex:1 1 100%}
       .ci-hint{white-space:normal}
@@ -552,10 +784,8 @@
   (function(){
     const STORAGE_KEY_INTAKE = "carbyne_intake_business_info";
     const DOC_ID_INTAKE = "client_intake_form";
-    const FEIN_LAST_KEY = "carbyne_intake_fein_last_value";
 
     function onlyDigits(s){ return (s || "").replace(/\D/g,""); }
-    function normalize(v){ return (v ?? "").toString().trim(); }
 
     function formatPhone(raw){
       const d = onlyDigits(raw).slice(0,10);
@@ -601,7 +831,9 @@
       } else {
         const x = d.slice(0,16);
         const parts = [];
-        for (let i=0;i<x.length;i+=4) parts.push(x.slice(i,i+4));
+        for (let i=0;i<x.length;i+=4){
+          parts.push(x.slice(i,i+4));
+        }
         return parts.join(" ");
       }
     }
@@ -616,10 +848,11 @@
     function parseExp(mmYY){
       const d = onlyDigits(mmYY);
       if (d.length !== 4) return null;
-      const mm = parseInt(d.slice(0,2),10);
-      const yy = parseInt(d.slice(2,4),10);
+      const mm = parseInt(d.slice(0,2), 10);
+      const yy = parseInt(d.slice(2,4), 10);
       if (!mm || mm < 1 || mm > 12) return null;
-      return { mm, year: 2000 + yy };
+      const year = 2000 + yy;
+      return { mm, year };
     }
 
     function isExpNotExpired(mmYY){
@@ -637,11 +870,14 @@
       return (brand === "American Express") ? 4 : 3;
     }
 
+    function normalize(v){ return (v ?? "").toString().trim(); }
+
     function injectAsterisks(root){
       const labels = Array.from(root.querySelectorAll(".ci-label"));
       labels.forEach(l=>{
         if (!l) return;
         if (l.querySelector(".ci-req")) return;
+
         const star = document.createElement("span");
         star.className = "ci-req";
         star.textContent = "*";
@@ -674,7 +910,9 @@
         });
 
         const cb = root.querySelector("#bi_no_fein");
-        if (cb) cb.checked = !!data["bi_no_fein"];
+        if (cb){
+          cb.checked = !!data["bi_no_fein"];
+        }
 
         const savedBasis = (data["boa_basis"] ?? "");
         if (savedBasis){
@@ -793,12 +1031,7 @@
       const requiredFields = Array.from(root.querySelectorAll("[data-required='true']"));
       requiredFields.forEach(el=>{
         if (!el) return;
-
-        if (el.disabled){
-          el.classList.remove("ci-error");
-          return;
-        }
-
+        if (el.disabled) { el.classList.remove("ci-error"); return; }
         const v = normalize(el.value);
         if (!v || (el.tagName.toLowerCase()==="select" && !v)){
           el.classList.add("ci-error");
@@ -807,6 +1040,23 @@
           el.classList.remove("ci-error");
         }
       });
+
+      const fein = root.querySelector("#bi_fein");
+      const noFein = root.querySelector("#bi_no_fein");
+      if (fein){
+        const needFein = !(noFein && noFein.checked);
+        if (needFein){
+          const fv = normalize(fein.value);
+          if (!fv || fv.toLowerCase()==="unavailable"){
+            fein.classList.add("ci-error");
+            ok = false;
+          } else {
+            fein.classList.remove("ci-error");
+          }
+        } else {
+          fein.classList.remove("ci-error");
+        }
+      }
 
       const radioGroups = Array.from(root.querySelectorAll("[data-required-radio]"))
         .map(el => el.getAttribute("data-required-radio"))
@@ -826,10 +1076,7 @@
           el.classList.remove("ci-error");
           return;
         }
-        if (el.disabled){
-          el.classList.remove("ci-error");
-          return;
-        }
+        if (el.disabled) return;
         const v = normalize(el.value);
         if (!v){
           el.classList.add("ci-error");
@@ -840,7 +1087,7 @@
       });
 
       const payExp = root.querySelector("#pay_card_exp");
-      if (payExp && !payExp.disabled){
+      if (payExp){
         const v = normalize(payExp.value);
         if (v && !isExpNotExpired(v)){
           payExp.classList.add("ci-error");
@@ -984,7 +1231,6 @@
 
       const fein = root.querySelector("#bi_fein");
       const noFein = root.querySelector("#bi_no_fein");
-
       const phone = root.querySelector("#bi_phone");
       const zip = root.querySelector("#bi_zip");
 
@@ -1020,38 +1266,22 @@
 
       loadSaved(root);
 
-      function storeFeinLast(val){
-        const v = normalize(val);
-        if (!v) return;
-        if (v.toLowerCase() === "unavailable") return;
-        try{ localStorage.setItem(FEIN_LAST_KEY, v); } catch {}
-      }
-
-      function getFeinLast(){
-        try{ return normalize(localStorage.getItem(FEIN_LAST_KEY) || ""); } catch { return ""; }
-      }
-
       const onFeinInput = () => {
         if (!fein) return;
-        if (fein.disabled) return;
+        if (noFein && noFein.checked) return;
         fein.value = formatFein(fein.value);
-        storeFeinLast(fein.value);
         save(root);
       };
 
       const onNoFeinToggle = () => {
         if (!fein || !noFein) return;
-
         if (noFein.checked){
-          storeFeinLast(fein.value);
           fein.value = "Unavailable";
-          fein.disabled = true;
+          fein.setAttribute("readonly","readonly");
         } else {
-          fein.disabled = false;
-          const restore = getFeinLast();
-          fein.value = restore ? formatFein(restore) : "";
+          fein.removeAttribute("readonly");
+          fein.value = "";
         }
-
         save(root);
       };
 
@@ -1126,16 +1356,6 @@
 
       function validateExp(){
         if (!payCardExp) return;
-        if (payCardExp.disabled){
-          payCardExp.classList.remove("ci-invalid");
-          payCardExp.removeAttribute("aria-invalid");
-          if (payExpHint){
-            payExpHint.textContent = "";
-            payExpHint.classList.remove("bad");
-          }
-          return;
-        }
-
         const v = payCardExp.value || "";
         if (!v){
           payCardExp.classList.remove("ci-invalid");
@@ -1237,6 +1457,10 @@
         save(root);
       };
 
+      const onBasisChange = () => syncOtherState();
+      const onOtherAcctChange = () => syncOtherAccountantState();
+      const onUseSwChange = () => syncAccountingSoftwareState();
+      const onBrandChange = () => syncCardFormat();
       const onOtherTextInput = () => { if (!boaOtherText) return; save(root); };
 
       async function onSubmit(){
@@ -1318,8 +1542,8 @@
       }
       if (noFein){
         noFein.addEventListener("change", onNoFeinToggle);
+        onNoFeinToggle();
       }
-
       if (phone){
         phone.addEventListener("input", onPhoneInput);
         phone.addEventListener("blur", onPhoneInput);
@@ -1337,7 +1561,7 @@
         zip.addEventListener("blur", onZipInput);
       }
 
-      boaRadios.forEach(r=>{ r.addEventListener("change", syncOtherState); });
+      boaRadios.forEach(r=>{ r.addEventListener("change", onBasisChange); });
 
       if (boaOtherText){
         boaOtherText.addEventListener("input", onOtherTextInput);
@@ -1345,22 +1569,18 @@
         boaOtherText.addEventListener("blur", onOtherTextInput);
       }
 
-      const otherAcctRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]'));
-      otherAcctRadios.forEach(r=>{ r.addEventListener("change", syncOtherAccountantState); });
-
-      const useSwRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
-      useSwRadios.forEach(r=>{ r.addEventListener("change", syncAccountingSoftwareState); });
-
-      payBrandRadios.forEach(r=>{ r.addEventListener("change", syncCardFormat); });
-
-      payOwnerRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
-      payTypeRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
+      otherAcctRadios.forEach(r=>{ r.addEventListener("change", onOtherAcctChange); });
+      useSwRadios.forEach(r=>{ r.addEventListener("change", onUseSwChange); });
 
       if (swSpecify){
         swSpecify.addEventListener("input", onAnyChange);
         swSpecify.addEventListener("change", onAnyChange);
         swSpecify.addEventListener("blur", onAnyChange);
       }
+
+      payBrandRadios.forEach(r=>{ r.addEventListener("change", onBrandChange); });
+      payOwnerRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
+      payTypeRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
 
       if (payCardNumber){
         payCardNumber.addEventListener("input", onPayCardNumberInput);
@@ -1380,6 +1600,12 @@
         payCardZip.addEventListener("blur", onPayZipInput);
       }
 
+      syncOtherState();
+      syncOtherAccountantState();
+      syncAccountingSoftwareState();
+      syncCardFormat();
+      validateExp();
+
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
         el.addEventListener("input", onAnyChange);
@@ -1390,16 +1616,6 @@
       if (submitBtn){
         submitBtn.addEventListener("click", onSubmit);
       }
-
-      syncOtherState();
-      syncOtherAccountantState();
-      syncAccountingSoftwareState();
-      syncCardFormat();
-
-      if (fein && !fein.disabled){
-        storeFeinLast(fein.value);
-      }
-      onNoFeinToggle();
 
       return function unmount(){
         if (fein){
@@ -1426,7 +1642,7 @@
           zip.removeEventListener("blur", onZipInput);
         }
 
-        boaRadios.forEach(r=>{ r.removeEventListener("change", syncOtherState); });
+        boaRadios.forEach(r=>{ r.removeEventListener("change", onBasisChange); });
 
         if (boaOtherText){
           boaOtherText.removeEventListener("input", onOtherTextInput);
@@ -1434,18 +1650,18 @@
           boaOtherText.removeEventListener("blur", onOtherTextInput);
         }
 
-        otherAcctRadios.forEach(r=>{ r.removeEventListener("change", syncOtherAccountantState); });
-        useSwRadios.forEach(r=>{ r.removeEventListener("change", syncAccountingSoftwareState); });
-
-        payBrandRadios.forEach(r=>{ r.removeEventListener("change", syncCardFormat); });
-        payOwnerRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
-        payTypeRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
+        otherAcctRadios.forEach(r=>{ r.removeEventListener("change", onOtherAcctChange); });
+        useSwRadios.forEach(r=>{ r.removeEventListener("change", onUseSwChange); });
 
         if (swSpecify){
           swSpecify.removeEventListener("input", onAnyChange);
           swSpecify.removeEventListener("change", onAnyChange);
           swSpecify.removeEventListener("blur", onAnyChange);
         }
+
+        payBrandRadios.forEach(r=>{ r.removeEventListener("change", onBrandChange); });
+        payOwnerRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
+        payTypeRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
 
         if (payCardNumber){
           payCardNumber.removeEventListener("input", onPayCardNumberInput);
