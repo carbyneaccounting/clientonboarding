@@ -95,10 +95,12 @@
       grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
     }
 
+    /* Card row: card number slightly shorter, others wider */
     .ci-grid.paycard{
       grid-template-columns: minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
     }
 
+    /* Payment: tighten gap between ownership & type */
     .ci-grid.paymeta{
       column-gap:10px;
       row-gap:0px;
@@ -106,6 +108,7 @@
     }
 
     .ci-field{width:100%}
+
     .ci-wide{grid-column:1 / -1}
 
     .ci-labelrow{
@@ -121,16 +124,12 @@
       font-weight:950;
       color:#0f172a;
       opacity:.92;
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
     }
 
     .ci-req{
       color:#b91c1c;
       font-weight:950;
       margin-left:2px;
-      line-height:1;
     }
 
     .ci-inline{
@@ -210,6 +209,7 @@
       box-shadow:0 0 0 3px rgba(185,28,28,.10), 0 12px 24px rgba(2,6,23,.10);
     }
 
+    /* Basis of Accounting */
     .ci-basis-row{
       display:flex;
       align-items:center;
@@ -283,6 +283,7 @@
       cursor:not-allowed;
     }
 
+    /* Payment notice */
     .ci-note{
       width:100%;
       border:1px solid rgba(0,48,91,.18);
@@ -297,6 +298,7 @@
       margin-top:2px;
     }
 
+    /* Bottom submit (match nav button height/style) */
     .ci-actions{
       width:100%;
       display:flex;
@@ -387,14 +389,14 @@
     <div class="ci-grid">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Name of Business</div>
+          <div class="ci-label">Name of Business<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_name" type="text" placeholder="Name of Business" autocomplete="organization" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Employer Identification Number (EIN)</div>
+          <div class="ci-label">Employer Identification Number (EIN)<span class="ci-req">*</span></div>
           <label class="ci-inline">
             <input class="ci-check" id="bi_no_fein" type="checkbox">
             No EIN
@@ -407,21 +409,21 @@
     <div class="ci-grid three titlefit" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Business Formation Date</div>
+          <div class="ci-label">Business Formation Date<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_formation_date" type="date" autocomplete="off" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Full Name of Person Completing this Agreement</div>
+          <div class="ci-label">Full Name of Person Completing this Agreement<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_fullname" type="text" placeholder="Full Name" autocomplete="name" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Title</div>
+          <div class="ci-label">Title<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_title" type="text" placeholder="Title" autocomplete="organization-title" data-required="true">
       </div>
@@ -430,14 +432,14 @@
     <div class="ci-grid three industryaddr" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Business Industry</div>
+          <div class="ci-label">Business Industry<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_industry" type="text" placeholder="Business Industry" autocomplete="organization" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Business Address</div>
+          <div class="ci-label">Business Address<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_address" type="text" placeholder="Business Address" autocomplete="street-address" data-required="true">
       </div>
@@ -453,14 +455,14 @@
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">City</div>
+          <div class="ci-label">City<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_city" type="text" placeholder="City" autocomplete="address-level2" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">State</div>
+          <div class="ci-label">State<span class="ci-req">*</span></div>
         </div>
         <select class="ci-select" id="bi_state" autocomplete="address-level1" data-required="true">
           <option value="" selected>Select</option>
@@ -482,7 +484,7 @@
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Zip Code</div>
+          <div class="ci-label">Zip Code<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10" data-required="true">
       </div>
@@ -491,14 +493,14 @@
     <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Business Phone Number</div>
+          <div class="ci-label">Business Phone Number<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Business Email Address</div>
+          <div class="ci-label">Business Email Address<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_email" type="email" placeholder="Business Email Address" autocomplete="email" data-required="true">
       </div>
@@ -507,21 +509,21 @@
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Point of Contact (POC)</div>
+          <div class="ci-label">Point of Contact (POC)<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="bi_poc" type="text" placeholder="Point of Contact" autocomplete="name" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">POC Email</div>
+          <div class="ci-label">POC Email<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="poc_email" type="email" placeholder="POC Email" autocomplete="email" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">POC Phone Number</div>
+          <div class="ci-label">POC Phone Number<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="poc_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" data-required="true">
       </div>
@@ -533,7 +535,7 @@
     <div class="ci-grid" style="margin-top:0;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Basis of Accounting</div>
+          <div class="ci-label">Basis of Accounting<span class="ci-req">*</span></div>
         </div>
       </div>
     </div>
@@ -566,7 +568,7 @@
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Do you have another accountant?</div>
+          <div class="ci-label">Do you have another accountant?<span class="ci-req">*</span></div>
         </div>
 
         <div class="ci-basis-row" role="group" aria-label="Do you have another accountant?" style="margin-top:0;" data-required-radio="ai_other_accountant">
@@ -586,21 +588,21 @@
     <div class="ci-grid three" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Accountant Name</div>
+          <div class="ci-label">Accountant Name<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="ai_accountant_name" type="text" placeholder="Accountant Name" autocomplete="name" disabled data-required-when="ai_other_acct_yes">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Phone Number</div>
+          <div class="ci-label">Phone Number<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="ai_accountant_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" disabled data-required-when="ai_other_acct_yes">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Email Address</div>
+          <div class="ci-label">Email Address<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="ai_accountant_email" type="email" placeholder="Email Address" autocomplete="email" disabled data-required-when="ai_other_acct_yes">
       </div>
@@ -609,7 +611,7 @@
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Do you currently use an accounting software?</div>
+          <div class="ci-label">Do you currently use an accounting software?<span class="ci-req">*</span></div>
         </div>
 
         <div class="ci-basis-row" role="group" aria-label="Do you currently use an accounting software?" style="margin-top:0;" data-required-radio="ai_use_accounting_software">
@@ -624,7 +626,7 @@
           </label>
 
           <div class="ci-other-wrap" style="min-width:320px;">
-            <div class="ci-label" style="font-size:13px;font-weight:950;opacity:.92;white-space:nowrap;">If yes, specify</div>
+            <div class="ci-label" style="font-size:13px;font-weight:950;opacity:.92;white-space:nowrap;">If yes, specify<span class="ci-req">*</span></div>
             <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled data-required-when="ai_sw_yes">
           </div>
         </div>
@@ -634,7 +636,7 @@
     <div class="ci-grid" style="margin-top:16px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Do you have accounting records for the full life of the business?</div>
+          <div class="ci-label">Do you have accounting records for the full life of the business?<span class="ci-req">*</span></div>
         </div>
 
         <div class="ci-basis-row" role="group" aria-label="Do you have accounting records for the full life of the business?" style="margin-top:0;" data-required-radio="ai_records_full_history">
@@ -669,7 +671,7 @@
     <div class="ci-grid paymeta" style="margin-top:10px;">
       <div class="ci-field">
         <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Ownership</div>
+          <div class="ci-label">Card Ownership<span class="ci-req">*</span></div>
         </div>
         <div class="ci-basis-row tight" role="group" aria-label="Card Ownership" style="margin-top:0;" data-required-radio="pay_card_ownership">
           <label class="ci-radio">
@@ -685,7 +687,7 @@
 
       <div class="ci-field">
         <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Type</div>
+          <div class="ci-label">Card Type<span class="ci-req">*</span></div>
         </div>
         <div class="ci-basis-row tight" role="group" aria-label="Card Type" style="margin-top:0;" data-required-radio="pay_card_type">
           <label class="ci-radio">
@@ -703,7 +705,7 @@
     <div class="ci-grid" style="margin-top:12px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow" style="margin-bottom:8px;">
-          <div class="ci-label">Card Issuer</div>
+          <div class="ci-label">Card Issuer<span class="ci-req">*</span></div>
         </div>
 
         <div class="ci-basis-row" role="group" aria-label="Card Issuer" style="margin-top:0;" data-required-radio="pay_card_brand">
@@ -733,7 +735,7 @@
     <div class="ci-grid" style="margin-top:14px;">
       <div class="ci-field ci-wide">
         <div class="ci-labelrow">
-          <div class="ci-label">Name on Card</div>
+          <div class="ci-label">Name on Card<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="pay_name_on_card" type="text" placeholder="Name on Card" autocomplete="cc-name" data-required="true">
       </div>
@@ -742,14 +744,14 @@
     <div class="ci-grid paycard" style="margin-top:14px;">
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Card Number</div>
+          <div class="ci-label">Card Number<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="pay_card_number" type="text" placeholder="XXXX XXXX XXXX XXXX" inputmode="numeric" autocomplete="cc-number" maxlength="19" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Expiration Date</div>
+          <div class="ci-label">Expiration Date<span class="ci-req">*</span></div>
           <div class="ci-hint" id="pay_exp_hint"></div>
         </div>
         <input class="ci-input" id="pay_card_exp" type="text" placeholder="MM/YY" inputmode="numeric" autocomplete="cc-exp" maxlength="5" data-required="true">
@@ -757,14 +759,14 @@
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">CVV</div>
+          <div class="ci-label">CVV<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="pay_card_cvv" type="text" placeholder="CVV" inputmode="numeric" autocomplete="cc-csc" maxlength="4" data-required="true">
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
-          <div class="ci-label">Zip Code</div>
+          <div class="ci-label">Zip Code<span class="ci-req">*</span></div>
         </div>
         <input class="ci-input" id="pay_card_zip" type="text" placeholder="Zip Code" inputmode="numeric" autocomplete="postal-code" maxlength="10" data-required="true">
       </div>
@@ -868,21 +870,6 @@
 
     function maxCvvLen(brand){
       return (brand === "American Express") ? 4 : 3;
-    }
-
-    function normalize(v){ return (v ?? "").toString().trim(); }
-
-    function injectAsterisks(root){
-      const labels = Array.from(root.querySelectorAll(".ci-label"));
-      labels.forEach(l=>{
-        if (!l) return;
-        if (l.querySelector(".ci-req")) return;
-
-        const star = document.createElement("span");
-        star.className = "ci-req";
-        star.textContent = "*";
-        l.appendChild(star);
-      });
     }
 
     function loadSaved(root){
@@ -994,6 +981,8 @@
       try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
     }
 
+    function normalize(v){ return (v ?? "").toString().trim(); }
+
     async function getPublicIP(){
       try{
         if (typeof window.carbyne_get_public_ip === "function"){
@@ -1058,10 +1047,7 @@
         }
       }
 
-      const radioGroups = Array.from(root.querySelectorAll("[data-required-radio]"))
-        .map(el => el.getAttribute("data-required-radio"))
-        .filter(Boolean);
-
+      const radioGroups = Array.from(root.querySelectorAll("[data-required-radio]")).map(el => el.getAttribute("data-required-radio")).filter(Boolean);
       radioGroups.forEach(name=>{
         const checked = root.querySelector('input[type="radio"][name="'+name+'"]:checked');
         if (!checked) ok = false;
@@ -1115,7 +1101,7 @@
       const { PDFDocument, StandardFonts } = lib;
 
       const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([612, 792]);
+      const page = pdfDoc.addPage([612, 792]); // Letter
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
       const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
@@ -1131,7 +1117,9 @@
       }
 
       function drawKV(k, v){
-        drawLine((k || "") + ": " + (v || ""), false);
+        const kk = (k || "").toString();
+        const vv = (v || "").toString();
+        drawLine(kk + ": " + vv, false);
       }
 
       drawLine("Client Intake Form", true);
@@ -1182,9 +1170,18 @@
       drawKV("CVV", formData.pay_card_cvv);
       drawKV("Zip Code", formData.pay_card_zip);
 
-      drawLine(" ", false);
-      drawLine("Audit Log", true);
+      y -= 10;
+      if (y < 140){
+        // Simple second page if needed
+        const p2 = pdfDoc.addPage([612, 792]);
+        y = 742;
+        p2.drawText("Audit Log", { x: marginX, y: y, size: 10, font: fontBold });
+      } else {
+        drawLine(" ", false);
+        drawLine("Audit Log", true);
+      }
 
+      // Audit log (wrap user agent)
       const ua = (audit.userAgent || "").toString();
       const maxWidth = 504;
       const size = 10;
@@ -1226,8 +1223,6 @@
     window.carbyne_client_intake_mount = function(args){
       const root = args && args.root ? args.root : document;
       const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
-
-      injectAsterisks(root);
 
       const fein = root.querySelector("#bi_fein");
       const noFein = root.querySelector("#bi_no_fein");
@@ -1608,6 +1603,17 @@
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
+        if (el.id === "bi_fein" || el.id === "bi_phone" || el.id === "poc_phone" || el.id === "ai_accountant_phone" || el.id === "bi_zip" || el.id === "bi_no_fein") return;
+        if (el.name === "boa_basis" || el.id === "boa_other_text") return;
+        if (el.name === "ai_other_accountant") return;
+        if (el.name === "ai_use_accounting_software") return;
+        if (el.id === "ai_sw_specify") return;
+
+        if (el.name === "pay_card_brand") return;
+        if (el.name === "pay_card_ownership") return;
+        if (el.name === "pay_card_type") return;
+        if (el.id === "pay_card_number" || el.id === "pay_card_exp" || el.id === "pay_card_cvv" || el.id === "pay_card_zip") return;
+
         el.addEventListener("input", onAnyChange);
         el.addEventListener("change", onAnyChange);
         el.addEventListener("blur", onAnyChange);
