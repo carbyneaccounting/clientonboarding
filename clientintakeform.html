@@ -872,11 +872,20 @@
 
     function normalize(v){ return (v ?? "").toString().trim(); }
 
+    function isEffectivelyDisabled(el){
+      if (!el) return true;
+      if (el.disabled) return true;
+      if (el.getAttribute("aria-disabled") === "true") return true;
+      if (el.hasAttribute("readonly")) return true;
+      return false;
+    }
+
     function injectAsterisks(root){
       const labels = Array.from(root.querySelectorAll(".ci-label"));
       labels.forEach(l=>{
         if (!l) return;
         if (l.querySelector(".ci-req")) return;
+
         const star = document.createElement("span");
         star.className = "ci-req";
         star.textContent = "*";
@@ -1031,7 +1040,7 @@
       requiredFields.forEach(el=>{
         if (!el) return;
 
-        if (el.disabled) { el.classList.remove("ci-error"); return; }
+        if (isEffectivelyDisabled(el)) { el.classList.remove("ci-error"); return; }
 
         const v = normalize(el.value);
         if (!v || (el.tagName.toLowerCase()==="select" && !v)){
@@ -1046,7 +1055,9 @@
       const noFein = root.querySelector("#bi_no_fein");
       if (fein){
         const needFein = !(noFein && noFein.checked);
-        if (needFein){
+        if (!needFein){
+          fein.classList.remove("ci-error");
+        } else if (!isEffectivelyDisabled(fein)){
           const fv = normalize(fein.value);
           if (!fv || fv.toLowerCase()==="unavailable"){
             fein.classList.add("ci-error");
@@ -1054,8 +1065,6 @@
           } else {
             fein.classList.remove("ci-error");
           }
-        } else {
-          fein.classList.remove("ci-error");
         }
       }
 
@@ -1072,14 +1081,14 @@
       conditional.forEach(el=>{
         const condId = el.getAttribute("data-required-when");
         const condEl = condId ? root.querySelector("#"+condId) : null;
-        const active = !!(condEl && condEl.checked);
 
+        const active = !!(condEl && (condEl.checked === true));
         if (!active){
           el.classList.remove("ci-error");
           return;
         }
 
-        if (el.disabled) return;
+        if (isEffectivelyDisabled(el)) { el.classList.remove("ci-error"); return; }
 
         const v = normalize(el.value);
         if (!v){
@@ -1091,7 +1100,7 @@
       });
 
       const payExp = root.querySelector("#pay_card_exp");
-      if (payExp){
+      if (payExp && !isEffectivelyDisabled(payExp)){
         const v = normalize(payExp.value);
         if (v && !isExpNotExpired(v)){
           payExp.classList.add("ci-error");
@@ -1144,7 +1153,10 @@
 
       drawLine("Business Information", true);
       drawKV("Name of Business", formData.bi_name);
-      drawKV("Employer Identification Number (EIN)", formData.bi_fein);
+
+      const feinNo = !!formData.bi_no_fein;
+      drawKV("Employer Identification Number (EIN)", feinNo ? "No EIN" : (formData.bi_fein || ""));
+
       drawKV("Business Formation Date", formData.bi_formation_date);
       drawKV("Full Name of Person Completing this Agreement", formData.bi_fullname);
       drawKV("Title", formData.bi_title);
@@ -1164,15 +1176,18 @@
       drawLine("Accounting Information", true);
       drawKV("Basis of Accounting", formData.boa_basis === "Other" ? ("Other: " + (formData.boa_other_text || "")) : (formData.boa_basis || ""));
       drawKV("Do you have another accountant?", formData.ai_other_accountant);
+
       if ((formData.ai_other_accountant || "") === "Yes"){
         drawKV("Accountant Name", formData.ai_accountant_name);
         drawKV("Accountant Phone Number", formData.ai_accountant_phone);
         drawKV("Accountant Email Address", formData.ai_accountant_email);
       }
+
       drawKV("Do you currently use an accounting software?", formData.ai_use_accounting_software);
       if ((formData.ai_use_accounting_software || "") === "Yes"){
         drawKV("Accounting Software", formData.ai_sw_specify);
       }
+
       drawKV("Do you have accounting records for the full life of the business?", formData.ai_records_full_history);
 
       drawLine(" ", false);
@@ -1279,15 +1294,12 @@
 
       const onNoFeinToggle = () => {
         if (!fein || !noFein) return;
-
         if (noFein.checked){
           fein.value = "Unavailable";
           fein.setAttribute("readonly","readonly");
         } else {
           fein.removeAttribute("readonly");
-          if (normalize(fein.value).toLowerCase() === "unavailable"){
-            fein.value = "";
-          }
+          fein.value = "";
         }
         save(root);
       };
@@ -1496,6 +1508,8 @@
             const el = root.querySelector("#"+id);
             data[id] = el ? (el.value || "") : "";
           });
+
+          data["bi_no_fein"] = !!(noFein && noFein.checked);
 
           data["boa_basis"] = getSelectedValue(root, "boa_basis");
           const otherText = root.querySelector("#boa_other_text");
