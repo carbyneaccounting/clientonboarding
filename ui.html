@@ -169,20 +169,6 @@
       letter-spacing:.2px;
     }
 
-    /* Added: Review Documents link */
-    .review-docs-link{
-      display:inline-block;
-      margin-top:6px;
-      font-size:12px;
-      font-weight:950;
-      letter-spacing:.2px;
-      color:#00305B;
-      text-decoration:none;
-      opacity:.92;
-      cursor:pointer;
-    }
-    .review-docs-link:hover{opacity:1;text-decoration:underline}
-
     .content{padding:0 2px 2px}
 
     .bottombar{
@@ -312,6 +298,18 @@
     .welcome-h{font-size:13px;font-weight:950;color:#0f172a;margin:16px 0 6px;letter-spacing:.2px}
     .welcome-list{padding-left:18px;margin:6px 0 0}
     .welcome-li{font-size:14px;font-weight:800;color:#0f172a;opacity:.86;line-height:1.6;margin:0 0 8px}
+
+    /* Review Documents link (added only) */
+    .review-docs-link{
+      display:inline-block;
+      margin-top:6px;
+      font-size:12px;
+      font-weight:950;
+      color:#00305B;
+      text-decoration:none;
+      opacity:.95;
+    }
+    .review-docs-link:hover{ text-decoration:underline; opacity:1; }
   </style>
 </head>
 
@@ -371,6 +369,10 @@
     const CLIENT_INTAKE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
     const SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
 
+    // PDF packet storage keys (added only)
+    const PDF_PACKET_KEY = "carbyne_pdf_packet_items";
+    const PDF_PACKET_MERGED_KEY = "carbyne_pdf_packet_merged";
+
     let currentPage = 1;
     let isAccessValidated = false;
     let validCodesCache = null;
@@ -385,6 +387,139 @@
 
     function normalize(v){ return (v ?? "").toString().trim(); }
     function now(){ return Date.now(); }
+
+    // ===== PDF helpers (added only) =====
+    function safeJsonParse(s, fallback){
+      try{ return JSON.parse(s); } catch { return fallback; }
+    }
+
+    function base64ToUint8(b64){
+      const bin = atob(b64);
+      const len = bin.length;
+      const u8 = new Uint8Array(len);
+      for (let i=0;i<len;i++) u8[i] = bin.charCodeAt(i);
+      return u8;
+    }
+
+    function getMergedPdfBytes(){
+      try{
+        const b64 = sessionStorage.getItem(PDF_PACKET_MERGED_KEY) || "";
+        return b64 ? base64ToUint8(b64) : null;
+      } catch {}
+      try{
+        const b64 = localStorage.getItem(PDF_PACKET_MERGED_KEY) || "";
+        return b64 ? base64ToUint8(b64) : null;
+      } catch {}
+      return null;
+    }
+
+    function getPacketItems(){
+      try{
+        const raw = sessionStorage.getItem(PDF_PACKET_KEY) || "";
+        const parsed = safeJsonParse(raw, []);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {}
+      try{
+        const raw2 = localStorage.getItem(PDF_PACKET_KEY) || "";
+        const parsed2 = safeJsonParse(raw2, []);
+        return Array.isArray(parsed2) ? parsed2 : [];
+      } catch {}
+      return [];
+    }
+
+    async function mergePacketPdfs(items){
+      const PDFLib = window.PDFLib;
+      if (!PDFLib || !PDFLib.PDFDocument) return null;
+
+      const merged = await PDFLib.PDFDocument.create();
+      for (const it of (items || [])){
+        if (!it || !it.bytesB64) continue;
+        const u8 = base64ToUint8(it.bytesB64);
+        const src = await PDFLib.PDFDocument.load(u8);
+        const pages = await merged.copyPages(src, src.getPageIndices());
+        for (const p of pages) merged.addPage(p);
+      }
+      const out = await merged.save();
+      return new Uint8Array(out);
+    }
+
+    function openPdfBytesInNewTab(bytesU8){
+      const tab = window.open("about:blank", "_blank");
+      if (!tab) return;
+
+      const blob = new Blob([bytesU8], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+
+      try{
+        tab.location.href = url;
+      } catch {
+        try{
+          tab.document.open();
+          tab.document.write('<iframe style="border:0;width:100%;height:100vh" src="' + url + '"></iframe>');
+          tab.document.close();
+        } catch {}
+      }
+
+      setTimeout(()=>{ try{ URL.revokeObjectURL(url); } catch {} }, 60000);
+    }
+
+    async function openReviewDocuments(){
+      const merged = getMergedPdfBytes();
+      if (merged && merged.length){
+        openPdfBytesInNewTab(merged);
+        return;
+      }
+
+      const items = getPacketItems().filter(x=>x && x.bytesB64);
+      if (!items.length){
+        const tab = window.open("about:blank", "_blank");
+        if (tab){
+          try{
+            tab.document.open();
+            tab.document.write('<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:24px;font-weight:900;color:#0f172a;">No documents yet.</div>');
+            tab.document.close();
+          } catch {}
+        }
+        return;
+      }
+
+      if (items.length === 1){
+        openPdfBytesInNewTab(base64ToUint8(items[0].bytesB64));
+        return;
+      }
+
+      const merged2 = await mergePacketPdfs(items);
+      if (merged2 && merged2.length){
+        openPdfBytesInNewTab(merged2);
+        return;
+      }
+
+      openPdfBytesInNewTab(base64ToUint8(items[items.length-1].bytesB64));
+    }
+
+    function injectReviewDocumentsLink(shell){
+      const step = getStepNumber();
+      if (step < 4) return; // Page 5+ only
+
+      const ref = shell.querySelector(".reference-number");
+      if (!ref) return;
+      if (ref.querySelector("#carbyneReviewDocsLink")) return;
+
+      const br = document.createElement("br");
+      const a = document.createElement("a");
+      a.id = "carbyneReviewDocsLink";
+      a.href = "#";
+      a.className = "review-docs-link";
+      a.textContent = "Review Documents";
+      a.addEventListener("click", (e)=>{
+        e.preventDefault();
+        openReviewDocuments();
+      });
+
+      ref.appendChild(br);
+      ref.appendChild(a);
+    }
+    // ===== end PDF helpers =====
 
     function getCachedCodes(){
       if (validCodesCache) return validCodesCache;
@@ -508,25 +643,6 @@
       onScroll();
     }
 
-    function injectReviewDocumentsLink(shell){
-      const step = getStepNumber();
-      if (step < 4) return; // Page 5+ only
-      const ref = shell.querySelector(".reference-number");
-      if (!ref) return;
-      if (ref.querySelector("#carbyneReviewDocsLink")) return;
-    
-      const br = document.createElement("br");
-      const a = document.createElement("a");
-      a.id = "carbyneReviewDocsLink";
-      a.href = "#";
-      a.className = "review-docs-link";
-      a.textContent = "Review Documents";
-    
-      ref.appendChild(br);
-      ref.appendChild(a);
-    }
-
-
     function buildShell(secureCode){
       const shell = document.createElement("div");
       shell.className = "shell";
@@ -541,7 +657,7 @@
         </div>
       `;
       attachRefHideOnScroll(shell);
-      injectReviewDocumentsLink(shell);
+      injectReviewDocumentsLink(shell); // added only
       return shell;
     }
 
@@ -798,112 +914,6 @@
     }
 
     init();
-  </script>
-
-  <script>
-    (function(){
-      "use strict";
-
-      const PACKET_KEY = "carbyne_packet_docs_v1";
-
-      function safeJsonParse(raw){
-        try{ return JSON.parse(raw); } catch { return null; }
-      }
-
-      function loadPacket(){
-        const raw = sessionStorage.getItem(PACKET_KEY);
-        const obj = safeJsonParse(raw);
-        if (obj && Array.isArray(obj.docs)) return obj;
-        return { version: 1, docs: [] };
-      }
-
-      function fromBase64ToBytes(b64){
-        const bin = atob(b64);
-        const len = bin.length;
-        const out = new Uint8Array(len);
-        for (let i=0;i<len;i++) out[i] = bin.charCodeAt(i);
-        return out;
-      }
-
-      async function mergePacketPdfs(packet){
-        const PDFDocument = window.PDFLib && window.PDFLib.PDFDocument;
-        if (!PDFDocument) throw new Error("pdf-lib not available.");
-
-        const outDoc = await PDFDocument.create();
-
-        for (const doc of packet.docs){
-          if (!doc || !doc.pdf_base64) continue;
-          const bytes = fromBase64ToBytes(doc.pdf_base64);
-          const src = await PDFDocument.load(bytes);
-          const copied = await outDoc.copyPages(src, src.getPageIndices());
-          copied.forEach(p => outDoc.addPage(p));
-        }
-
-        return await outDoc.save();
-      }
-
-      function openPdfInNewTabFromBytes(bytes, tab){
-        const blob = new Blob([bytes], { type: "application/pdf" });
-        const url = URL.createObjectURL(blob);
-
-        if (tab && !tab.closed){
-          tab.location = url;
-        } else {
-          window.open(url, "_blank", "noopener");
-        }
-
-        setTimeout(() => { try{ URL.revokeObjectURL(url); } catch {} }, 60 * 1000);
-      }
-
-      async function handleReviewClick(e){
-        const a = e.target && e.target.closest ? e.target.closest("#carbyneReviewDocsLink") : null;
-        if (!a) return;
-
-        e.preventDefault();
-
-        const tab = window.open("about:blank", "_blank", "noopener");
-        if (tab){
-          try{
-            tab.document.write(
-              '<!doctype html><html><head><meta charset="utf-8"><title>Review Documents</title></head>' +
-              '<body style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; padding:20px;">' +
-              '<div style="font-weight:900;font-size:14px;color:#0f172a;">Preparing documents...</div>' +
-              '</body></html>'
-            );
-            tab.document.close();
-          } catch {}
-        }
-
-        const packet = loadPacket();
-        if (!packet.docs.length){
-          if (tab && !tab.closed){
-            try{
-              tab.document.body.innerHTML =
-                '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; padding:20px;">' +
-                '<div style="font-weight:900;font-size:14px;color:#0f172a;">No documents have been completed yet.</div>' +
-                '</div>';
-            } catch {}
-          }
-          return;
-        }
-
-        try{
-          const merged = await mergePacketPdfs(packet);
-          openPdfInNewTabFromBytes(merged, tab);
-        } catch {
-          if (tab && !tab.closed){
-            try{
-              tab.document.body.innerHTML =
-                '<div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif; padding:20px;">' +
-                '<div style="font-weight:900;font-size:14px;color:#0f172a;">Unable to open documents.</div>' +
-                '</div>';
-            } catch {}
-          }
-        }
-      }
-
-      document.addEventListener("click", handleReviewClick);
-    })();
   </script>
 </body>
 </html>
