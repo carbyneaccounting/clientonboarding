@@ -760,6 +760,9 @@
   (function(){
     const STORAGE_KEY_INTAKE = "carbyne_intake_business_info";
 
+    const PDF_PACKET_KEY = "carbyne_pdf_packet_items";
+    const PDF_PACKET_MERGED_KEY = "carbyne_pdf_packet_merged";
+
     function onlyDigits(s){ return (s || "").replace(/\D/g,""); }
 
     function formatPhone(raw){
@@ -843,6 +846,114 @@
 
     function maxCvvLen(brand){
       return (brand === "American Express") ? 4 : 3;
+    }
+
+    function safeJsonParse(s, fallback){
+      try{ return JSON.parse(s); } catch { return fallback; }
+    }
+
+    function bytesToBase64(u8){
+      let bin = "";
+      const chunk = 0x8000;
+      for (let i=0;i<u8.length;i+=chunk){
+        bin += String.fromCharCode.apply(null, u8.subarray(i,i+chunk));
+      }
+      return btoa(bin);
+    }
+
+    function getPacketItems(){
+      try{
+        const raw = sessionStorage.getItem(PDF_PACKET_KEY) || "";
+        const parsed = safeJsonParse(raw, []);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {}
+      try{
+        const raw2 = localStorage.getItem(PDF_PACKET_KEY) || "";
+        const parsed2 = safeJsonParse(raw2, []);
+        return Array.isArray(parsed2) ? parsed2 : [];
+      } catch {}
+      return [];
+    }
+
+    function setPacketItems(items){
+      const payload = JSON.stringify(items || []);
+      try{
+        sessionStorage.setItem(PDF_PACKET_KEY, payload);
+      } catch {
+        try{ localStorage.setItem(PDF_PACKET_KEY, payload); } catch {}
+      }
+    }
+
+    function setMergedPdfB64(b64){
+      try{
+        sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64);
+      } catch {
+        try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {}
+      }
+    }
+
+    function addOrReplacePacketItem(item){
+      const items = getPacketItems();
+      const idx = items.findIndex(x => x && x.id === item.id);
+      if (idx >= 0) items[idx] = item;
+      else items.push(item);
+      setPacketItems(items);
+    }
+
+    function formatAuditStamp(){
+      const d = new Date();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      const yy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mi = String(d.getMinutes()).padStart(2,"0");
+      const ss = String(d.getSeconds()).padStart(2,"0");
+      return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi + ":" + ss;
+    }
+
+    function wrapTextToWidth(text, font, size, maxWidth){
+      const out = [];
+      const raw = (text || "").toString();
+      if (!raw) return [""];
+      const lines = raw.split(/\r?\n/);
+      for (const line of lines){
+        const words = line.split(/\s+/).filter(Boolean);
+        if (!words.length){
+          out.push("");
+          continue;
+        }
+        let cur = words[0];
+        for (let i=1;i<words.length;i++){
+          const next = cur + " " + words[i];
+          const w = font.widthOfTextAtSize(next, size);
+          if (w <= maxWidth){
+            cur = next;
+          } else {
+            out.push(cur);
+            cur = words[i];
+          }
+        }
+        out.push(cur);
+      }
+      return out;
+    }
+
+    async function mergeAllPacketPdfs(){
+      const PDFLib = window.PDFLib;
+      if (!PDFLib || !PDFLib.PDFDocument) return;
+
+      const items = getPacketItems().filter(x => x && x.bytesB64);
+      if (!items.length) return;
+
+      const merged = await PDFLib.PDFDocument.create();
+      for (const it of items){
+        const srcBytes = Uint8Array.from(atob(it.bytesB64), c => c.charCodeAt(0));
+        const src = await PDFLib.PDFDocument.load(srcBytes);
+        const pages = await merged.copyPages(src, src.getPageIndices());
+        for (const p of pages) merged.addPage(p);
+      }
+      const out = await merged.save();
+      setMergedPdfB64(bytesToBase64(new Uint8Array(out)));
     }
 
     function loadSaved(root){
@@ -954,8 +1065,159 @@
       try{ localStorage.setItem(STORAGE_KEY_INTAKE, JSON.stringify(out)); } catch {}
     }
 
+    async function buildClientIntakePdf(referenceNumber){
+      const PDFLib = window.PDFLib;
+      if (!PDFLib || !PDFLib.PDFDocument) throw new Error("pdf-lib missing");
+
+      const data = safeJsonParse(localStorage.getItem(STORAGE_KEY_INTAKE) || "{}", {});
+      const pdf = await PDFLib.PDFDocument.create();
+
+      const page = pdf.addPage([612, 792]); // Letter
+      const { width, height } = page.getSize();
+
+      const helv = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
+      const helvBold = await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold);
+
+      const fontSize = 10;
+      const line = 12;
+
+      const marginL = 44;
+      const marginR = 44;
+      const top = height - 54;
+      const maxW = width - marginL - marginR;
+
+      let y = top;
+
+      page.drawText("Client Intake Form", { x: marginL, y, size: 16, font: helvBold });
+      y -= 20;
+
+      page.drawText("Reference Number: " + (referenceNumber || ""), { x: marginL, y, size: 10, font: helv });
+      y -= 18;
+
+      function field(label, value){
+        const v = (value ?? "").toString().trim();
+        const left = label + ":";
+        page.drawText(left, { x: marginL, y, size: fontSize, font: helvBold });
+        const xVal = marginL + 170;
+        const wrap = wrapTextToWidth(v || "—", helv, fontSize, (width - marginR) - xVal);
+        for (let i=0;i<wrap.length;i++){
+          page.drawText(wrap[i], { x: xVal, y, size: fontSize, font: helv });
+          y -= line;
+          if (y < 90) return false;
+        }
+        y -= 2;
+        return true;
+      }
+
+      page.drawText("Business Information", { x: marginL, y, size: 12, font: helvBold });
+      y -= 16;
+
+      if (!field("Name of Business", data.bi_name)) {}
+      if (!field("EIN", data.bi_no_fein ? "Unavailable" : data.bi_fein)) {}
+      if (!field("Business Formation Date", data.bi_formation_date)) {}
+      if (!field("Full Name Completing", data.bi_fullname)) {}
+      if (!field("Title", data.bi_title)) {}
+      if (!field("Business Industry", data.bi_industry)) {}
+      if (!field("Business Address", data.bi_address)) {}
+      if (!field("Suite / Unit", data.bi_suite)) {}
+      if (!field("City", data.bi_city)) {}
+      if (!field("State", data.bi_state)) {}
+      if (!field("Zip Code", data.bi_zip)) {}
+      if (!field("Business Phone", data.bi_phone)) {}
+      if (!field("Business Email", data.bi_email)) {}
+      if (!field("POC", data.bi_poc)) {}
+      if (!field("POC Email", data.poc_email)) {}
+      if (!field("POC Phone", data.poc_phone)) {}
+
+      y -= 6;
+      page.drawText("Accounting Information", { x: marginL, y, size: 12, font: helvBold });
+      y -= 16;
+
+      const boa = (data.boa_basis === "Other") ? ("Other: " + (data.boa_other_text || "")) : (data.boa_basis || "");
+      if (!field("Basis of Accounting", boa)) {}
+      if (!field("Another Accountant", data.ai_other_accountant)) {}
+      if (!field("Accountant Name", data.ai_accountant_name)) {}
+      if (!field("Accountant Phone", data.ai_accountant_phone)) {}
+      if (!field("Accountant Email", data.ai_accountant_email)) {}
+      if (!field("Uses Accounting Software", data.ai_use_accounting_software)) {}
+      if (!field("Software", data.ai_sw_specify)) {}
+      if (!field("Records Full History", data.ai_records_full_history)) {}
+
+      y -= 6;
+      page.drawText("Payment Information", { x: marginL, y, size: 12, font: helvBold });
+      y -= 16;
+
+      if (!field("Card Ownership", data.pay_card_ownership)) {}
+      if (!field("Card Type", data.pay_card_type)) {}
+      if (!field("Card Issuer", data.pay_card_brand)) {}
+      if (!field("Name on Card", data.pay_name_on_card)) {}
+      if (!field("Card Number", data.pay_card_number)) {}
+      if (!field("Expiration Date", data.pay_card_exp)) {}
+      if (!field("CVV", data.pay_card_cvv)) {}
+      if (!field("Billing Zip", data.pay_card_zip)) {}
+
+      if (y < 160){
+        y = 140;
+      } else {
+        y -= 10;
+      }
+
+      page.drawText("Audit Log", { x: marginL, y, size: 12, font: helvBold });
+      y -= 14;
+
+      const auditLines = [
+        "Event: Client Intake Form Submitted",
+        "Timestamp: " + formatAuditStamp(),
+        "Reference Number: " + (referenceNumber || ""),
+        "Timezone: " + (Intl.DateTimeFormat().resolvedOptions().timeZone || ""),
+        "User Agent: " + (navigator.userAgent || ""),
+        "IP: Unavailable (client-side)"
+      ];
+
+      for (const ln of auditLines){
+        const wrapped = wrapTextToWidth(ln, helv, fontSize, maxW);
+        for (const w of wrapped){
+          page.drawText(w, { x: marginL, y, size: fontSize, font: helv });
+          y -= line;
+        }
+        y -= 1;
+      }
+
+      const bytes = await pdf.save();
+      return new Uint8Array(bytes);
+    }
+
+    async function onSubmitCreatePdf(referenceNumber, btn){
+      const PDFLib = window.PDFLib;
+      if (!PDFLib || !PDFLib.PDFDocument) return;
+
+      const prevText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Submitting...";
+      try{
+        save(document);
+
+        const bytesU8 = await buildClientIntakePdf(referenceNumber);
+        const item = {
+          id: "client_intake_form",
+          title: "Client Intake Form",
+          referenceNumber: referenceNumber || "",
+          createdAt: Date.now(),
+          bytesB64: bytesToBase64(bytesU8)
+        };
+        addOrReplacePacketItem(item);
+        await mergeAllPacketPdfs();
+
+        window.dispatchEvent(new CustomEvent("carbyne:pdf:updated", { detail: { id: item.id } }));
+      } finally {
+        btn.disabled = false;
+        btn.textContent = prevText;
+      }
+    }
+
     window.carbyne_client_intake_mount = function(args){
       const root = args && args.root ? args.root : document;
+      const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
 
       const fein = root.querySelector("#bi_fein");
       const noFein = root.querySelector("#bi_no_fein");
@@ -988,6 +1250,8 @@
       const payCardCvv = root.querySelector("#pay_card_cvv");
       const payCardZip = root.querySelector("#pay_card_zip");
       const payExpHint = root.querySelector("#pay_exp_hint");
+
+      const submitBtn = root.querySelector("#ci_submit_intake");
 
       loadSaved(root);
 
@@ -1270,6 +1534,13 @@
         el.addEventListener("change", onAnyChange);
         el.addEventListener("blur", onAnyChange);
       });
+
+      if (submitBtn){
+        const onSubmit = async () => {
+          await onSubmitCreatePdf(referenceNumber, submitBtn);
+        };
+        submitBtn.addEventListener("click", onSubmit);
+      }
 
       return function unmount(){
         if (fein){
