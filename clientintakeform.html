@@ -10,147 +10,35 @@
 
 <template id="carbyne_client_intake">
   <style>
-    .ci-wrap{
-      width:100%;
-      max-width:980px;
-    }
+    .ci-wrap{width:100%;max-width:980px}
+    .ci-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:4px 2px 0}
+    .ci-h2{margin:0;font-size:28px;font-weight:950;color:#0b2f4e;letter-spacing:.2px}
 
-    .ci-top{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:14px;
-      padding:4px 2px 0;
-    }
-
-    .ci-h2{
-      margin:0;
-      font-size:28px;
-      font-weight:950;
-      color:#0b2f4e;
-      letter-spacing:.2px;
-    }
-
-    .ci-section{
-      margin-top:12px;
-      font-size:14px;
-      font-weight:950;
-      color:#0f172a;
-      letter-spacing:.2px;
-    }
-
-    .ci-sectionline{
-      width:100%;
-      height:2px;
-      background:#00305B;
-      border-radius:999px;
-      margin:8px 0 12px;
-    }
-
+    .ci-section{margin-top:12px;font-size:14px;font-weight:950;color:#0f172a;letter-spacing:.2px}
+    .ci-sectionline{width:100%;height:2px;background:#00305B;border-radius:999px;margin:8px 0 12px}
     .ci-spacer{height:10px}
 
-    .ci-grid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
-      width:100%;
-    }
-
-    .ci-grid.three{
-      display:grid;
-      grid-template-columns:repeat(3, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
-      width:100%;
-    }
-
-    .ci-grid.four{
-      display:grid;
-      grid-template-columns:repeat(4, minmax(0,1fr));
-      gap:14px;
-      margin-top:10px;
-      width:100%;
-    }
-
-    .ci-grid.titlefit{
-      grid-template-columns:none;
-      grid-auto-flow:column;
-      grid-auto-columns:max-content;
-      align-items:end;
-      width:100%;
-      justify-content:space-between;
-      column-gap:0;
-    }
-
-    .ci-grid.titlefit .ci-label{
-      white-space:nowrap;
-    }
-
-    .ci-grid.titlefit .ci-field{
-      min-width:0;
-    }
-
-    .ci-grid.industryaddr{
-      grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr);
-    }
-
-    .ci-grid.paycard{
-      grid-template-columns: minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr);
-    }
-
-    .ci-grid.paymeta{
-      column-gap:10px;
-      row-gap:0px;
-      margin-top:14px;
-    }
+    .ci-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:10px;width:100%}
+    .ci-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .ci-grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}
+    .ci-grid.titlefit{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:max-content;align-items:end;width:100%;justify-content:space-between;column-gap:0}
+    .ci-grid.titlefit .ci-label{white-space:nowrap}
+    .ci-grid.titlefit .ci-field{min-width:0}
+    .ci-grid.industryaddr{grid-template-columns:minmax(0,1fr) minmax(0,1.45fr) minmax(0,.65fr)}
+    .ci-grid.paycard{grid-template-columns:minmax(0,2.05fr) minmax(0,1.25fr) minmax(0,.85fr) minmax(0,.85fr)}
+    .ci-grid.paymeta{column-gap:10px;row-gap:0px;margin-top:14px}
 
     .ci-field{width:100%}
     .ci-wide{grid-column:1 / -1}
 
-    .ci-labelrow{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin:0 0 8px;
-    }
+    .ci-labelrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 8px}
+    .ci-label{font-size:13px;font-weight:950;color:#0f172a;opacity:.92;display:inline-flex;align-items:center;gap:4px}
+    .ci-req{color:#b91c1c;font-weight:950;margin-left:2px;line-height:1}
 
-    .ci-label{
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.92;
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-    }
+    .ci-inline{display:flex;align-items:center;gap:10px;font-size:12px;font-weight:950;color:#0f172a;opacity:.85;white-space:nowrap}
+    .ci-check{width:16px;height:16px;accent-color:#00305B;cursor:pointer}
 
-    .ci-req{
-      color:#b91c1c;
-      font-weight:950;
-      margin-left:2px;
-      line-height:1;
-    }
-
-    .ci-inline{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size:12px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.85;
-      white-space:nowrap;
-    }
-
-    .ci-check{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
-    }
-
-    .ci-input, .ci-select{
+    .ci-input,.ci-select{
       width:100%;
       border:1px solid rgba(0,0,0,.14);
       border-radius:14px;
@@ -163,23 +51,17 @@
       transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
       color:#0f172a;
     }
-
     .ci-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
 
-    .ci-input:focus, .ci-select:focus{
+    .ci-input:focus,.ci-select:focus{
       border-color:rgba(0,48,91,.70);
       box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
     }
 
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      opacity: 0.6;
-    }
-    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover {
-      opacity: 1;
-    }
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator{cursor:pointer;opacity:.6}
+    .ci-input[type="date"]::-webkit-calendar-picker-indicator:hover{opacity:1}
 
-    .ci-input:disabled{
+    .ci-input:disabled,.ci-select:disabled{
       background:#f1f5f9;
       color:#64748b;
       box-shadow:none;
@@ -192,96 +74,33 @@
       box-shadow:0 0 0 3px rgba(185,28,28,.10), 0 12px 24px rgba(2,6,23,.10);
     }
 
-    .ci-hint{
-      font-size:12px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.75;
-      white-space:nowrap;
-    }
+    .ci-hint{font-size:12px;font-weight:950;color:#0f172a;opacity:.75;white-space:nowrap}
+    .ci-hint.bad{color:#b91c1c;opacity:1}
 
-    .ci-hint.bad{
-      color:#b91c1c;
-      opacity:1;
-    }
-
-    .ci-input.ci-error, .ci-select.ci-error{
+    .ci-input.ci-error,.ci-select.ci-error{
       border-color:rgba(185,28,28,.65);
       box-shadow:0 0 0 3px rgba(185,28,28,.10), 0 12px 24px rgba(2,6,23,.10);
     }
 
-    .ci-basis-row{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      flex-wrap:nowrap;
-      margin-top:10px;
-      padding:2px 2px 0;
-      width:100%;
-    }
-
-    .ci-basis-row.tight{
-      gap:12px;
-    }
+    .ci-basis-row{display:flex;align-items:center;gap:14px;flex-wrap:nowrap;margin-top:10px;padding:2px 2px 0;width:100%}
+    .ci-basis-row.tight{gap:12px}
 
     .ci-radio{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size:13px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.92;
-      white-space:nowrap;
-      user-select:none;
-      flex:0 0 auto;
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:13px;font-weight:950;color:#0f172a;opacity:.92;
+      white-space:nowrap;user-select:none;flex:0 0 auto;
     }
+    .ci-radio input[type="radio"]{width:16px;height:16px;accent-color:#00305B;cursor:pointer;flex:0 0 auto}
 
-    .ci-radio input[type="radio"]{
-      width:16px;height:16px;
-      accent-color:#00305B;
-      cursor:pointer;
-      flex:0 0 auto;
-    }
-
-    .ci-other-wrap{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex:1 1 auto;
-      min-width:220px;
-    }
-
+    .ci-other-wrap{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-width:220px}
     .ci-other-input{
-      flex:1 1 auto;
-      width:100%;
-      min-width:0;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid rgba(0,0,0,.14);
-      font-size:14px;
-      font-weight:900;
-      outline:none;
-      background:#fff;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
-      transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;
-      color:#0f172a;
+      flex:1 1 auto;width:100%;min-width:0;padding:12px 14px;border-radius:14px;border:1px solid rgba(0,0,0,.14);
+      font-size:14px;font-weight:900;outline:none;background:#fff;box-shadow:0 10px 20px rgba(2,6,23,.08);
+      transition:border-color .18s ease, box-shadow .18s ease, background-color .18s ease, opacity .18s ease;color:#0f172a;
     }
-
     .ci-other-input::placeholder{color:#64748b;font-weight:900;opacity:.75}
-
-    .ci-other-input:focus{
-      border-color:rgba(0,48,91,.70);
-      box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10);
-    }
-
-    .ci-other-input:disabled{
-      background:#f1f5f9;
-      color:#64748b;
-      box-shadow:none;
-      opacity:.95;
-      cursor:not-allowed;
-    }
+    .ci-other-input:focus{border-color:rgba(0,48,91,.70);box-shadow:0 0 0 3px rgba(0,48,91,.16), 0 12px 24px rgba(2,6,23,.10)}
+    .ci-other-input:disabled{background:#f1f5f9;color:#64748b;box-shadow:none;opacity:.95;cursor:not-allowed}
 
     .ci-note{
       width:100%;
@@ -297,73 +116,25 @@
       margin-top:2px;
     }
 
-    .ci-actions{
-      width:100%;
-      display:flex;
-      justify-content:flex-start;
-      margin-top:12px;
-      align-items:center;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .ci-submitline{
-      width:100%;
-      height:2px;
-      background:#00305B;
-      border-radius:999px;
-      margin:18px 0 12px;
-    }
+    .ci-actions{width:100%;display:flex;justify-content:flex-start;margin-top:12px;align-items:center;gap:12px;flex-wrap:wrap}
+    .ci-submitline{width:100%;height:2px;background:#00305B;border-radius:999px;margin:18px 0 12px}
 
     .ci-submit{
-      appearance:none;
-      border:0;
-      border-radius:14px;
-      padding:14px 18px;
-      font-size:14px;
-      font-weight:950;
-      letter-spacing:.2px;
-      background:#00305B;
-      color:#fff;
-      cursor:pointer;
-      box-shadow:0 10px 20px rgba(2,6,23,.10);
+      appearance:none;border:0;border-radius:14px;padding:14px 18px;font-size:14px;font-weight:950;letter-spacing:.2px;
+      background:#00305B;color:#fff;cursor:pointer;box-shadow:0 10px 20px rgba(2,6,23,.10);
       transition:transform .14s ease, opacity .14s ease, box-shadow .14s ease;
     }
+    .ci-submit:hover{transform:translateY(-1px);box-shadow:0 12px 24px rgba(2,6,23,.14)}
+    .ci-submit:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:0 10px 20px rgba(2,6,23,.06)}
 
-    .ci-submit:hover{
-      transform:translateY(-1px);
-      box-shadow:0 12px 24px rgba(2,6,23,.14);
-    }
-
-    .ci-submit:disabled{
-      opacity:.55;
-      cursor:not-allowed;
-      transform:none;
-      box-shadow:0 10px 20px rgba(2,6,23,.06);
-    }
-
-    .ci-submit-msg{
-      display:none;
-      font-size:13px;
-      font-weight:950;
-      color:#b91c1c;
-      letter-spacing:.2px;
-      white-space:nowrap;
-    }
+    .ci-submit-msg{display:none;font-size:13px;font-weight:950;color:#b91c1c;letter-spacing:.2px;white-space:nowrap}
     .ci-submit-msg.show{display:inline}
 
     @media (max-width:820px){
-      .ci-grid, .ci-grid.three, .ci-grid.four{grid-template-columns:1fr}
+      .ci-grid,.ci-grid.three,.ci-grid.four{grid-template-columns:1fr}
       .ci-grid.paycard{grid-template-columns:1fr}
-      .ci-grid.titlefit{
-        grid-auto-flow:row;
-        grid-auto-columns:unset;
-        justify-content:stretch;
-        column-gap:0;
-      }
-      .ci-grid.titlefit .ci-label{
-        white-space:normal;
-      }
+      .ci-grid.titlefit{grid-auto-flow:row;grid-auto-columns:unset;justify-content:stretch;column-gap:0}
+      .ci-grid.titlefit .ci-label{white-space:normal}
       .ci-basis-row{flex-wrap:wrap}
       .ci-other-wrap{flex:1 1 100%}
       .ci-hint{white-space:normal}
@@ -400,7 +171,7 @@
             No EIN
           </label>
         </div>
-        <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10" data-required="true">
+        <input class="ci-input" id="bi_fein" type="text" placeholder="XX-XXXXXXX" inputmode="numeric" autocomplete="off" maxlength="10">
       </div>
     </div>
 
@@ -559,7 +330,7 @@
           <input type="radio" name="boa_basis" id="boa_other" value="Other">
           Other
         </label>
-        <input class="ci-other-input" id="boa_other_text" type="text" placeholder="Specify" autocomplete="off" disabled data-required-when="boa_other">
+        <input class="ci-other-input" id="boa_other_text" type="text" placeholder="Specify" autocomplete="off" disabled>
       </div>
     </div>
 
@@ -588,21 +359,21 @@
         <div class="ci-labelrow">
           <div class="ci-label">Accountant Name</div>
         </div>
-        <input class="ci-input" id="ai_accountant_name" type="text" placeholder="Accountant Name" autocomplete="name" disabled data-required-when="ai_other_acct_yes">
+        <input class="ci-input" id="ai_accountant_name" type="text" placeholder="Accountant Name" autocomplete="name" disabled>
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Phone Number</div>
         </div>
-        <input class="ci-input" id="ai_accountant_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" disabled data-required-when="ai_other_acct_yes">
+        <input class="ci-input" id="ai_accountant_phone" type="tel" placeholder="(XXX) XXX-XXXX" inputmode="numeric" autocomplete="tel" maxlength="14" disabled>
       </div>
 
       <div class="ci-field">
         <div class="ci-labelrow">
           <div class="ci-label">Email Address</div>
         </div>
-        <input class="ci-input" id="ai_accountant_email" type="email" placeholder="Email Address" autocomplete="email" disabled data-required-when="ai_other_acct_yes">
+        <input class="ci-input" id="ai_accountant_email" type="email" placeholder="Email Address" autocomplete="email" disabled>
       </div>
     </div>
 
@@ -625,7 +396,7 @@
 
           <div class="ci-other-wrap" style="min-width:320px;">
             <div class="ci-label" style="font-size:13px;font-weight:950;opacity:.92;white-space:nowrap;">If yes, specify</div>
-            <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled data-required-when="ai_sw_yes">
+            <input class="ci-other-input" id="ai_sw_specify" type="text" placeholder="Accounting Software" autocomplete="off" disabled>
           </div>
         </div>
       </div>
@@ -776,7 +547,6 @@
       <button class="ci-submit" id="ci_submit_intake" type="button">Submit Client Intake Form</button>
       <div class="ci-submit-msg" id="ci_submit_msg">Please complete all required fields.</div>
     </div>
-
   </div>
 </template>
 
@@ -786,12 +556,11 @@
     const DOC_ID_INTAKE = "client_intake_form";
 
     function onlyDigits(s){ return (s || "").replace(/\D/g,""); }
+    function normalize(v){ return (v ?? "").toString().trim(); }
 
     function formatPhone(raw){
       const d = onlyDigits(raw).slice(0,10);
-      const a = d.slice(0,3);
-      const b = d.slice(3,6);
-      const c = d.slice(6,10);
+      const a = d.slice(0,3), b = d.slice(3,6), c = d.slice(6,10);
       if (!d) return "";
       if (d.length <= 3) return "(" + a;
       if (d.length <= 6) return "(" + a + ") " + b;
@@ -821,21 +590,16 @@
       const d = onlyDigits(raw);
       if (brand === "American Express"){
         const x = d.slice(0,15);
-        const p1 = x.slice(0,4);
-        const p2 = x.slice(4,10);
-        const p3 = x.slice(10,15);
+        const p1 = x.slice(0,4), p2 = x.slice(4,10), p3 = x.slice(10,15);
         if (!x) return "";
         if (x.length <= 4) return p1;
         if (x.length <= 10) return p1 + " " + p2;
         return p1 + " " + p2 + " " + p3;
-      } else {
-        const x = d.slice(0,16);
-        const parts = [];
-        for (let i=0;i<x.length;i+=4){
-          parts.push(x.slice(i,i+4));
-        }
-        return parts.join(" ");
       }
+      const x = d.slice(0,16);
+      const parts = [];
+      for (let i=0;i<x.length;i+=4) parts.push(x.slice(i,i+4));
+      return parts.join(" ");
     }
 
     function formatExp(raw){
@@ -851,8 +615,7 @@
       const mm = parseInt(d.slice(0,2), 10);
       const yy = parseInt(d.slice(2,4), 10);
       if (!mm || mm < 1 || mm > 12) return null;
-      const year = 2000 + yy;
-      return { mm, year };
+      return { mm, year: 2000 + yy };
     }
 
     function isExpNotExpired(mmYY){
@@ -866,18 +629,13 @@
       return p.mm >= curMonth;
     }
 
-    function maxCvvLen(brand){
-      return (brand === "American Express") ? 4 : 3;
-    }
-
-    function normalize(v){ return (v ?? "").toString().trim(); }
+    function maxCvvLen(brand){ return (brand === "American Express") ? 4 : 3; }
 
     function injectAsterisks(root){
       const labels = Array.from(root.querySelectorAll(".ci-label"));
       labels.forEach(l=>{
         if (!l) return;
         if (l.querySelector(".ci-req")) return;
-
         const star = document.createElement("span");
         star.className = "ci-req";
         star.textContent = "*";
@@ -910,51 +668,21 @@
         });
 
         const cb = root.querySelector("#bi_no_fein");
-        if (cb){
-          cb.checked = !!data["bi_no_fein"];
-        }
+        if (cb) cb.checked = !!data["bi_no_fein"];
 
-        const savedBasis = (data["boa_basis"] ?? "");
-        if (savedBasis){
-          const radios = Array.from(root.querySelectorAll('input[type="radio"][name="boa_basis"]'));
-          radios.forEach(r=>{ r.checked = (r.value === savedBasis); });
-        }
+        const setRadio = (name, val) => {
+          if (!val) return;
+          const radios = Array.from(root.querySelectorAll('input[type="radio"][name="'+name+'"]'));
+          radios.forEach(r=>{ r.checked = (r.value === val); });
+        };
 
-        const savedOtherAcct = (data["ai_other_accountant"] ?? "");
-        if (savedOtherAcct){
-          const radios2 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]'));
-          radios2.forEach(r=>{ r.checked = (r.value === savedOtherAcct); });
-        }
-
-        const savedUseSw = (data["ai_use_accounting_software"] ?? "");
-        if (savedUseSw){
-          const radios3 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_use_accounting_software"]'));
-          radios3.forEach(r=>{ r.checked = (r.value === savedUseSw); });
-        }
-
-        const savedRecords = (data["ai_records_full_history"] ?? "");
-        if (savedRecords){
-          const radios4 = Array.from(root.querySelectorAll('input[type="radio"][name="ai_records_full_history"]'));
-          radios4.forEach(r=>{ r.checked = (r.value === savedRecords); });
-        }
-
-        const savedBrand = (data["pay_card_brand"] ?? "");
-        if (savedBrand){
-          const radios5 = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_brand"]'));
-          radios5.forEach(r=>{ r.checked = (r.value === savedBrand); });
-        }
-
-        const savedOwnership = (data["pay_card_ownership"] ?? "");
-        if (savedOwnership){
-          const radios6 = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_ownership"]'));
-          radios6.forEach(r=>{ r.checked = (r.value === savedOwnership); });
-        }
-
-        const savedType = (data["pay_card_type"] ?? "");
-        if (savedType){
-          const radios7 = Array.from(root.querySelectorAll('input[type="radio"][name="pay_card_type"]'));
-          radios7.forEach(r=>{ r.checked = (r.value === savedType); });
-        }
+        setRadio("boa_basis", data["boa_basis"] ?? "");
+        setRadio("ai_other_accountant", data["ai_other_accountant"] ?? "");
+        setRadio("ai_use_accounting_software", data["ai_use_accounting_software"] ?? "");
+        setRadio("ai_records_full_history", data["ai_records_full_history"] ?? "");
+        setRadio("pay_card_brand", data["pay_card_brand"] ?? "");
+        setRadio("pay_card_ownership", data["pay_card_ownership"] ?? "");
+        setRadio("pay_card_type", data["pay_card_type"] ?? "");
       } catch {}
     }
 
@@ -1026,37 +754,27 @@
       let ok = true;
 
       const msg = root.querySelector("#ci_submit_msg");
-      if (msg) msg.classList.remove("show");
+      if (msg){
+        msg.textContent = "Please complete all required fields.";
+        msg.classList.remove("show");
+      }
+
+      const clearErrors = () => {
+        const errs = Array.from(root.querySelectorAll(".ci-error"));
+        errs.forEach(el=>el.classList.remove("ci-error"));
+      };
+      clearErrors();
 
       const requiredFields = Array.from(root.querySelectorAll("[data-required='true']"));
       requiredFields.forEach(el=>{
         if (!el) return;
-        if (el.disabled) { el.classList.remove("ci-error"); return; }
+        if (el.disabled) return;
         const v = normalize(el.value);
         if (!v || (el.tagName.toLowerCase()==="select" && !v)){
           el.classList.add("ci-error");
           ok = false;
-        } else {
-          el.classList.remove("ci-error");
         }
       });
-
-      const fein = root.querySelector("#bi_fein");
-      const noFein = root.querySelector("#bi_no_fein");
-      if (fein){
-        const needFein = !(noFein && noFein.checked);
-        if (needFein){
-          const fv = normalize(fein.value);
-          if (!fv || fv.toLowerCase()==="unavailable"){
-            fein.classList.add("ci-error");
-            ok = false;
-          } else {
-            fein.classList.remove("ci-error");
-          }
-        } else {
-          fein.classList.remove("ci-error");
-        }
-      }
 
       const radioGroups = Array.from(root.querySelectorAll("[data-required-radio]"))
         .map(el => el.getAttribute("data-required-radio"))
@@ -1065,25 +783,6 @@
       radioGroups.forEach(name=>{
         const checked = root.querySelector('input[type="radio"][name="'+name+'"]:checked');
         if (!checked) ok = false;
-      });
-
-      const conditional = Array.from(root.querySelectorAll("[data-required-when]"));
-      conditional.forEach(el=>{
-        const condId = el.getAttribute("data-required-when");
-        const condEl = condId ? root.querySelector("#"+condId) : null;
-        const active = !!(condEl && condEl.checked);
-        if (!active){
-          el.classList.remove("ci-error");
-          return;
-        }
-        if (el.disabled) return;
-        const v = normalize(el.value);
-        if (!v){
-          el.classList.add("ci-error");
-          ok = false;
-        } else {
-          el.classList.remove("ci-error");
-        }
       });
 
       const payExp = root.querySelector("#pay_card_exp");
@@ -1123,69 +822,6 @@
       const topY = 742;
       let y = topY;
 
-      function drawLine(text, isBold){
-        const f = isBold ? fontBold : font;
-        const size = 10;
-        page.drawText(text, { x: marginX, y: y, size, font: f });
-        y -= 14;
-      }
-
-      function drawKV(k, v){
-        drawLine((k || "") + ": " + (v || ""), false);
-      }
-
-      drawLine("Client Intake Form", true);
-      drawLine("Reference Number: " + (referenceNumber || ""), false);
-      drawLine(" ", false);
-
-      drawLine("Business Information", true);
-      drawKV("Name of Business", formData.bi_name);
-      drawKV("Employer Identification Number (EIN)", formData.bi_fein);
-      drawKV("Business Formation Date", formData.bi_formation_date);
-      drawKV("Full Name of Person Completing this Agreement", formData.bi_fullname);
-      drawKV("Title", formData.bi_title);
-      drawKV("Business Industry", formData.bi_industry);
-      drawKV("Business Address", formData.bi_address);
-      drawKV("Suite / Unit Number", formData.bi_suite);
-      drawKV("City", formData.bi_city);
-      drawKV("State", formData.bi_state);
-      drawKV("Zip Code", formData.bi_zip);
-      drawKV("Business Phone Number", formData.bi_phone);
-      drawKV("Business Email Address", formData.bi_email);
-      drawKV("Point of Contact (POC)", formData.bi_poc);
-      drawKV("POC Email", formData.poc_email);
-      drawKV("POC Phone Number", formData.poc_phone);
-
-      drawLine(" ", false);
-      drawLine("Accounting Information", true);
-      drawKV("Basis of Accounting", formData.boa_basis === "Other" ? ("Other: " + (formData.boa_other_text || "")) : (formData.boa_basis || ""));
-      drawKV("Do you have another accountant?", formData.ai_other_accountant);
-      if ((formData.ai_other_accountant || "") === "Yes"){
-        drawKV("Accountant Name", formData.ai_accountant_name);
-        drawKV("Accountant Phone Number", formData.ai_accountant_phone);
-        drawKV("Accountant Email Address", formData.ai_accountant_email);
-      }
-      drawKV("Do you currently use an accounting software?", formData.ai_use_accounting_software);
-      if ((formData.ai_use_accounting_software || "") === "Yes"){
-        drawKV("Accounting Software", formData.ai_sw_specify);
-      }
-      drawKV("Do you have accounting records for the full life of the business?", formData.ai_records_full_history);
-
-      drawLine(" ", false);
-      drawLine("Payment Information", true);
-      drawKV("Card Ownership", formData.pay_card_ownership);
-      drawKV("Card Type", formData.pay_card_type);
-      drawKV("Card Issuer", formData.pay_card_brand);
-      drawKV("Name on Card", formData.pay_name_on_card);
-      drawKV("Card Number", formData.pay_card_number);
-      drawKV("Expiration Date", formData.pay_card_exp);
-      drawKV("CVV", formData.pay_card_cvv);
-      drawKV("Zip Code", formData.pay_card_zip);
-
-      drawLine(" ", false);
-      drawLine("Audit Log", true);
-
-      const ua = (audit.userAgent || "").toString();
       const maxWidth = 504;
       const size = 10;
 
@@ -1207,13 +843,79 @@
         return lines;
       }
 
-      drawKV("Timestamp", audit.timestamp);
-      drawKV("Public IP", audit.publicIP);
-      drawKV("Time Zone", audit.timezone);
-      drawKV("Platform", audit.platform);
-      drawLine("User Agent:", false);
+      function drawLine(text, isBold){
+        const f = isBold ? fontBold : font;
+        page.drawText(text, { x: marginX, y: y, size, font: f });
+        y -= 14;
+      }
 
-      const uaLines = wrapText(ua, font);
+      function drawKV(k, v){
+        drawLine((k || "") + ": " + (v || ""), false);
+      }
+
+      function safeVal(v){
+        const s = normalize(v);
+        return s || "";
+      }
+
+      drawLine("Client Intake Form", true);
+      drawLine("Reference Number: " + (referenceNumber || ""), false);
+      drawLine(" ", false);
+
+      drawLine("Business Information", true);
+      drawKV("Name of Business", safeVal(formData.bi_name));
+      drawKV("Employer Identification Number (EIN)", safeVal(formData.bi_fein));
+      drawKV("Business Formation Date", safeVal(formData.bi_formation_date));
+      drawKV("Full Name of Person Completing this Agreement", safeVal(formData.bi_fullname));
+      drawKV("Title", safeVal(formData.bi_title));
+      drawKV("Business Industry", safeVal(formData.bi_industry));
+      drawKV("Business Address", safeVal(formData.bi_address));
+      drawKV("Suite / Unit Number", safeVal(formData.bi_suite));
+      drawKV("City", safeVal(formData.bi_city));
+      drawKV("State", safeVal(formData.bi_state));
+      drawKV("Zip Code", safeVal(formData.bi_zip));
+      drawKV("Business Phone Number", safeVal(formData.bi_phone));
+      drawKV("Business Email Address", safeVal(formData.bi_email));
+      drawKV("Point of Contact (POC)", safeVal(formData.bi_poc));
+      drawKV("POC Email", safeVal(formData.poc_email));
+      drawKV("POC Phone Number", safeVal(formData.poc_phone));
+
+      drawLine(" ", false);
+      drawLine("Accounting Information", true);
+      drawKV("Basis of Accounting", (formData.boa_basis === "Other") ? ("Other: " + safeVal(formData.boa_other_text)) : safeVal(formData.boa_basis));
+      drawKV("Do you have another accountant?", safeVal(formData.ai_other_accountant));
+      if (safeVal(formData.ai_other_accountant) === "Yes"){
+        drawKV("Accountant Name", safeVal(formData.ai_accountant_name));
+        drawKV("Accountant Phone Number", safeVal(formData.ai_accountant_phone));
+        drawKV("Accountant Email Address", safeVal(formData.ai_accountant_email));
+      }
+      drawKV("Do you currently use an accounting software?", safeVal(formData.ai_use_accounting_software));
+      if (safeVal(formData.ai_use_accounting_software) === "Yes"){
+        drawKV("Accounting Software", safeVal(formData.ai_sw_specify));
+      }
+      drawKV("Do you have accounting records for the full life of the business?", safeVal(formData.ai_records_full_history));
+
+      drawLine(" ", false);
+      drawLine("Payment Information", true);
+      drawKV("Card Ownership", safeVal(formData.pay_card_ownership));
+      drawKV("Card Type", safeVal(formData.pay_card_type));
+      drawKV("Card Issuer", safeVal(formData.pay_card_brand));
+      drawKV("Name on Card", safeVal(formData.pay_name_on_card));
+      drawKV("Card Number", safeVal(formData.pay_card_number));
+      drawKV("Expiration Date", safeVal(formData.pay_card_exp));
+      drawKV("CVV", safeVal(formData.pay_card_cvv));
+      drawKV("Zip Code", safeVal(formData.pay_card_zip));
+
+      drawLine(" ", false);
+      drawLine("Audit Log", true);
+
+      drawKV("Timestamp", safeVal(audit.timestamp));
+      drawKV("Public IP", safeVal(audit.publicIP));
+      drawKV("Time Zone", safeVal(audit.timezone));
+      drawKV("Platform", safeVal(audit.platform));
+
+      drawLine("User Agent:", false);
+      const uaLines = wrapText((audit.userAgent || "").toString(), font);
       uaLines.forEach(l=>{
         page.drawText(l, { x: marginX, y: y, size, font });
         y -= 14;
@@ -1221,28 +923,6 @@
 
       const bytes = await pdfDoc.save();
       return bytesToB64(bytes);
-    }
-
-    function upsertToReviewDocuments(payload){
-      try{
-        window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", { detail: payload }));
-      } catch (e){
-        console.error("window dispatch failed", e);
-      }
-
-      try{
-        document.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", { detail: payload }));
-      } catch (e){
-        console.error("document dispatch failed", e);
-      }
-
-      try{
-        if (window.parent && window.parent !== window){
-          window.parent.postMessage({ type: "carbyne:pdfdoc:upsert", detail: payload }, "*");
-        }
-      } catch (e){
-        console.error("postMessage failed", e);
-      }
     }
 
     window.carbyne_client_intake_mount = function(args){
@@ -1255,7 +935,6 @@
       const noFein = root.querySelector("#bi_no_fein");
       const phone = root.querySelector("#bi_phone");
       const zip = root.querySelector("#bi_zip");
-
       const pocPhone = root.querySelector("#poc_phone");
       const acctPhone = root.querySelector("#ai_accountant_phone");
 
@@ -1265,7 +944,6 @@
 
       const otherAcctRadios = Array.from(root.querySelectorAll('input[type="radio"][name="ai_other_accountant"]'));
       const otherAcctYes = root.querySelector("#ai_other_acct_yes");
-
       const acctName = root.querySelector("#ai_accountant_name");
       const acctEmail = root.querySelector("#ai_accountant_email");
 
@@ -1290,7 +968,7 @@
 
       const onFeinInput = () => {
         if (!fein) return;
-        if (noFein && noFein.checked) return;
+        if (fein.disabled) return;
         fein.value = formatFein(fein.value);
         save(root);
       };
@@ -1298,44 +976,20 @@
       const onNoFeinToggle = () => {
         if (!fein || !noFein) return;
         if (noFein.checked){
-          fein.value = "Unavailable";
-          fein.setAttribute("readonly","readonly");
-        } else {
-          fein.removeAttribute("readonly");
           fein.value = "";
+          fein.setAttribute("disabled","disabled");
+        } else {
+          fein.removeAttribute("disabled");
+          fein.value = formatFein(fein.value);
         }
         save(root);
       };
 
-      const onPhoneInput = () => {
-        if (!phone) return;
-        phone.value = formatPhone(phone.value);
-        save(root);
-      };
-
-      const onPocPhoneInput = () => {
-        if (!pocPhone) return;
-        pocPhone.value = formatPhone(pocPhone.value);
-        save(root);
-      };
-
-      const onAcctPhoneInput = () => {
-        if (!acctPhone) return;
-        acctPhone.value = formatPhone(acctPhone.value);
-        save(root);
-      };
-
-      const onZipInput = () => {
-        if (!zip) return;
-        zip.value = formatZip(zip.value);
-        save(root);
-      };
-
-      const onPayZipInput = () => {
-        if (!payCardZip) return;
-        payCardZip.value = formatZip(payCardZip.value);
-        save(root);
-      };
+      const onPhoneInput = () => { if (!phone) return; phone.value = formatPhone(phone.value); save(root); };
+      const onPocPhoneInput = () => { if (!pocPhone) return; pocPhone.value = formatPhone(pocPhone.value); save(root); };
+      const onAcctPhoneInput = () => { if (!acctPhone) return; acctPhone.value = formatPhone(acctPhone.value); save(root); };
+      const onZipInput = () => { if (!zip) return; zip.value = formatZip(zip.value); save(root); };
+      const onPayZipInput = () => { if (!payCardZip) return; payCardZip.value = formatZip(payCardZip.value); save(root); };
 
       function syncOtherState(){
         if (!boaOtherText) return;
@@ -1382,10 +1036,7 @@
         if (!v){
           payCardExp.classList.remove("ci-invalid");
           payCardExp.removeAttribute("aria-invalid");
-          if (payExpHint){
-            payExpHint.textContent = "";
-            payExpHint.classList.remove("bad");
-          }
+          if (payExpHint){ payExpHint.textContent = ""; payExpHint.classList.remove("bad"); }
           return;
         }
 
@@ -1395,29 +1046,20 @@
         if (!okFormat){
           payCardExp.classList.add("ci-invalid");
           payCardExp.setAttribute("aria-invalid","true");
-          if (payExpHint){
-            payExpHint.textContent = "Use MM/YY";
-            payExpHint.classList.add("bad");
-          }
+          if (payExpHint){ payExpHint.textContent = "Use MM/YY"; payExpHint.classList.add("bad"); }
           return;
         }
 
         if (!okNotExpired){
           payCardExp.classList.add("ci-invalid");
           payCardExp.setAttribute("aria-invalid","true");
-          if (payExpHint){
-            payExpHint.textContent = "Card expired";
-            payExpHint.classList.add("bad");
-          }
+          if (payExpHint){ payExpHint.textContent = "Card expired"; payExpHint.classList.add("bad"); }
           return;
         }
 
         payCardExp.classList.remove("ci-invalid");
         payCardExp.removeAttribute("aria-invalid");
-        if (payExpHint){
-          payExpHint.textContent = "";
-          payExpHint.classList.remove("bad");
-        }
+        if (payExpHint){ payExpHint.textContent = ""; payExpHint.classList.remove("bad"); }
       }
 
       function syncCardFormat(){
@@ -1445,32 +1087,10 @@
         save(root);
       }
 
-      const onPayCardNumberInput = () => {
-        if (!payCardNumber) return;
-        const brand = getSelectedValue(root, "pay_card_brand");
-        payCardNumber.value = formatCardNumber(payCardNumber.value, brand);
-        save(root);
-      };
-
-      const onPayExpInput = () => {
-        if (!payCardExp) return;
-        payCardExp.value = formatExp(payCardExp.value);
-        validateExp();
-        save(root);
-      };
-
-      const onPayExpBlur = () => {
-        validateExp();
-        save(root);
-      };
-
-      const onPayCvvInput = () => {
-        if (!payCardCvv) return;
-        const brand = getSelectedValue(root, "pay_card_brand");
-        const maxLen = maxCvvLen(brand);
-        payCardCvv.value = onlyDigits(payCardCvv.value).slice(0, maxLen);
-        save(root);
-      };
+      const onPayCardNumberInput = () => { if (!payCardNumber) return; payCardNumber.value = formatCardNumber(payCardNumber.value, getSelectedValue(root, "pay_card_brand")); save(root); };
+      const onPayExpInput = () => { if (!payCardExp) return; payCardExp.value = formatExp(payCardExp.value); validateExp(); save(root); };
+      const onPayExpBlur = () => { validateExp(); save(root); };
+      const onPayCvvInput = () => { if (!payCardCvv) return; const maxLen = maxCvvLen(getSelectedValue(root, "pay_card_brand")); payCardCvv.value = onlyDigits(payCardCvv.value).slice(0, maxLen); save(root); };
 
       const onAnyChange = () => {
         if (submitMsg) submitMsg.classList.remove("show");
@@ -1524,6 +1144,12 @@
           data["pay_card_ownership"] = getSelectedValue(root, "pay_card_ownership");
           data["pay_card_type"] = getSelectedValue(root, "pay_card_type");
 
+          if (noFein && noFein.checked){
+            data["bi_fein"] = "";
+          } else {
+            data["bi_fein"] = formatFein(data["bi_fein"]);
+          }
+
           const ip = await getPublicIP();
 
           const audit = {
@@ -1536,20 +1162,19 @@
 
           const b64 = await buildIntakePdfB64(referenceNumber, data, audit);
 
-          const payload = {
-            id: DOC_ID_INTAKE,
-            title: "Client Intake Form",
-            b64: b64,
-            meta: {
-              referenceNumber: referenceNumber || "",
-              createdAt: audit.timestamp,
-              publicIP: audit.publicIP
+          window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+            detail: {
+              id: DOC_ID_INTAKE,
+              title: "Client Intake Form",
+              b64: b64,
+              meta: {
+                referenceNumber: referenceNumber || "",
+                createdAt: audit.timestamp,
+                publicIP: audit.publicIP
+              }
             }
-          };
-
-          upsertToReviewDocuments(payload);
-        } catch (e){
-          console.error(e);
+          }));
+        } catch {
           if (submitMsg){
             submitMsg.textContent = "Unable to generate document.";
             submitMsg.classList.add("show");
@@ -1559,30 +1184,13 @@
         }
       }
 
-      if (fein){
-        fein.addEventListener("input", onFeinInput);
-        fein.addEventListener("blur", onFeinInput);
-      }
-      if (noFein){
-        noFein.addEventListener("change", onNoFeinToggle);
-        onNoFeinToggle();
-      }
-      if (phone){
-        phone.addEventListener("input", onPhoneInput);
-        phone.addEventListener("blur", onPhoneInput);
-      }
-      if (pocPhone){
-        pocPhone.addEventListener("input", onPocPhoneInput);
-        pocPhone.addEventListener("blur", onPocPhoneInput);
-      }
-      if (acctPhone){
-        acctPhone.addEventListener("input", onAcctPhoneInput);
-        acctPhone.addEventListener("blur", onAcctPhoneInput);
-      }
-      if (zip){
-        zip.addEventListener("input", onZipInput);
-        zip.addEventListener("blur", onZipInput);
-      }
+      if (fein){ fein.addEventListener("input", onFeinInput); fein.addEventListener("blur", onFeinInput); }
+      if (noFein){ noFein.addEventListener("change", onNoFeinToggle); }
+
+      if (phone){ phone.addEventListener("input", onPhoneInput); phone.addEventListener("blur", onPhoneInput); }
+      if (pocPhone){ pocPhone.addEventListener("input", onPocPhoneInput); pocPhone.addEventListener("blur", onPocPhoneInput); }
+      if (acctPhone){ acctPhone.addEventListener("input", onAcctPhoneInput); acctPhone.addEventListener("blur", onAcctPhoneInput); }
+      if (zip){ zip.addEventListener("input", onZipInput); zip.addEventListener("blur", onZipInput); }
 
       boaRadios.forEach(r=>{ r.addEventListener("change", onBasisChange); });
 
@@ -1605,29 +1213,10 @@
       payOwnerRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
       payTypeRadios.forEach(r=>{ r.addEventListener("change", onAnyChange); });
 
-      if (payCardNumber){
-        payCardNumber.addEventListener("input", onPayCardNumberInput);
-        payCardNumber.addEventListener("blur", onPayCardNumberInput);
-      }
-      if (payCardExp){
-        payCardExp.addEventListener("input", onPayExpInput);
-        payCardExp.addEventListener("blur", onPayExpBlur);
-        payCardExp.addEventListener("change", onPayExpBlur);
-      }
-      if (payCardCvv){
-        payCardCvv.addEventListener("input", onPayCvvInput);
-        payCardCvv.addEventListener("blur", onPayCvvInput);
-      }
-      if (payCardZip){
-        payCardZip.addEventListener("input", onPayZipInput);
-        payCardZip.addEventListener("blur", onPayZipInput);
-      }
-
-      syncOtherState();
-      syncOtherAccountantState();
-      syncAccountingSoftwareState();
-      syncCardFormat();
-      validateExp();
+      if (payCardNumber){ payCardNumber.addEventListener("input", onPayCardNumberInput); payCardNumber.addEventListener("blur", onPayCardNumberInput); }
+      if (payCardExp){ payCardExp.addEventListener("input", onPayExpInput); payCardExp.addEventListener("blur", onPayExpBlur); payCardExp.addEventListener("change", onPayExpBlur); }
+      if (payCardCvv){ payCardCvv.addEventListener("input", onPayCvvInput); payCardCvv.addEventListener("blur", onPayCvvInput); }
+      if (payCardZip){ payCardZip.addEventListener("input", onPayZipInput); payCardZip.addEventListener("blur", onPayZipInput); }
 
       const allInputs = Array.from(root.querySelectorAll("input,select"));
       allInputs.forEach(el=>{
@@ -1636,34 +1225,22 @@
         el.addEventListener("blur", onAnyChange);
       });
 
-      if (submitBtn){
-        submitBtn.addEventListener("click", onSubmit);
-      }
+      if (submitBtn) submitBtn.addEventListener("click", onSubmit);
+
+      onNoFeinToggle();
+      syncOtherState();
+      syncOtherAccountantState();
+      syncAccountingSoftwareState();
+      syncCardFormat();
+      validateExp();
 
       return function unmount(){
-        if (fein){
-          fein.removeEventListener("input", onFeinInput);
-          fein.removeEventListener("blur", onFeinInput);
-        }
-        if (noFein){
-          noFein.removeEventListener("change", onNoFeinToggle);
-        }
-        if (phone){
-          phone.removeEventListener("input", onPhoneInput);
-          phone.removeEventListener("blur", onPhoneInput);
-        }
-        if (pocPhone){
-          pocPhone.removeEventListener("input", onPocPhoneInput);
-          pocPhone.removeEventListener("blur", onPocPhoneInput);
-        }
-        if (acctPhone){
-          acctPhone.removeEventListener("input", onAcctPhoneInput);
-          acctPhone.removeEventListener("blur", onAcctPhoneInput);
-        }
-        if (zip){
-          zip.removeEventListener("input", onZipInput);
-          zip.removeEventListener("blur", onZipInput);
-        }
+        if (fein){ fein.removeEventListener("input", onFeinInput); fein.removeEventListener("blur", onFeinInput); }
+        if (noFein){ noFein.removeEventListener("change", onNoFeinToggle); }
+        if (phone){ phone.removeEventListener("input", onPhoneInput); phone.removeEventListener("blur", onPhoneInput); }
+        if (pocPhone){ pocPhone.removeEventListener("input", onPocPhoneInput); pocPhone.removeEventListener("blur", onPocPhoneInput); }
+        if (acctPhone){ acctPhone.removeEventListener("input", onAcctPhoneInput); acctPhone.removeEventListener("blur", onAcctPhoneInput); }
+        if (zip){ zip.removeEventListener("input", onZipInput); zip.removeEventListener("blur", onZipInput); }
 
         boaRadios.forEach(r=>{ r.removeEventListener("change", onBasisChange); });
 
@@ -1686,23 +1263,10 @@
         payOwnerRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
         payTypeRadios.forEach(r=>{ r.removeEventListener("change", onAnyChange); });
 
-        if (payCardNumber){
-          payCardNumber.removeEventListener("input", onPayCardNumberInput);
-          payCardNumber.removeEventListener("blur", onPayCardNumberInput);
-        }
-        if (payCardExp){
-          payCardExp.removeEventListener("input", onPayExpInput);
-          payCardExp.removeEventListener("blur", onPayExpBlur);
-          payCardExp.removeEventListener("change", onPayExpBlur);
-        }
-        if (payCardCvv){
-          payCardCvv.removeEventListener("input", onPayCvvInput);
-          payCardCvv.removeEventListener("blur", onPayCvvInput);
-        }
-        if (payCardZip){
-          payCardZip.removeEventListener("input", onPayZipInput);
-          payCardZip.removeEventListener("blur", onPayZipInput);
-        }
+        if (payCardNumber){ payCardNumber.removeEventListener("input", onPayCardNumberInput); payCardNumber.removeEventListener("blur", onPayCardNumberInput); }
+        if (payCardExp){ payCardExp.removeEventListener("input", onPayExpInput); payCardExp.removeEventListener("blur", onPayExpBlur); payCardExp.removeEventListener("change", onPayExpBlur); }
+        if (payCardCvv){ payCardCvv.removeEventListener("input", onPayCvvInput); payCardCvv.removeEventListener("blur", onPayCvvInput); }
+        if (payCardZip){ payCardZip.removeEventListener("input", onPayZipInput); payCardZip.removeEventListener("blur", onPayZipInput); }
 
         allInputs.forEach(el=>{
           el.removeEventListener("input", onAnyChange);
@@ -1710,9 +1274,7 @@
           el.removeEventListener("blur", onAnyChange);
         });
 
-        if (submitBtn){
-          submitBtn.removeEventListener("click", onSubmit);
-        }
+        if (submitBtn) submitBtn.removeEventListener("click", onSubmit);
       };
     };
   })();
