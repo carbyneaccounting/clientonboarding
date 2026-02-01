@@ -5,8 +5,6 @@
   <meta charset="utf-8">
   <title>Electronic Signature</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
 <body>
 
@@ -120,8 +118,9 @@
       background:rgba(0,0,0,.02);
     }
     .es-script{
-      font-family:"Brush Script MT","Segoe Script","Snell Roundhand","Apple Chancery",cursive;
-      font-size:26px;
+      font-family:"Arial Narrow","Arial","system-ui",-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      font-weight:900;
+      font-size:18px;
       color:#0f172a;
       line-height:1;
       user-select:none;
@@ -254,8 +253,6 @@
 
     const PDF_PACKET_KEY = "carbyne_pdf_packet_items";
     const PDF_PACKET_MERGED_KEY = "carbyne_pdf_packet_merged";
-    const PDF_PACKET_META_KEY = "carbyne_pdf_packet_meta";
-    const PDF_DOC_ID_SIGNATURE = "signature_page";
 
     function nowStamp(){
       const d = new Date();
@@ -267,12 +264,112 @@
       return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
     }
 
-    function nowIso(){
-      try{ return new Date().toISOString(); } catch { return ""; }
+    function auditStamp(){
+      const d = new Date();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      const yy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mi = String(d.getMinutes()).padStart(2,"0");
+      const ss = String(d.getSeconds()).padStart(2,"0");
+      return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi + ":" + ss;
     }
 
     function safeJsonParse(s, fallback){
       try{ return JSON.parse(s); } catch { return fallback; }
+    }
+
+    function bytesToBase64(u8){
+      let bin = "";
+      const chunk = 0x8000;
+      for (let i=0;i<u8.length;i+=chunk){
+        bin += String.fromCharCode.apply(null, u8.subarray(i,i+chunk));
+      }
+      return btoa(bin);
+    }
+
+    function getPacketItems(){
+      try{
+        const raw = sessionStorage.getItem(PDF_PACKET_KEY) || "";
+        const parsed = safeJsonParse(raw, []);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {}
+      try{
+        const raw2 = localStorage.getItem(PDF_PACKET_KEY) || "";
+        const parsed2 = safeJsonParse(raw2, []);
+        return Array.isArray(parsed2) ? parsed2 : [];
+      } catch {}
+      return [];
+    }
+
+    function setPacketItems(items){
+      const payload = JSON.stringify(items || []);
+      try{
+        sessionStorage.setItem(PDF_PACKET_KEY, payload);
+      } catch {
+        try{ localStorage.setItem(PDF_PACKET_KEY, payload); } catch {}
+      }
+    }
+
+    function setMergedPdfB64(b64){
+      try{
+        sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64);
+      } catch {
+        try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {}
+      }
+    }
+
+    function addOrReplacePacketItem(item){
+      const items = getPacketItems();
+      const idx = items.findIndex(x => x && x.id === item.id);
+      if (idx >= 0) items[idx] = item;
+      else items.push(item);
+      setPacketItems(items);
+    }
+
+    function wrapTextToWidth(text, font, size, maxWidth){
+      const out = [];
+      const raw = (text || "").toString();
+      if (!raw) return [""];
+      const lines = raw.split(/\r?\n/);
+      for (const line of lines){
+        const words = line.split(/\s+/).filter(Boolean);
+        if (!words.length){
+          out.push("");
+          continue;
+        }
+        let cur = words[0];
+        for (let i=1;i<words.length;i++){
+          const next = cur + " " + words[i];
+          const w = font.widthOfTextAtSize(next, size);
+          if (w <= maxWidth){
+            cur = next;
+          } else {
+            out.push(cur);
+            cur = words[i];
+          }
+        }
+        out.push(cur);
+      }
+      return out;
+    }
+
+    async function mergeAllPacketPdfs(){
+      const PDFLib = window.PDFLib;
+      if (!PDFLib || !PDFLib.PDFDocument) return;
+
+      const items = getPacketItems().filter(x => x && x.bytesB64);
+      if (!items.length) return;
+
+      const merged = await PDFLib.PDFDocument.create();
+      for (const it of items){
+        const srcBytes = Uint8Array.from(atob(it.bytesB64), c => c.charCodeAt(0));
+        const src = await PDFLib.PDFDocument.load(srcBytes);
+        const pages = await merged.copyPages(src, src.getPageIndices());
+        for (const p of pages) merged.addPage(p);
+      }
+      const out = await merged.save();
+      setMergedPdfB64(bytesToBase64(new Uint8Array(out)));
     }
 
     function clearStored(){
@@ -357,331 +454,115 @@
       root.querySelector("#esLastVal").textContent = last || "—";
     }
 
-    function uint8ToBase64(u8){
-      let s = "";
-      const chunk = 0x8000;
-      for (let i=0;i<u8.length;i+=chunk){
-        s += String.fromCharCode.apply(null, u8.subarray(i, i+chunk));
-      }
-      return btoa(s);
+    function normalizeTypedSig(name){
+      const t = (name || "").toString().trim();
+      if (!t) return "";
+      if (/^\/s\//i.test(t)) return "/s/ " + t.replace(/^\/s\/\s*/i,"").trim();
+      return "/s/ " + t;
     }
 
-    function base64ToUint8(b64){
-      const bin = atob(b64);
-      const len = bin.length;
-      const u8 = new Uint8Array(len);
-      for (let i=0;i<len;i++) u8[i] = bin.charCodeAt(i);
-      return u8;
-    }
-
-    function dataUrlToUint8(dataUrl){
-      const idx = (dataUrl || "").indexOf(",");
-      if (idx < 0) return new Uint8Array();
-      const b64 = dataUrl.slice(idx+1);
-      return base64ToUint8(b64);
-    }
-
-    function getPacketItems(){
-      try{
-        const raw = sessionStorage.getItem(PDF_PACKET_KEY) || "";
-        const parsed = safeJsonParse(raw, []);
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {}
-      try{
-        const raw2 = localStorage.getItem(PDF_PACKET_KEY) || "";
-        const parsed2 = safeJsonParse(raw2, []);
-        return Array.isArray(parsed2) ? parsed2 : [];
-      } catch {}
-      return [];
-    }
-
-    function setPacketItems(items){
-      try{
-        sessionStorage.setItem(PDF_PACKET_KEY, JSON.stringify(items || []));
-      } catch {
-        try{ localStorage.setItem(PDF_PACKET_KEY, JSON.stringify(items || [])); } catch {}
-      }
-    }
-
-    function setPacketMeta(meta){
-      try{
-        sessionStorage.setItem(PDF_PACKET_META_KEY, JSON.stringify(meta || {}));
-      } catch {
-        try{ localStorage.setItem(PDF_PACKET_META_KEY, JSON.stringify(meta || {})); } catch {}
-      }
-    }
-
-    function setMergedPdfBytes(u8){
-      const b64 = uint8ToBase64(u8);
-      try{
-        sessionStorage.setItem(PDF_PACKET_MERGED_KEY, b64);
-      } catch {
-        try{ localStorage.setItem(PDF_PACKET_MERGED_KEY, b64); } catch {}
-      }
-    }
-
-    function getMergedPdfBytes(){
-      try{
-        const b64 = sessionStorage.getItem(PDF_PACKET_MERGED_KEY) || "";
-        return b64 ? base64ToUint8(b64) : null;
-      } catch {}
-      try{
-        const b64 = localStorage.getItem(PDF_PACKET_MERGED_KEY) || "";
-        return b64 ? base64ToUint8(b64) : null;
-      } catch {}
-      return null;
-    }
-
-    async function mergePacketPdfs(items){
+    async function buildSignaturePdf(referenceNumber, stored){
       const PDFLib = window.PDFLib;
-      if (!PDFLib || !PDFLib.PDFDocument) return null;
+      if (!PDFLib || !PDFLib.PDFDocument) throw new Error("pdf-lib missing");
 
-      const merged = await PDFLib.PDFDocument.create();
-      for (const it of (items || [])){
-        if (!it || !it.bytesB64) continue;
-        const u8 = base64ToUint8(it.bytesB64);
-        const src = await PDFLib.PDFDocument.load(u8);
-        const pages = await merged.copyPages(src, src.getPageIndices());
-        for (const p of pages) merged.addPage(p);
-      }
-      const out = await merged.save();
-      return new Uint8Array(out);
-    }
+      const pdf = await PDFLib.PDFDocument.create();
+      const page = pdf.addPage([612, 792]); // Letter
+      const { width, height } = page.getSize();
 
-    function upsertPacketItem(docId, name, bytesU8, meta){
-      const items = getPacketItems();
-      const b64 = uint8ToBase64(bytesU8);
+      const helv = await pdf.embedFont(PDFLib.StandardFonts.Helvetica);
+      const helvBold = await pdf.embedFont(PDFLib.StandardFonts.HelveticaBold);
 
-      const nowTs = Date.now();
-      const entry = {
-        id: docId,
-        name: name || docId,
-        bytesB64: b64,
-        updatedAt: nowTs
-      };
+      const baseSize = 10;
+      const line = 12;
 
-      let replaced = false;
-      const out = [];
-      for (const it of items){
-        if (it && it.id === docId){
-          out.push(entry);
-          replaced = true;
+      const marginL = 44;
+      const marginR = 44;
+      const top = height - 54;
+      const maxW = width - marginL - marginR;
+
+      let y = top;
+
+      page.drawText("Electronic Signature", { x: marginL, y, size: 16, font: helvBold });
+      y -= 20;
+
+      page.drawText("Reference Number: " + (referenceNumber || ""), { x: marginL, y, size: 10, font: helv });
+      y -= 18;
+
+      const meta = stored && stored.meta ? stored.meta : {};
+      const mode = meta.mode || "";
+      const last = meta.lastAdopted || "";
+
+      page.drawText("Signature", { x: marginL, y, size: 12, font: helvBold });
+      y -= 16;
+
+      if ((mode || "").toLowerCase() === "type"){
+        const typed = normalizeTypedSig(meta.typedText || meta.typedTextRaw || "");
+        page.drawText(typed || "—", { x: marginL, y, size: 10, font: helvBold });
+        y -= 18;
+      } else {
+        if (stored && stored.dataUrl){
+          const pngBytes = await fetch(stored.dataUrl).then(r=>r.arrayBuffer());
+          const png = await pdf.embedPng(pngBytes);
+          const sigW = Math.min(420, png.width);
+          const scale = sigW / png.width;
+          const sigH = png.height * scale;
+
+          const boxH = 90;
+          const yTop = y;
+          page.drawRectangle({
+            x: marginL,
+            y: yTop - boxH,
+            width: maxW,
+            height: boxH,
+            borderWidth: 1,
+            borderColor: PDFLib.rgb(0.75,0.75,0.75)
+          });
+
+          page.drawImage(png, {
+            x: marginL + 10,
+            y: (yTop - boxH) + (boxH - sigH) / 2,
+            width: png.width * scale,
+            height: sigH
+          });
+
+          y = yTop - boxH - 10;
         } else {
-          out.push(it);
-        }
-      }
-      if (!replaced) out.push(entry);
-
-      out.sort((a,b)=> (a.updatedAt||0) - (b.updatedAt||0));
-
-      setPacketItems(out);
-      setPacketMeta(meta || {});
-      return out;
-    }
-
-    function firePacketEvents(detail){
-      try{
-        window.dispatchEvent(new CustomEvent("carbyne:pdf:packet:updated", { detail: detail || {} }));
-      } catch {}
-      try{
-        window.dispatchEvent(new CustomEvent("carbyne:pdf:upsert", { detail: detail || {} }));
-      } catch {}
-    }
-
-    async function fetchPublicIp(timeoutMs){
-      const ctrl = new AbortController();
-      const t = setTimeout(()=>ctrl.abort(), Math.max(250, timeoutMs || 1200));
-      try{
-        const res = await fetch("https://api.ipify.org?format=json", { signal: ctrl.signal, cache: "no-store" });
-        if (!res.ok) return "";
-        const j = await res.json();
-        return (j && j.ip) ? String(j.ip) : "";
-      } catch {
-        return "";
-      } finally {
-        clearTimeout(t);
-      }
-    }
-
-    function guessTimeZone(){
-      try{
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        return tz ? String(tz) : "";
-      } catch { return ""; }
-    }
-
-    function safeUserAgent(){
-      try{ return String(navigator.userAgent || ""); } catch { return ""; }
-    }
-
-    async function buildSignaturePdf(opts){
-      const PDFLib = window.PDFLib;
-      if (!PDFLib || !PDFLib.PDFDocument) return null;
-
-      const { dataUrl, referenceNumber, adoptedAtDisplay, adoptedAtIso, mode, typedText, evidence } = opts || {};
-
-      const pdfDoc = await PDFLib.PDFDocument.create();
-      const page = pdfDoc.addPage([612, 792]); // Letter
-
-      const helv = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
-      const helvBold = await pdfDoc.embedFont(PDFLib.StandardFonts.HelveticaBold);
-
-      const fontBody = helv;
-      const fontHead = helvBold;
-
-      const marginL = 48;
-      const marginR = 48;
-      const top = 740;
-
-      const bodySize = 10;
-      const headSize = 12;
-      const line = 11;
-
-      const textColor = PDFLib.rgb(0.06, 0.09, 0.16);
-
-      page.drawText("Electronic Signature", {
-        x: marginL,
-        y: top,
-        size: headSize,
-        font: fontHead,
-        color: textColor
-      });
-
-      const subY = top - 18;
-      page.drawText("Reference Number: " + (referenceNumber || ""), {
-        x: marginL,
-        y: subY,
-        size: bodySize,
-        font: fontBody,
-        color: textColor
-      });
-
-      page.drawText("Adopted: " + (adoptedAtDisplay || ""), {
-        x: marginL,
-        y: subY - line,
-        size: bodySize,
-        font: fontBody,
-        color: textColor
-      });
-
-      page.drawText("Mode: " + (mode || ""), {
-        x: marginL,
-        y: subY - (line * 2),
-        size: bodySize,
-        font: fontBody,
-        color: textColor
-      });
-
-      if (mode === "Type" && typedText){
-        page.drawText("Typed Name: " + typedText, {
-          x: marginL,
-          y: subY - (line * 3),
-          size: bodySize,
-          font: fontBody,
-          color: textColor
-        });
-      }
-
-      const boxTop = 620;
-      const boxH = 150;
-      const boxW = 612 - marginL - marginR;
-      const boxX = marginL;
-      const boxY = boxTop - boxH;
-
-      page.drawRectangle({
-        x: boxX,
-        y: boxY,
-        width: boxW,
-        height: boxH,
-        borderWidth: 1,
-        borderColor: PDFLib.rgb(0.85,0.87,0.91),
-        color: PDFLib.rgb(1,1,1)
-      });
-
-      page.drawText("Signature", {
-        x: boxX,
-        y: boxTop + 8,
-        size: bodySize,
-        font: fontHead,
-        color: textColor
-      });
-
-      let sigBytes = null;
-      try{ sigBytes = dataUrlToUint8(dataUrl || ""); } catch { sigBytes = null; }
-
-      if (sigBytes && sigBytes.length){
-        let img;
-        try{
-          img = await pdfDoc.embedPng(sigBytes);
-        } catch {
-          img = null;
-        }
-
-        if (img){
-          const dims = img.scale(1);
-          const maxW = boxW - 24;
-          const maxH = boxH - 24;
-
-          let scale = 1;
-          if (dims.width > 0 && dims.height > 0){
-            const s1 = maxW / dims.width;
-            const s2 = maxH / dims.height;
-            scale = Math.min(s1, s2, 1);
-          }
-
-          const w = dims.width * scale;
-          const h = dims.height * scale;
-
-          const x = boxX + ((boxW - w) / 2);
-          const y = boxY + ((boxH - h) / 2);
-
-          page.drawImage(img, { x, y, width: w, height: h });
+          page.drawText("—", { x: marginL, y, size: baseSize, font: helv });
+          y -= 18;
         }
       }
 
-      const evTop = 440;
-      page.drawText("Evidence Log", {
-        x: marginL,
-        y: evTop,
-        size: headSize,
-        font: fontHead,
-        color: textColor
-      });
+      y -= 6;
+      page.drawText("Audit Log", { x: marginL, y, size: 12, font: helvBold });
+      y -= 14;
 
-      const ev = evidence || {};
-      const rows = [
-        ["Event", "Signature Adopted"],
-        ["Timestamp (ISO)", adoptedAtIso || ""],
-        ["Timestamp (Local)", adoptedAtDisplay || ""],
-        ["Public IP", ev.publicIp || "Unavailable"],
-        ["User Agent", ev.userAgent || ""],
-        ["Time Zone", ev.timeZone || ""]
+      const auditLines = [
+        "Event: Signature Adopted",
+        "Timestamp: " + (auditStamp()),
+        "Reference Number: " + (referenceNumber || ""),
+        "Mode: " + (mode || ""),
+        "Adopted Time: " + (last || ""),
+        "Timezone: " + (Intl.DateTimeFormat().resolvedOptions().timeZone || ""),
+        "User Agent: " + (navigator.userAgent || ""),
+        "IP: Unavailable (client-side)"
       ];
 
-      const col1 = 140;
-      let y = evTop - 18;
-      for (const r of rows){
-        page.drawText(String(r[0] || ""), { x: marginL, y, size: bodySize, font: fontHead, color: textColor });
-        page.drawText(String(r[1] || ""), { x: marginL + col1, y, size: bodySize, font: fontBody, color: textColor });
-        y -= line;
+      for (const ln of auditLines){
+        const wrapped = wrapTextToWidth(ln, helv, baseSize, maxW);
+        for (const w of wrapped){
+          page.drawText(w, { x: marginL, y, size: baseSize, font: helv });
+          y -= line;
+        }
+        y -= 1;
       }
 
-      const footerY = 40;
-      page.drawText("Carbyne Accounting™ - Confidential & Proprietary System", {
-        x: marginL,
-        y: footerY,
-        size: 9,
-        font: fontBody,
-        color: PDFLib.rgb(0.25,0.29,0.36)
-      });
-
-      const out = await pdfDoc.save();
-      return new Uint8Array(out);
+      const bytes = await pdf.save();
+      return new Uint8Array(bytes);
     }
 
     window.carbyne_electronic_signature_mount = function(args){
       const root = args && args.root ? args.root : document;
-      const referenceNumber = (args && args.referenceNumber) ? String(args.referenceNumber) : "";
+      const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
 
       const canvas = root.querySelector("#esCanvas");
       const ctx = canvas.getContext("2d");
@@ -758,15 +639,38 @@
         setAdoptedUI(root, stored.dataUrl || "");
       }
 
+      async function writeSignaturePdfToPacket(stored){
+        const PDFLib = window.PDFLib;
+        if (!PDFLib || !PDFLib.PDFDocument) return;
+
+        const bytesU8 = await buildSignaturePdf(referenceNumber, stored);
+        const item = {
+          id: "electronic_signature",
+          title: "Electronic Signature",
+          referenceNumber: referenceNumber || "",
+          createdAt: Date.now(),
+          bytesB64: bytesToBase64(bytesU8)
+        };
+        addOrReplacePacketItem(item);
+        await mergeAllPacketPdfs();
+
+        window.dispatchEvent(new CustomEvent("carbyne:pdf:updated", { detail: { id: item.id } }));
+      }
+
       async function adopt(){
         if (!currentHasSignature()) return;
 
         let dataUrl = "";
-        let meta = { mode, lastAdopted: nowStamp(), lastAdoptedISO: nowIso() };
+        let meta = { mode, lastAdopted: nowStamp() };
 
         if (mode === "Draw"){
           dataUrl = canvas.toDataURL("image/png");
         } else {
+          const name = (typeInput.value || "").trim();
+          const sig = normalizeTypedSig(name);
+          meta.typedTextRaw = name;
+          meta.typedText = sig;
+
           const off = document.createElement("canvas");
           off.width = 900;
           off.height = 220;
@@ -778,71 +682,17 @@
           octx.fillStyle = "#0f172a";
           octx.textAlign = "center";
           octx.textBaseline = "middle";
-          octx.font = "80px Brush Script MT, Segoe Script, Snell Roundhand, Apple Chancery, cursive";
-          octx.fillText((typeInput.value || "").trim(), off.width/2, off.height/2);
+          octx.font = "bold 56px Arial Narrow, Arial, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+          octx.fillText(sig, off.width/2, off.height/2);
 
           dataUrl = off.toDataURL("image/png");
-          meta.typedText = (typeInput.value || "").trim();
         }
 
         setStored(dataUrl, meta);
         refreshUI();
 
-        const evidence = {
-          publicIp: "",
-          userAgent: safeUserAgent(),
-          timeZone: guessTimeZone()
-        };
-
-        evidence.publicIp = await fetchPublicIp(1200);
-
-        const pdfBytes = await buildSignaturePdf({
-          dataUrl: dataUrl,
-          referenceNumber: referenceNumber,
-          adoptedAtDisplay: meta.lastAdopted || "",
-          adoptedAtIso: meta.lastAdoptedISO || "",
-          mode: meta.mode || mode,
-          typedText: meta.typedText || "",
-          evidence: evidence
-        });
-
-        if (pdfBytes && pdfBytes.length){
-          const packetMeta = {
-            referenceNumber: referenceNumber,
-            updatedAtISO: nowIso(),
-            lastUpdatedDocId: PDF_DOC_ID_SIGNATURE
-          };
-
-          const items = upsertPacketItem(PDF_DOC_ID_SIGNATURE, "Electronic Signature", pdfBytes, packetMeta);
-
-          let merged = null;
-          try{ merged = await mergePacketPdfs(items); } catch { merged = null; }
-          if (merged && merged.length){
-            setMergedPdfBytes(merged);
-          } else {
-            setMergedPdfBytes(pdfBytes);
-          }
-
-          if (typeof window.carbyne_packet_upsert_pdf === "function"){
-            try{
-              window.carbyne_packet_upsert_pdf({
-                id: PDF_DOC_ID_SIGNATURE,
-                name: "Electronic Signature",
-                bytes: pdfBytes,
-                referenceNumber: referenceNumber,
-                meta: packetMeta
-              });
-            } catch {}
-          }
-
-          firePacketEvents({
-            id: PDF_DOC_ID_SIGNATURE,
-            name: "Electronic Signature",
-            referenceNumber: referenceNumber,
-            updatedAtISO: packetMeta.updatedAtISO,
-            mergedAvailable: !!getMergedPdfBytes()
-          });
-        }
+        const stored = getStored();
+        await writeSignaturePdfToPacket(stored);
 
         window.dispatchEvent(new CustomEvent("carbyne:signature:adopted", { detail: { dataUrl, meta } }));
       }
@@ -857,9 +707,9 @@
       }
 
       function onTypeInput(){
-        const val = (typeInput.value || "").trim();
+        const val = normalizeTypedSig((typeInput.value || "").trim());
         typePreview.textContent = val;
-        hasTypeInk = !!val;
+        hasTypeInk = !!val.replace(/^\/s\/\s*/i,"").trim();
         refreshUI();
       }
 
@@ -914,16 +764,24 @@
         resizeCanvasToCSS(canvas);
         drawStatus.classList.add("bad");
 
-        modeDrawBtn.addEventListener("click", onModeDrawClick);
-        modeTypeBtn.addEventListener("click", onModeTypeClick);
+        modeDrawBtn.addEventListener("click", ()=>setMode("Draw"));
+        modeTypeBtn.addEventListener("click", ()=>setMode("Type"));
 
         typeInput.addEventListener("input", onTypeInput);
 
         clearTop.addEventListener("click", clearAll);
-        clearDraw.addEventListener("click", onClearDraw);
-        clearType.addEventListener("click", onClearType);
+        clearDraw.addEventListener("click", ()=>{
+          clearCanvas();
+          refreshUI();
+        });
+        clearType.addEventListener("click", ()=>{
+          typeInput.value = "";
+          typePreview.textContent = "";
+          hasTypeInk = false;
+          refreshUI();
+        });
 
-        adoptTop.addEventListener("click", adopt);
+        adoptTop.addEventListener("click", ()=>{ adopt(); });
 
         canvas.addEventListener("mousedown", startDraw);
         canvas.addEventListener("mousemove", moveDraw);
@@ -940,39 +798,19 @@
         const stored = getStored();
         if (stored && stored.dataUrl){
           setAdoptedUI(root, stored.dataUrl);
+          const last = stored.meta && stored.meta.lastAdopted ? stored.meta.lastAdopted : "—";
+          renderStatus(root, mode, currentHasSignature(), currentHasSignature(), last);
         }
 
-        refreshUI();
-      }
-
-      function onModeDrawClick(){ setMode("Draw"); }
-      function onModeTypeClick(){ setMode("Type"); }
-
-      function onClearDraw(){
-        clearCanvas();
-        refreshUI();
-      }
-
-      function onClearType(){
-        typeInput.value = "";
-        typePreview.textContent = "";
-        hasTypeInk = false;
         refreshUI();
       }
 
       init();
 
       return function unmount(){
-        modeDrawBtn.removeEventListener("click", onModeDrawClick);
-        modeTypeBtn.removeEventListener("click", onModeTypeClick);
-
         typeInput.removeEventListener("input", onTypeInput);
 
         clearTop.removeEventListener("click", clearAll);
-        adoptTop.removeEventListener("click", adopt);
-
-        clearDraw.removeEventListener("click", onClearDraw);
-        clearType.removeEventListener("click", onClearType);
 
         canvas.removeEventListener("mousedown", startDraw);
         canvas.removeEventListener("mousemove", moveDraw);
