@@ -214,12 +214,12 @@
     return { roman: m[1], title: m[2] };
   }
 
-  function parseLeadLabel(p){
+  function parseBoldLeadLabel(p){
     const m = p.match(/^([A-Za-z][A-Za-z\s\-&]+)\.\s+(.+)$/);
     if (!m) return null;
     const lead = m[1].trim();
     const rest = m[2].trim();
-    if (!lead || lead.length > 60) return null;
+    if (!lead || lead.length > 42) return null;
     if (!rest) return null;
     return { lead, rest };
   }
@@ -256,33 +256,21 @@
     } catch {}
   }
 
-  function drawHLine(page, x, y, w){
-    try{
-      page.drawLine({
-        start: { x, y },
-        end: { x: x + w, y },
-        thickness: 0.9,
-        opacity: 1
-      });
-    } catch {}
-  }
-
   function drawBold(page, font, text, x, y, size){
     page.drawText(text, { x, y, size, font });
     page.drawText(text, { x: x + 0.35, y, size, font });
   }
 
-  function stripEmbeddedUnderscores(text){
-    return normalize(text).replace(/_{3,}/g, " ").replace(/\s+/g, " ").trim();
-  }
-
-  function looksLikeSignatureBlock(p){
-    const s = normalize(p).toLowerCase();
-    return (
-      s.includes("signature of authorized signatory") ||
-      s.includes("printed name and title") ||
-      (s.includes("signature") && s.includes("date") && s.includes("_"))
-    );
+  function isSignatureRelated(p){
+    const t = normalize(p).toLowerCase();
+    if (!t) return false;
+    if (t.includes("signature of authorized signatory")) return true;
+    if (t === "date") return true;
+    if (t.includes("printed name and title")) return true;
+    if (/^_+$/.test(t.replace(/\s+/g,""))) return true;
+    if (t.includes("signature") && t.includes("date")) return true;
+    if (t.includes("printed name") && t.includes("title")) return true;
+    return false;
   }
 
   async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
@@ -321,13 +309,13 @@
     const BODY_BOTTOM_Y = M_BOTTOM + 20;
 
     const FONT_SIZE = 10;
-    const LINE_H = 13;
+    const LINE_H = 13; /* was 12 */
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const headerLeft = "Carbyne Accounting";
     const headerRight = DOC_TITLE;
 
-    const footerLeft = "Confidential";
+    const footerCenter = "Confidential";
     const footerRightPrefix = "Page ";
 
     const paragraphs = splitParagraphsKeepGrid(agreementText);
@@ -357,8 +345,8 @@
       }
 
       const footerY = M_BOTTOM - 6;
-
-      p.drawText(footerLeft, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
+      const cw = measureText(bodyFont, footerCenter, FONT_SIZE);
+      p.drawText(footerCenter, { x: (PAGE_W - cw) / 2, y: footerY, size: FONT_SIZE, font: bodyFont });
 
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
       const prw = measureText(bodyFont, pr, FONT_SIZE);
@@ -383,47 +371,46 @@
     }
 
     function drawSignatureBlock(){
-      const GAP_BEFORE = LINE_H * 3;
-      const LINE_Y_OFFSET = 0;
-
-      const lineY = y - GAP_BEFORE;
-      const labelY = lineY - (LINE_H * 0.95);
-      const nextBlockY = labelY - (LINE_H * 1.35);
+      const sigLineW = 330;
+      const dateLineW = 130;
 
       const sigX = M_LEFT;
-      const sigW = 360;
+      const dateX = PAGE_W - M_RIGHT - dateLineW;
 
-      const dateX = sigX + sigW + 56;
-      const dateW = PAGE_W - M_RIGHT - dateX;
+      ensureSpace(7);
 
-      const pnX = M_LEFT;
-      const pnW = 360;
+      y -= (LINE_H * 2);
 
-      // Signature + Date lines
-      drawHLine(page, sigX, lineY + LINE_Y_OFFSET, sigW);
-      drawHLine(page, dateX, lineY + LINE_Y_OFFSET, dateW);
+      page.drawLine({ start:{x:sigX,y:y}, end:{x:sigX+sigLineW,y:y}, thickness:0.9 });
+      page.drawLine({ start:{x:dateX,y:y}, end:{x:dateX+dateLineW,y:y}, thickness:0.9 });
 
-      // Labels under lines
-      page.drawText("Signature of Authorized Signatory", { x: sigX, y: labelY, size: FONT_SIZE, font: bodyFont });
-      page.drawText("Date", { x: dateX, y: labelY, size: FONT_SIZE, font: bodyFont });
+      y -= LINE_H;
 
-      // Printed Name line + label
-      drawHLine(page, pnX, nextBlockY + (LINE_H * 0.7), pnW);
-      page.drawText("Printed Name and Title", { x: pnX, y: nextBlockY - (LINE_H * 0.15), size: FONT_SIZE, font: bodyFont });
+      page.drawText("Signature of Authorized Signatory", { x:sigX, y:y, size:FONT_SIZE, font:bodyFont });
+      page.drawText("Date", { x:dateX, y:y, size:FONT_SIZE, font:bodyFont });
 
-      // Advance cursor to below the signature block
-      y = nextBlockY - (LINE_H * 1.4);
+      y -= (LINE_H * 3);
+
+      page.drawLine({ start:{x:sigX,y:y}, end:{x:sigX+sigLineW,y:y}, thickness:0.9 });
+
+      y -= LINE_H;
+
+      page.drawText("Printed Name and Title", { x:sigX, y:y, size:FONT_SIZE, font:bodyFont });
+
+      y -= LINE_H;
     }
 
-    for (const rawP of paragraphs){
-      if (looksLikeSignatureBlock(rawP)){
-        ensureSpace(8);
+    let signatureDrawn = false;
+
+    for (const p of paragraphs){
+      if (!signatureDrawn && isSignatureRelated(p)) {
         drawSignatureBlock();
+        signatureDrawn = true;
         continue;
       }
-
-      const p = stripEmbeddedUnderscores(rawP);
-      if (!p) continue;
+      if (signatureDrawn && isSignatureRelated(p)) {
+        continue;
+      }
 
       if (isRomanSection(p)){
         const s = parseRomanSection(p);
@@ -435,15 +422,18 @@
         const romanX = M_LEFT;
         const titleX = M_LEFT + 22;
 
+        const titleW = Math.min(measureText(bodyFont, title, FONT_SIZE), MAX_W - 22);
+
         ensureSpace(1);
         drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
         drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
+        drawUnderline(page, titleX, y, titleW);
         y -= LINE_H;
 
         continue;
       }
 
-      const lead = parseLeadLabel(p);
+      const lead = parseBoldLeadLabel(p);
       if (lead){
         const leadText = lead.lead + ".";
         const restText = lead.rest;
@@ -454,11 +444,8 @@
         const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
         ensureSpace(Math.max(1, restLines.length));
 
-        // Lead label UNDERLINED (not bold)
-        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
-        drawUnderline(page, M_LEFT, y, measureText(bodyFont, leadText, FONT_SIZE));
-
         const firstRest = restLines[0] || "";
+        drawBold(page, bodyFont, leadText, M_LEFT, y, FONT_SIZE);
         page.drawText(" " + firstRest, { x: M_LEFT + measureText(bodyFont, leadText, FONT_SIZE), y, size: FONT_SIZE, font: bodyFont });
         y -= LINE_H;
 
@@ -473,6 +460,13 @@
       ensureSpace(Math.max(1, lines.length));
       for (const ln of lines){
         drawLine(ln, M_LEFT, false);
+      }
+    }
+
+    if (!signatureDrawn) {
+      const t = normalize(agreementText).toLowerCase();
+      if (t.includes("signature of authorized signatory") || t.includes("printed name and title")) {
+        drawSignatureBlock();
       }
     }
 
