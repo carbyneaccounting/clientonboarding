@@ -1,458 +1,984 @@
-<!-- index.html -->
+<!-- masterserviceagreement_page.html -->
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Carbyne Client Data Table</title>
+  <meta charset="utf-8">
+  <title>Master Service Agreement</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
 
+<template id="carbyne_masterserviceagreement_page">
   <style>
-    :root {
-      --ink: #0f172a;
-      --muted: #475569;
-      --border: #00305B;
-      --panel: #d7d7d7;
-      --accent: #00305B;
-      --radius: 10px;
-      --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
-      --bg: #f8fafc;
+    .msa-wrap{width:100%}
+    .msa-h{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      padding:2px 2px 12px;
+    }
+    .msa-title{
+      margin:0;
+      font-size:18px;
+      font-weight:950;
+      color:#0b2f4e;
+      letter-spacing:.2px;
+    }
+    .msa-sub{
+      margin:0;
+      font-size:12px;
+      font-weight:850;
+      color:#334155;
+      opacity:.88;
+      line-height:1.45;
     }
 
-    * {
-      box-sizing: border-box;
+    .msa-view{
+      width:100%;
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow:0 10px 22px rgba(2,6,23,.08);
     }
 
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--ink);
-      background: var(--bg);
+    .msa-iframe{
+      width:100%;
+      height:430px;
+      border:0;
+      display:block;
+      background:#fff;
     }
 
-    .wrap {
-      max-width: 1100px;
-      margin: 40px auto;
-      padding: 0 16px;
+    .msa-actions{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 2px 0;
+      flex-wrap:wrap;
     }
 
-    .card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    .msa-btn{
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color:#0f172a;
+      font-weight:950;
+      font-size:12px;
+      padding:9px 12px;
+      border-radius:10px;
+      cursor:pointer;
+      transition:transform .12s ease, opacity .12s ease;
+      box-shadow:0 8px 18px rgba(2,6,23,.06);
+      user-select:none;
+      white-space:nowrap;
     }
+    .msa-btn.primary{
+      background:linear-gradient(90deg, #00305B, #0A3D6F);
+      color:#fff;
+      border-color:rgba(0,48,91,.25);
+    }
+    .msa-btn:hover{transform:translateY(-1px);opacity:.97}
+    .msa-btn:active{transform:translateY(0);opacity:.96}
+    .msa-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
 
-    header {
-      padding: 18px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      background: #fff;
+    .msa-status{
+      font-size:12px;
+      font-weight:900;
+      color:#0f172a;
+      opacity:.78;
     }
-
-    header h1 {
-      margin: 0;
-      font-size: 18px;
-      letter-spacing: 0.2px;
-    }
-
-    header .meta {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: inline-block;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .controls {
-      padding: 14px 20px;
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      border-bottom: 1px solid var(--border);
-      background: #fff;
-    }
-
-    .controls .left {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    input[type="search"] {
-      width: min(420px, 84vw);
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      font-size: 14px;
-      outline: none;
-    }
-
-    input[type="search"]:focus {
-      border-color: var(--accent);
-    }
-
-    button {
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: #fff;
-      cursor: pointer;
-      font-size: 14px;
-      transition: border-color 0.2s ease;
-    }
-
-    button:hover {
-      border-color: #cbd5e1;
-    }
-
-    .status {
-      color: var(--muted);
-      font-size: 13px;
-      max-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .table-wrap {
-      overflow: auto;
-      max-height: 70vh;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      min-width: 720px;
-    }
-
-    thead th {
-      position: sticky;
-      top: 0;
-      background: #fff;
-      z-index: 2;
-      text-align: left;
-      font-size: 13px;
-      color: #0f172a;
-      padding: 12px 12px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    thead th:hover {
-      background: #f8fafc;
-    }
-
-    thead th.sorted {
-      background: #e0f2fe;
-    }
-
-    tbody td {
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-      white-space: nowrap;
-    }
-
-    tbody tr:hover td {
-      background: #f1f5f9;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 40px;
-      color: var(--muted);
-    }
-
-    .error-message {
-      padding: 20px;
-      background: #fee2e2;
-      color: #991b1b;
-      border-radius: 8px;
-      margin: 20px;
-    }
+    .msa-status.bad{color:#b91c1c;opacity:1}
+    .msa-status.good{color:#0a7a3a;opacity:1}
   </style>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-</head>
+  <div class="msa-wrap" id="msaRoot">
+    <div class="msa-h">
+      <h2 class="msa-title">Master Service Agreement</h2>
+      <p class="msa-sub">Review the agreement below. When you are ready, select Electronic Sign.</p>
+    </div>
 
-<body>
-  <div class="wrap">
-    <div class="card">
-      <header>
-        <h1>Client Data Table</h1>
-        <div class="meta">
-          <span class="tag"><span class="dot"></span> Live Data</span>
-          <span id="updated" class="muted"></span>
-        </div>
-      </header>
+    <div class="msa-view">
+      <iframe class="msa-iframe" id="msaFrame" title="Master Service Agreement"></iframe>
+    </div>
 
-      <div class="controls">
-        <div class="left">
-          <input id="search" type="search" placeholder="Search..." autocomplete="off" />
-          <button id="reload" type="button">Reload</button>
-        </div>
-        <div class="status" id="status">Loading...</div>
-      </div>
-
-      <div class="table-wrap">
-        <table id="table">
-          <thead></thead>
-          <tbody></tbody>
-        </table>
-      </div>
+    <div class="msa-actions">
+      <div class="msa-status" id="msaStatus">Loading agreement…</div>
+      <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Electronic Sign</button>
     </div>
   </div>
+</template>
 
-  <script>
-    // Configuration
-    const FILE_URL = "https://carbyneaccounting407-my.sharepoint.com/personal/drew_parker_carbyneaccounting_com/_layouts/15/download.aspx?share=IQAcTAjRA-l7TqHbBdGRxsEiAeJJGgMWq2HGDeAv6tGCUIQ";
+<script>
+(function(){
+  const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
+  const ARIAL_NARROW_TTF_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/ARIALN.TTF";
 
-    // Elements
-    const statusEl = document.getElementById("status");
-    const updatedEl = document.getElementById("updated");
-    const searchEl = document.getElementById("search");
-    const reloadBtn = document.getElementById("reload");
-    const table = document.getElementById("table");
-    const thead = table.querySelector("thead");
-    const tbody = table.querySelector("tbody");
+  const FONTKIT_URL = "https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js";
 
-    // State
-    let headers = [];
-    let rawRows = [];
-    let sortState = { col: -1, dir: 1 };
+  const DOC_ID = "master_service_agreement";
+  const DOC_TITLE = "Master Service Agreement";
 
-    // Helper functions
-    function setStatus(msg) {
-      statusEl.textContent = msg;
+  const INTAKE_STORAGE_KEY = "carbyne_intake_business_info";
+  const STORAGE_KEY_CODE = "carbyne_access_code";
+
+  function normalize(v){ return (v ?? "").toString(); }
+
+  function bytesToB64(bytes){
+    let s = "";
+    const chunk = 0x8000;
+    for (let i=0;i<bytes.length;i+=chunk){
+      s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+    }
+    return btoa(s);
+  }
+
+  function stamp(){
+    const d = new Date();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const yy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
+  }
+
+  function setStatus(root, msg, cls){
+    const el = root.querySelector("#msaStatus");
+    if (!el) return;
+    el.classList.remove("bad","good");
+    if (cls) el.classList.add(cls);
+    el.textContent = msg || "";
+  }
+
+  async function fetchText(url){
+    const res = await fetch(url, { cache:"no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return await res.text();
+  }
+
+  async function fetchBytes(url){
+    const res = await fetch(url, { cache:"no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const ab = await res.arrayBuffer();
+    return new Uint8Array(ab);
+  }
+
+  function loadScriptOnce(id, src){
+    return new Promise((resolve, reject) => {
+      const existing = document.getElementById(id);
+      if (existing) { resolve(); return; }
+      const s = document.createElement("script");
+      s.id = id;
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load " + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureFontkit(){
+    try{
+      if (window.fontkit) return true;
+      await loadScriptOnce("carbyne_fontkit_umd", FONTKIT_URL);
+      return !!window.fontkit;
+    } catch {
+      return false;
+    }
+  }
+
+  function getIntakeData(){
+    try{
+      const raw = localStorage.getItem(INTAKE_STORAGE_KEY);
+      console.log("Loading intake data from localStorage:", raw);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      console.log("Parsed intake data:", parsed);
+      return parsed;
+    } catch (e) {
+      console.error("Error loading intake data:", e);
+      return null;
+    }
+  }
+
+  function getAccessCode(){
+    try{
+      const code = localStorage.getItem(STORAGE_KEY_CODE);
+      return normalize(code).trim();
+    } catch {
+      return "";
+    }
+  }
+
+  function getDataFromTable(accessCode){
+    console.log("Attempting to get data from table for access code:", accessCode);
+    
+    // Try to access the global table data from index.html
+    if (!window.CARBYNE_TABLE_DATA) {
+      console.log("CARBYNE_TABLE_DATA not found in window");
+      return { serviceFees: "", retainerAmount: "" };
     }
 
-    function normalizeToWidth(rows, width) {
-      return rows.map(r => {
-        const out = new Array(width).fill("");
-        for (let i = 0; i < width; i++) {
-          out[i] = (r[i] ?? "").toString();
-        }
-        return out;
-      });
+    const tableData = window.CARBYNE_TABLE_DATA;
+    const headers = tableData.headers || [];
+    const rows = tableData.rows || [];
+
+    console.log("Table headers:", headers);
+    console.log("Total rows:", rows.length);
+
+    // Find column indices
+    const uniqueIdIndex = headers.findIndex(h => 
+      normalize(h).toLowerCase() === "unique identifier"
+    );
+    const columnAIndex = headers.findIndex(h => 
+      normalize(h).toLowerCase() === "a"
+    );
+    const columnRIndex = headers.findIndex(h => 
+      normalize(h).toLowerCase() === "r"
+    );
+
+    console.log("Column indices - Unique ID:", uniqueIdIndex, "A:", columnAIndex, "R:", columnRIndex);
+
+    if (uniqueIdIndex < 0 || columnAIndex < 0 || columnRIndex < 0) {
+      console.log("Required columns not found");
+      return { serviceFees: "", retainerAmount: "" };
     }
 
-    function renderTable(filteredRows) {
-      thead.innerHTML = "";
-      tbody.innerHTML = "";
+    // Find the row matching the access code
+    const matchingRow = rows.find(row => {
+      const rowCode = normalize(row[uniqueIdIndex] || "").toLowerCase();
+      return rowCode === accessCode.toLowerCase();
+    });
 
-      if (!filteredRows.length) {
-        tbody.innerHTML = '<tr><td colspan="100" style="text-align:center;padding:40px;color:#94a3b8;">No data found</td></tr>';
-        return;
-      }
-
-      // Render header
-      const trh = document.createElement("tr");
-      headers.forEach((h, idx) => {
-        const th = document.createElement("th");
-        th.textContent = (h && h.trim()) ? h : `Column ${idx + 1}`;
-        th.addEventListener("click", () => sortBy(idx));
-        if (sortState.col === idx) {
-          th.classList.add("sorted");
-        }
-        trh.appendChild(th);
-      });
-      thead.appendChild(trh);
-
-      // Render rows
-      const frag = document.createDocumentFragment();
-      filteredRows.forEach(r => {
-        const tr = document.createElement("tr");
-        headers.forEach((_, idx) => {
-          const td = document.createElement("td");
-          td.textContent = (r[idx] ?? "");
-          tr.appendChild(td);
-        });
-        frag.appendChild(tr);
-      });
-      tbody.appendChild(frag);
-
-      setStatus(`Rows: ${filteredRows.length.toLocaleString()}`);
+    if (!matchingRow) {
+      console.log("No matching row found for access code:", accessCode);
+      return { serviceFees: "", retainerAmount: "" };
     }
 
-    function applySearch() {
-      const q = (searchEl.value || "").trim().toLowerCase();
-      if (!q) {
-        renderTable(rawRows);
-        return;
-      }
-      const filtered = rawRows.filter(r =>
-        r.some(v => (v ?? "").toString().toLowerCase().includes(q))
-      );
-      renderTable(filtered);
-    }
+    console.log("Found matching row:", matchingRow);
 
-    function sortBy(colIndex) {
-      if (sortState.col === colIndex) {
-        sortState.dir *= -1;
+    const serviceFees = normalize(matchingRow[columnAIndex] || "").trim();
+    const retainerAmount = normalize(matchingRow[columnRIndex] || "").trim();
+
+    console.log("Extracted - Service Fees:", serviceFees, "Retainer Amount:", retainerAmount);
+
+    return { serviceFees, retainerAmount };
+  }
+
+  function replaceClientNamePlaceholder(text, businessName){
+    console.log("Attempting to replace placeholder with business name:", businessName);
+    
+    if (!businessName) {
+      console.log("No business name provided, returning original text");
+      return text;
+    }
+    
+    // Look for the pattern with underscores after "Firm to"
+    const pattern = /Firm to\s+_{5,}\s+\(hereinafter/gi;
+    
+    // Test if pattern exists
+    const matches = text.match(pattern);
+    console.log("Pattern matches found:", matches);
+    
+    if (!matches) {
+      console.log("No placeholder pattern found in text");
+      return text;
+    }
+    
+    // Replace with business name wrapped in bold markers
+    const replacement = `Firm to **${businessName}** (hereinafter`;
+    const result = text.replace(pattern, replacement);
+    
+    console.log("Replacement performed. Text contains ** markers:", result.includes("**"));
+    
+    return result;
+  }
+
+  function splitParagraphsKeepGrid(text){
+    const lines = normalize(text).replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n");
+    const out = [];
+    let buf = [];
+    function flush(){
+      if (!buf.length) return;
+      const p = buf.join(" ").replace(/\s+/g," ").trim();
+      if (p) out.push(p);
+      buf = [];
+    }
+    for (const rawLine of lines){
+      const line = rawLine.replace(/\t/g," ").trim();
+      if (!line){ flush(); continue; }
+      buf.push(line);
+    }
+    flush();
+    return out;
+  }
+
+  function isRomanSection(p){
+    return /^([IVXLCDM]+)\.\s+/.test(p);
+  }
+
+  function parseRomanSection(p){
+    const m = p.match(/^([IVXLCDM]+)\.\s+(.+)$/);
+    if (!m) return null;
+    return { roman: m[1], title: m[2] };
+  }
+
+  function parseLeadLabel(p){
+    const m = p.match(/^([A-Za-z][A-Za-z\s\-&]+)\.\s+(.+)$/);
+    if (!m) return null;
+    const lead = m[1].trim();
+    const rest = m[2].trim();
+    if (!lead || lead.length > 42) return null;
+    if (!rest) return null;
+    return { lead, rest };
+  }
+
+  function measureText(font, text, size){
+    try { return font.widthOfTextAtSize(text, size); } catch { return text.length * (size * 0.5); }
+  }
+
+  function wrapWords(font, text, size, maxWidth){
+    const words = text.split(/\s+/).filter(Boolean);
+    const lines = [];
+    let cur = "";
+    for (const w of words){
+      const test = cur ? (cur + " " + w) : w;
+      if (measureText(font, test, size) <= maxWidth){
+        cur = test;
       } else {
-        sortState.col = colIndex;
-        sortState.dir = 1;
+        if (cur) lines.push(cur);
+        cur = w;
       }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
 
-      const dir = sortState.dir;
-      rawRows.sort((a, b) => {
-        const av = (a[colIndex] ?? "").toString();
-        const bv = (b[colIndex] ?? "").toString();
-
-        const an = Number(av.replace(/[$,%\s]/g, ""));
-        const bn = Number(bv.replace(/[$,%\s]/g, ""));
-        const bothNum =
-          av.trim() !== "" &&
-          bv.trim() !== "" &&
-          !Number.isNaN(an) &&
-          !Number.isNaN(bn);
-
-        if (bothNum) return (an - bn) * dir;
-
-        return av.localeCompare(bv, undefined, {
-          numeric: true,
-          sensitivity: "base"
-        }) * dir;
+  function drawUnderline(page, x, y, w){
+    try{
+      page.drawLine({
+        start: { x, y: y - 1.2 },
+        end: { x: x + w, y: y - 1.2 },
+        thickness: 0.7,
+        opacity: 1
       });
+    } catch {}
+  }
 
-      applySearch();
+  function drawBold(page, font, text, x, y, size){
+    page.drawText(text, { x, y, size, font });
+    page.drawText(text, { x: x + 0.35, y, size, font });
+  }
+
+  function isBasisCheckboxLine(p){
+    const t = normalize(p);
+    return (
+      t.includes("Accrual Basis") &&
+      t.includes("Cash Basis") &&
+      t.includes("Mixed Method") &&
+      t.includes("Other:")
+    );
+  }
+
+  function isServiceFeesLine(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("service fees") && t.includes("total service fees charged per month");
+  }
+
+  function isRetainerAmountLine(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("retainer fee amount") && t.includes("total retainer amount to be paid");
+  }
+
+  function isSignatureTrigger(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("signature of authorized signatory");
+  }
+
+  function parseInlineBold(text){
+    console.log("Parsing inline bold for text:", text.substring(0, 100));
+    
+    // Parse **text** markers for bold
+    const parts = [];
+    const boldRegex = /\*\*(.+?)\*\*/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = boldRegex.exec(text)) !== null) {
+      console.log("Found bold match:", match[1]);
+      
+      // Add normal text before the bold part
+      if (match.index > lastIndex) {
+        const normalText = text.substring(lastIndex, match.index);
+        if (normalText) {
+          parts.push({ text: normalText, bold: false });
+        }
+      }
+      
+      // Add bold text
+      parts.push({ text: match[1], bold: true });
+      
+      lastIndex = match.index + match[0].length;
     }
 
-    async function loadWorkbook() {
-      setStatus("Loading...");
-      tbody.innerHTML = '<tr><td colspan="100" class="loading">Loading data from SharePoint...</td></tr>';
+    // Add remaining normal text
+    if (lastIndex < text.length) {
+      const remainingText = text.substring(lastIndex);
+      if (remainingText) {
+        parts.push({ text: remainingText, bold: false });
+      }
+    }
 
-      try {
-        const res = await fetch(FILE_URL, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    console.log("Parsed parts:", parts.length, "parts");
+    
+    return parts.length > 0 ? parts : [{ text: text, bold: false }];
+  }
 
-        const ab = await res.arrayBuffer();
-        const wb = XLSX.read(ab, { type: "array" });
+  async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
+    const lib = window.PDFLib;
+    if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
 
-        const ws = wb.Sheets[wb.SheetNames[0]];
-        const rows = XLSX.utils.sheet_to_json(ws, {
-          header: 1,
-          raw: false,
-          defval: ""
+    const { PDFDocument, StandardFonts, rgb } = lib;
+
+    const pdfDoc = await PDFDocument.create();
+
+    let bodyFont = null;
+    const fontkitReady = await ensureFontkit();
+
+    if (fontkitReady && typeof pdfDoc.registerFontkit === "function") {
+      try{
+        pdfDoc.registerFontkit(window.fontkit);
+        bodyFont = await pdfDoc.embedFont(fontBytes, { subset: true });
+      } catch {
+        bodyFont = null;
+      }
+    }
+
+    if (!bodyFont){
+      bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    }
+
+    const PAGE_W = 612;
+    const PAGE_H = 792;
+
+    const M_LEFT = 54;
+    const M_RIGHT = 54;
+    const M_TOP = 60;
+    const M_BOTTOM = 44;
+
+    const BODY_TOP_Y = PAGE_H - M_TOP - 24;
+    const BODY_BOTTOM_Y = M_BOTTOM + 20;
+
+    const FONT_SIZE = 10;
+    const LINE_H = 13;
+    const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
+
+    const headerLeft = "Carbyne Accounting";
+    const headerRight = DOC_TITLE;
+
+    const footerCenter = "Confidential";
+    const footerRightPrefix = "Page ";
+
+    // Get intake data
+    const intakeData = getIntakeData();
+    const businessName = intakeData && intakeData.bi_name ? normalize(intakeData.bi_name).trim() : "";
+    const selectedBasis = intakeData && intakeData.boa_basis ? normalize(intakeData.boa_basis).trim() : "";
+    const otherBasisText = intakeData && intakeData.boa_other_text ? normalize(intakeData.boa_other_text).trim() : "";
+    
+    // Get data from table
+    const accessCode = getAccessCode();
+    const tableData = getDataFromTable(accessCode);
+    const serviceFees = tableData.serviceFees;
+    const retainerAmount = tableData.retainerAmount;
+    
+    console.log("Business name extracted:", businessName);
+    console.log("Selected basis of accounting:", selectedBasis);
+    console.log("Other basis text:", otherBasisText);
+    console.log("Service Fees:", serviceFees);
+    console.log("Retainer Amount:", retainerAmount);
+    
+    const processedText = replaceClientNamePlaceholder(agreementText, businessName);
+
+    const paragraphs = splitParagraphsKeepGrid(processedText);
+    
+    console.log("Total paragraphs:", paragraphs.length);
+    console.log("Paragraphs with ** markers:", paragraphs.filter(p => p.includes("**")).length);
+
+    const pages = [];
+    function newPage(){
+      const p = pdfDoc.addPage([PAGE_W, PAGE_H]);
+      pages.push(p);
+      return p;
+    }
+
+    let page = newPage();
+    let y = BODY_TOP_Y;
+
+    function drawHeaderFooter(pageIndex, totalPages){
+      const p = pages[pageIndex];
+      const headerY = PAGE_H - M_TOP + 10;
+
+      drawBold(p, bodyFont, headerLeft, M_LEFT, headerY, FONT_SIZE);
+      const hrw = measureText(bodyFont, headerRight, FONT_SIZE);
+      drawBold(p, bodyFont, headerRight, PAGE_W - M_RIGHT - hrw, headerY, FONT_SIZE);
+
+      if (referenceNumber){
+        const refText = "Reference: " + referenceNumber;
+        const rw = measureText(bodyFont, refText, FONT_SIZE);
+        p.drawText(refText, { x: PAGE_W - M_RIGHT - rw, y: headerY - 14, size: FONT_SIZE, font: bodyFont });
+      }
+
+      const footerY = M_BOTTOM - 6;
+      
+      // LEFT: Confidential
+      p.drawText(footerCenter, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
+
+      // RIGHT: Page numbers
+      const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
+      const prw = measureText(bodyFont, pr, FONT_SIZE);
+      p.drawText(pr, { x: PAGE_W - M_RIGHT - prw, y: footerY, size: FONT_SIZE, font: bodyFont });
+    }
+
+    function ensureSpace(linesNeeded){
+      const need = linesNeeded * LINE_H;
+      if (y - need < BODY_BOTTOM_Y){
+        page = newPage();
+        y = BODY_TOP_Y;
+      }
+    }
+
+    function drawLineText(text, x){
+      page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+      y -= LINE_H;
+    }
+
+    function drawMixedLine(parts, x){
+      // Draw a line with mixed bold/normal text
+      let currentX = x;
+      
+      for (const part of parts) {
+        if (part.text) {
+          if (part.bold) {
+            drawBold(page, bodyFont, part.text, currentX, y, FONT_SIZE);
+          } else {
+            page.drawText(part.text, { x: currentX, y, size: FONT_SIZE, font: bodyFont });
+          }
+          currentX += measureText(bodyFont, part.text, FONT_SIZE);
+        }
+      }
+      
+      y -= LINE_H;
+    }
+
+    function drawCheckboxAtBaseline(x, baselineY, size){
+      const ascent = 9;
+      const boxTopY = baselineY + ascent;
+      page.drawRectangle({
+        x: x,
+        y: boxTopY - size,
+        width: size,
+        height: size,
+        borderWidth: 1,
+        borderColor: rgb(0,0,0)
+      });
+    }
+
+    function drawCheckmark(x, baselineY, size){
+      // Draw an "X" inside the checkbox
+      const ascent = 9;
+      const boxTopY = baselineY + ascent;
+      const boxBottomY = boxTopY - size;
+      
+      const padding = 2;
+      const x1 = x + padding;
+      const x2 = x + size - padding;
+      const y1 = boxBottomY + padding;
+      const y2 = boxTopY - padding;
+      
+      // Draw X - two diagonal lines
+      page.drawLine({
+        start: { x: x1, y: y1 },
+        end: { x: x2, y: y2 },
+        thickness: 1.2,
+        color: rgb(0, 0, 0)
+      });
+      
+      page.drawLine({
+        start: { x: x2, y: y1 },
+        end: { x: x1, y: y2 },
+        thickness: 1.2,
+        color: rgb(0, 0, 0)
+      });
+    }
+
+    function drawBasisCheckboxRow(){
+      const box = 10;
+      const gapAfterBox = 6;
+      const itemGap = 16;
+
+      ensureSpace(2);
+
+      const baselineY = y;
+      let x = M_LEFT;
+
+      const items = [
+        { label: "Accrual Basis", value: "Accrual Basis" },
+        { label: "Cash Basis", value: "Cash Basis" },
+        { label: "Mixed Method", value: "Mixed Method" },
+        { label: "Other:", value: "Other" }
+      ];
+
+      for (let i=0;i<items.length;i++){
+        const item = items[i];
+        
+        // Draw checkbox
+        drawCheckboxAtBaseline(x, baselineY, box);
+        
+        // Check if this option is selected
+        const isSelected = (selectedBasis === item.value);
+        
+        console.log(`Checkbox "${item.label}": selected=${isSelected} (selectedBasis="${selectedBasis}", item.value="${item.value}")`);
+        
+        // Draw X if selected
+        if (isSelected) {
+          drawCheckmark(x, baselineY, box);
+        }
+        
+        x += box + gapAfterBox;
+
+        if (item.label === "Other:") {
+          const otherLabel = "Other:";
+          page.drawText(otherLabel, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+          x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
+
+          // If "Other" is selected and there's custom text
+          if (isSelected && otherBasisText) {
+            // Draw the text
+            page.drawText(otherBasisText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+            
+            // Draw underline beneath the text
+            const textWidth = measureText(bodyFont, otherBasisText, FONT_SIZE);
+            page.drawLine({ 
+              start: {x: x, y: baselineY - 1.2}, 
+              end: {x: x + textWidth, y: baselineY - 1.2}, 
+              thickness: 0.7 
+            });
+          } else {
+            // No text selected - draw the blank line as usual
+            const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
+            page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
+          }
+          
+          break;
+        } else {
+          page.drawText(item.label, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+          x += measureText(bodyFont, item.label, FONT_SIZE) + itemGap;
+        }
+      }
+
+      y -= LINE_H;
+    }
+
+    function drawAmountLine(labelText, amount){
+      ensureSpace(1);
+      
+      const baselineY = y;
+      let x = M_LEFT;
+      
+      // Draw the label text
+      page.drawText(labelText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+      x += measureText(bodyFont, labelText, FONT_SIZE);
+      
+      // Draw the dollar sign
+      const dollarText = " $";
+      page.drawText(dollarText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+      x += measureText(bodyFont, dollarText, FONT_SIZE);
+      
+      if (amount) {
+        // Draw the amount
+        page.drawText(amount, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+        
+        // Draw underline beneath the amount
+        const amountWidth = measureText(bodyFont, amount, FONT_SIZE);
+        page.drawLine({ 
+          start: {x: x, y: baselineY - 1.2}, 
+          end: {x: x + amountWidth, y: baselineY - 1.2}, 
+          thickness: 0.7 
         });
+        x += amountWidth;
+      } else {
+        // No amount - draw the blank line
+        const lineW = Math.max(100, (M_LEFT + MAX_W) - x - 50);
+        page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
+      }
+      
+      y -= LINE_H;
+    }
 
-        if (!rows.length) {
-          headers = [];
-          rawRows = [];
-          renderTable([]);
-          setStatus("No data found.");
-          return;
+    function drawSignatureBlock(){
+      const gapBefore = 5 * LINE_H;
+      const gapBetweenRows = 3 * LINE_H;
+
+      ensureSpace(10);
+
+      y -= gapBefore;
+
+      const leftLineX = M_LEFT;
+      const rightLineX = M_LEFT + MAX_W * 0.70;
+
+      const leftLineW = (rightLineX - leftLineX) - 22;
+      const rightLineW = (M_LEFT + MAX_W) - rightLineX;
+
+      const lineY = y + 6;
+
+      page.drawLine({ start:{x:leftLineX,y:lineY}, end:{x:leftLineX+leftLineW,y:lineY}, thickness:0.9 });
+      page.drawLine({ start:{x:rightLineX,y:lineY}, end:{x:rightLineX+rightLineW,y:lineY}, thickness:0.9 });
+
+      const labelY = y - (LINE_H - 2);
+      page.drawText("Signature of Authorized Signatory", { x: leftLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
+      page.drawText("Date", { x: rightLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
+
+      y -= gapBetweenRows;
+
+      const pnLineY = y + 6;
+      page.drawLine({ start:{x:leftLineX,y:pnLineY}, end:{x:leftLineX+leftLineW,y:pnLineY}, thickness:0.9 });
+      page.drawText("Printed Name and Title", { x: leftLineX, y: y - (LINE_H - 2), size: FONT_SIZE, font: bodyFont });
+
+      y -= (2 * LINE_H);
+    }
+
+    let signatureDrawn = false;
+
+    for (let i=0;i<paragraphs.length;i++){
+      const p = paragraphs[i];
+
+      if (isBasisCheckboxLine(p)) {
+        drawBasisCheckboxRow();
+        continue;
+      }
+
+      if (isServiceFeesLine(p)) {
+        const labelText = "Service Fees. The total service fees charged per month by Firm to Client shall be:";
+        drawAmountLine(labelText, serviceFees);
+        continue;
+      }
+
+      if (isRetainerAmountLine(p)) {
+        const labelText = "Retainer Fee Amount. The total retainer amount to be paid by Client shall be:";
+        drawAmountLine(labelText, retainerAmount);
+        continue;
+      }
+
+      if (!signatureDrawn && isSignatureTrigger(p)) {
+        drawSignatureBlock();
+        signatureDrawn = true;
+
+        while (i + 1 < paragraphs.length) {
+          const nxt = normalize(paragraphs[i+1]).toLowerCase();
+          if (
+            nxt === "date" ||
+            nxt.includes("printed name and title") ||
+            nxt.includes("signature of authorized signatory")
+          ) {
+            i++;
+            continue;
+          }
+          break;
+        }
+        continue;
+      }
+
+      if (isRomanSection(p)){
+        const s = parseRomanSection(p);
+        if (!s) continue;
+
+        const roman = s.roman + ".";
+        const title = s.title;
+
+        const romanX = M_LEFT;
+        const titleX = M_LEFT + 22;
+
+        ensureSpace(1);
+
+        drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
+        drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
+
+        y -= LINE_H;
+        continue;
+      }
+
+      const lead = parseLeadLabel(p);
+      if (lead){
+        const leadText = lead.lead + ".";
+        const restText = lead.rest;
+
+        const leadW = measureText(bodyFont, leadText, FONT_SIZE);
+        const maxFirst = Math.max(10, MAX_W - (leadW + 1));
+
+        const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
+        ensureSpace(Math.max(1, restLines.length));
+
+        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
+        drawUnderline(page, M_LEFT, y, leadW);
+
+        const firstRest = restLines[0] || "";
+        page.drawText(" " + firstRest, {
+          x: M_LEFT + leadW,
+          y,
+          size: FONT_SIZE,
+          font: bodyFont
+        });
+        y -= LINE_H;
+
+        for (let j=1;j<restLines.length;j++){
+          drawLineText(restLines[j], M_LEFT);
         }
 
-        headers = rows[0].map(v => (v ?? "").toString().trim());
-        const width = headers.length;
+        continue;
+      }
 
-        rawRows = rows
-          .slice(1)
-          .filter(r => r.some(v => (v ?? "").toString().trim() !== ""));
-
-        rawRows = normalizeToWidth(rawRows, width);
-
-        sortState = { col: -1, dir: 1 };
-        updatedEl.textContent = `Last loaded: ${new Date().toLocaleString()}`;
+      // Check if paragraph contains bold markers
+      if (p.includes("**")) {
+        console.log("Processing paragraph with bold markers");
         
-        // Save valid codes to localStorage for validation
-        saveValidCodesToCache();
-        
-        applySearch();
+        const parts = parseInlineBold(p);
+        const lines = [];
+        let currentLine = [];
+        let currentWidth = 0;
 
-      } catch (e) {
-        headers = [];
-        rawRows = [];
-        tbody.innerHTML = `<tr><td colspan="100" class="error-message">Failed to load data: ${e.message}</td></tr>`;
-        setStatus(`Load failed`);
+        for (const part of parts) {
+          const words = part.text.split(/\s+/).filter(Boolean);
+          
+          for (const word of words) {
+            const wordWidth = measureText(bodyFont, word, FONT_SIZE);
+            const spaceWidth = measureText(bodyFont, " ", FONT_SIZE);
+            const testWidth = currentWidth + (currentLine.length > 0 ? spaceWidth : 0) + wordWidth;
+
+            if (testWidth <= MAX_W) {
+              if (currentLine.length > 0) {
+                currentLine.push({ text: " ", bold: false });
+                currentWidth += spaceWidth;
+              }
+              currentLine.push({ text: word, bold: part.bold });
+              currentWidth += wordWidth;
+            } else {
+              if (currentLine.length > 0) {
+                lines.push(currentLine);
+              }
+              currentLine = [{ text: word, bold: part.bold }];
+              currentWidth = wordWidth;
+            }
+          }
+        }
+
+        if (currentLine.length > 0) {
+          lines.push(currentLine);
+        }
+
+        ensureSpace(Math.max(1, lines.length));
+        
+        console.log("Drawing", lines.length, "lines with mixed formatting");
+        
+        for (const line of lines) {
+          drawMixedLine(line, M_LEFT);
+        }
+
+        continue;
+      }
+
+      // Regular paragraph without bold
+      const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
+      ensureSpace(Math.max(1, lines.length));
+      for (const ln of lines){
+        drawLineText(ln, M_LEFT);
       }
     }
 
-    function saveValidCodesToCache() {
-      const TARGET_HEADER = "Unique Identifier";
-      const CACHE_KEY = "carbyne_valid_codes_cache";
-      const CACHE_TIMESTAMP_KEY = "carbyne_valid_codes_timestamp";
-      
-      try {
-        // Find the "Unique Identifier" column
-        const colIndex = headers.findIndex(h => 
-          h.toLowerCase().trim() === TARGET_HEADER.toLowerCase()
-        );
-        
-        if (colIndex === -1) return;
-        
-        // Extract all non-blank values from that column
-        const validCodes = rawRows
-          .map(row => (row[colIndex] ?? "").toString().trim())
-          .filter(code => code !== "")
-          .map(code => code.toLowerCase());
-        
-        // Save to localStorage
-        localStorage.setItem(CACHE_KEY, JSON.stringify(validCodes));
-        localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-        
-        console.log(`Cached ${validCodes.length} valid codes`);
-      } catch (e) {
-        console.error("Failed to cache valid codes:", e);
-      }
+    const totalPages = pages.length;
+    for (let i=0;i<totalPages;i++){
+      drawHeaderFooter(i, totalPages);
     }
 
-    // Event listeners
-    searchEl.addEventListener("input", applySearch);
-    reloadBtn.addEventListener("click", loadWorkbook);
+    const out = await pdfDoc.save();
+    return new Uint8Array(out);
+  }
 
-    // Global access for validation (if needed)
-    window.CARBYNE_TABLE_DATA = {
-      get headers() { return headers; },
-      get rows() { return rawRows; },
-      getColumn: function(columnName) {
-        const colIndex = headers.findIndex(h =>
-          h.toLowerCase().trim() === columnName.toLowerCase().trim()
-        );
-        if (colIndex === -1) return [];
-        return rawRows.map(row => (row[colIndex] ?? "").toString().trim());
-      }
+  function setIframePdf(frameEl, bytes){
+    try{
+      const blob = new Blob([bytes], { type:"application/pdf" });
+      const url = URL.createObjectURL(blob);
+      frameEl.src = url;
+      setTimeout(() => { try{ URL.revokeObjectURL(url); } catch{} }, 600000);
+    } catch {}
+  }
+
+  window.carbyne_masterserviceagreement_page_mount = async function(args){
+    const root = args && args.root ? args.root : document;
+    const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
+
+    const frame = root.querySelector("#msaFrame");
+    const signBtn = root.querySelector("#msaSignBtn");
+
+    let done = false;
+
+    function safeDisable(){ try{ if (signBtn) signBtn.disabled = true; } catch {} }
+    function safeEnable(){ try{ if (signBtn) signBtn.disabled = false; } catch {} }
+
+    safeDisable();
+    setStatus(root, "Loading agreement…");
+
+    try{
+      const [txt, fontBytes] = await Promise.all([
+        fetchText(AGREEMENT_TXT_URL),
+        fetchBytes(ARIAL_NARROW_TTF_URL)
+      ]);
+
+      const pdfBytes = await buildAgreementPdfBytes(referenceNumber, txt, fontBytes);
+
+      if (frame) setIframePdf(frame, pdfBytes);
+
+      try{
+        const b64 = bytesToB64(pdfBytes);
+        window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+          detail: {
+            id: DOC_ID,
+            title: DOC_TITLE,
+            b64: b64,
+            meta: {
+              referenceNumber: referenceNumber || "",
+              createdAt: stamp()
+            }
+          }
+        }));
+      } catch {}
+
+      setStatus(root, "Ready", "good");
+      safeEnable();
+
+    } catch (e){
+      setStatus(root, "Unable to load agreement.", "bad");
+      safeDisable();
+      console.error("MSA load error:", e);
+    }
+
+    function onSign(){
+      if (done) return;
+      window.dispatchEvent(new CustomEvent("carbyne:agreement:sign", {
+        detail: { id: DOC_ID, title: DOC_TITLE, referenceNumber: referenceNumber || "" }
+      }));
+    }
+
+    try{ if (signBtn) signBtn.addEventListener("click", onSign); } catch {}
+
+    return function unmount(){
+      done = true;
+      try{ if (signBtn) signBtn.removeEventListener("click", onSign); } catch {}
+      try{ if (frame) frame.src = "about:blank"; } catch {}
     };
+  };
+})();
+</script>
 
-    // Initialize
-    loadWorkbook();
-  </script>
 </body>
 </html>
