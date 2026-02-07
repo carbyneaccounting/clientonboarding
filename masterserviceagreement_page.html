@@ -119,6 +119,8 @@
   const DOC_ID = "master_service_agreement";
   const DOC_TITLE = "Master Service Agreement";
 
+  const INTAKE_STORAGE_KEY = "carbyne_intake_business_info";
+
   function normalize(v){ return (v ?? "").toString(); }
 
   function bytesToB64(bytes){
@@ -183,6 +185,27 @@
     } catch {
       return false;
     }
+  }
+
+  function getIntakeData(){
+    try{
+      const raw = localStorage.getItem(INTAKE_STORAGE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+
+  function replaceClientNamePlaceholder(text, businessName){
+    if (!businessName) return text;
+    
+    // Replace the blank line after "Firm to" with the business name in bold markers
+    // The pattern is: "Firm to ________________________________________ (hereinafter"
+    const pattern = /(Firm to\s+)_{10,}(\s+\(hereinafter "Client"\))/gi;
+    const replacement = `$1**${businessName}**$2`;
+    
+    return text.replace(pattern, replacement);
   }
 
   function splitParagraphsKeepGrid(text){
@@ -276,6 +299,43 @@
     return t.includes("signature of authorized signatory");
   }
 
+  function parseInlineBold(text){
+    // Parse **text** markers for bold
+    const parts = [];
+    let remaining = text;
+    let match;
+    const boldRegex = /\*\*([^\*]+)\*\*/g;
+    let lastIndex = 0;
+
+    while ((match = boldRegex.exec(text)) !== null) {
+      // Add normal text before the bold part
+      if (match.index > lastIndex) {
+        parts.push({
+          text: text.substring(lastIndex, match.index),
+          bold: false
+        });
+      }
+      
+      // Add bold text
+      parts.push({
+        text: match[1],
+        bold: true
+      });
+      
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add remaining normal text
+    if (lastIndex < text.length) {
+      parts.push({
+        text: text.substring(lastIndex),
+        bold: false
+      });
+    }
+
+    return parts.length > 0 ? parts : [{ text: text, bold: false }];
+  }
+
   async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
     const lib = window.PDFLib;
     if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
@@ -321,7 +381,12 @@
     const footerCenter = "Confidential";
     const footerRightPrefix = "Page ";
 
-    const paragraphs = splitParagraphsKeepGrid(agreementText);
+    // Get intake data and replace placeholder
+    const intakeData = getIntakeData();
+    const businessName = intakeData && intakeData.bi_name ? normalize(intakeData.bi_name).trim() : "";
+    const processedText = replaceClientNamePlaceholder(agreementText, businessName);
+
+    const paragraphs = splitParagraphsKeepGrid(processedText);
 
     const pages = [];
     function newPage(){
@@ -366,6 +431,22 @@
 
     function drawLineText(text, x){
       page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+      y -= LINE_H;
+    }
+
+    function drawMixedLine(parts, x){
+      // Draw a line with mixed bold/normal text
+      let currentX = x;
+      
+      for (const part of parts) {
+        if (part.bold) {
+          drawBold(page, bodyFont, part.text, currentX, y, FONT_SIZE);
+        } else {
+          page.drawText(part.text, { x: currentX, y, size: FONT_SIZE, font: bodyFont });
+        }
+        currentX += measureText(bodyFont, part.text, FONT_SIZE);
+      }
+      
       y -= LINE_H;
     }
 
@@ -530,6 +611,52 @@
         continue;
       }
 
+      // Check if paragraph contains bold markers
+      if (p.includes("**")) {
+        const parts = parseInlineBold(p);
+        const lines = [];
+        let currentLine = [];
+        let currentWidth = 0;
+
+        for (const part of parts) {
+          const words = part.text.split(/\s+/).filter(Boolean);
+          
+          for (const word of words) {
+            const wordWidth = measureText(bodyFont, word, FONT_SIZE);
+            const spaceWidth = measureText(bodyFont, " ", FONT_SIZE);
+            const testWidth = currentWidth + (currentLine.length > 0 ? spaceWidth : 0) + wordWidth;
+
+            if (testWidth <= MAX_W) {
+              if (currentLine.length > 0) {
+                currentLine.push({ text: " ", bold: false });
+                currentWidth += spaceWidth;
+              }
+              currentLine.push({ text: word, bold: part.bold });
+              currentWidth += wordWidth;
+            } else {
+              if (currentLine.length > 0) {
+                lines.push(currentLine);
+              }
+              currentLine = [{ text: word, bold: part.bold }];
+              currentWidth = wordWidth;
+            }
+          }
+        }
+
+        if (currentLine.length > 0) {
+          lines.push(currentLine);
+        }
+
+        ensureSpace(Math.max(1, lines.length));
+        
+        for (const line of lines) {
+          drawMixedLine(line, M_LEFT);
+        }
+
+        continue;
+      }
+
+      // Regular paragraph without bold
       const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
       ensureSpace(Math.max(1, lines.length));
       for (const ln of lines){
