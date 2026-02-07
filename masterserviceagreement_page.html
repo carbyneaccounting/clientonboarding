@@ -113,12 +113,14 @@
 (function(){
   const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
   const ARIAL_NARROW_TTF_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/ARIALN.TTF";
+
   const FONTKIT_URL = "https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js";
 
   const DOC_ID = "master_service_agreement";
   const DOC_TITLE = "Master Service Agreement";
 
   function normalize(v){ return (v ?? "").toString(); }
+  function trim(v){ return normalize(v).trim(); }
 
   function bytesToB64(bytes){
     let s = "";
@@ -203,6 +205,12 @@
     return out;
   }
 
+  function isUnderlineOnly(p){
+    const t = trim(p);
+    if (!t) return false;
+    return /^[_\-\s]+$/.test(t);
+  }
+
   function isRomanSection(p){
     return /^([IVXLCDM]+)\.\s+/.test(p);
   }
@@ -213,7 +221,7 @@
     return { roman: m[1], title: m[2] };
   }
 
-  function parseLeadLabel(p){
+  function parseBoldLeadLabel(p){
     const m = p.match(/^([A-Za-z][A-Za-z\s\-&]+)\.\s+(.+)$/);
     if (!m) return null;
     const lead = m[1].trim();
@@ -247,8 +255,8 @@
   function drawUnderline(page, x, y, w){
     try{
       page.drawLine({
-        start: { x, y: y - 1.1 },
-        end: { x: x + w, y: y - 1.1 },
+        start: { x, y: y - 1.2 },
+        end: { x: x + w, y: y - 1.2 },
         thickness: 0.7,
         opacity: 1
       });
@@ -260,19 +268,15 @@
     page.drawText(text, { x: x + 0.35, y, size, font });
   }
 
-  function isBasisCheckboxLine(p){
-    const t = p.toLowerCase();
-    return t.includes("accrual basis") && t.includes("cash basis") && t.includes("mixed method") && t.includes("other");
-  }
-
-  function isSignatureRowLine(p){
-    const t = p.toLowerCase();
-    return t.includes("signature of authorized signatory") && t.includes("date");
-  }
-
-  function isPrintedNameLine(p){
-    const t = p.toLowerCase();
-    return t.includes("printed name and title");
+  function drawHLine(page, x, y, w, thickness){
+    try{
+      page.drawLine({
+        start: { x, y },
+        end: { x: x + w, y },
+        thickness: thickness || 0.7,
+        opacity: 1
+      });
+    } catch {}
   }
 
   async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
@@ -280,6 +284,7 @@
     if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
 
     const { PDFDocument, StandardFonts } = lib;
+
     const pdfDoc = await PDFDocument.create();
 
     let bodyFont = null;
@@ -310,13 +315,13 @@
     const BODY_BOTTOM_Y = M_BOTTOM + 20;
 
     const FONT_SIZE = 10;
-    const LINE_H = 13;
+    const LINE_H = 13; /* was 12 */
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const headerLeft = "Carbyne Accounting";
     const headerRight = DOC_TITLE;
 
-    const footerLeft = "Confidential";
+    const footerCenter = "Confidential";
     const footerRightPrefix = "Page ";
 
     const paragraphs = splitParagraphsKeepGrid(agreementText);
@@ -346,8 +351,8 @@
       }
 
       const footerY = M_BOTTOM - 6;
-
-      p.drawText(footerLeft, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
+      const cw = measureText(bodyFont, footerCenter, FONT_SIZE);
+      p.drawText(footerCenter, { x: (PAGE_W - cw) / 2, y: footerY, size: FONT_SIZE, font: bodyFont });
 
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
       const prw = measureText(bodyFont, pr, FONT_SIZE);
@@ -362,103 +367,77 @@
       }
     }
 
-    function drawLine(text, x){
-      page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+    function drawLine(text, x, isBold){
+      if (isBold){
+        drawBold(page, bodyFont, text, x, y, FONT_SIZE);
+      } else {
+        page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+      }
       y -= LINE_H;
     }
 
-    function drawSignatureRow(){
-      const gap = 34;
-      const lineY = y - 2;
-      const labelY = y - 22;
+    function isSigLabel(p){
+      const t = trim(p).toLowerCase();
+      return (
+        t === "signature of authorized signatory" ||
+        t === "signature of authorized signatory date" ||
+        t === "date" ||
+        t === "printed name and title"
+      );
+    }
 
-      const totalW = MAX_W;
-      const colW = (totalW - gap) / 2;
-
+    function drawSignatureBlock(){
+      const leftW = 320;
+      const gap = 44;
+      const rightW = Math.max(80, Math.min(170, MAX_W - leftW - gap));
       const leftX = M_LEFT;
-      const rightX = M_LEFT + colW + gap;
+      const rightX = M_LEFT + leftW + gap;
 
-      ensureSpace(3);
+      ensureSpace(6);
 
-      drawUnderline(page, leftX, lineY, colW);
-      drawUnderline(page, rightX, lineY, colW);
+      const lineY1 = y;
+      drawHLine(page, leftX, lineY1, leftW, 0.7);
+      drawHLine(page, rightX, lineY1, rightW, 0.7);
 
-      page.drawText("Signature of Authorized Signatory", { x: leftX, y: labelY, size: FONT_SIZE + 6, font: bodyFont });
-      page.drawText("Date", { x: rightX, y: labelY, size: FONT_SIZE + 6, font: bodyFont });
+      const labelY1 = lineY1 - 14;
+      page.drawText("Signature of Authorized Signatory", { x: leftX, y: labelY1, size: FONT_SIZE, font: bodyFont });
+      page.drawText("Date", { x: rightX, y: labelY1, size: FONT_SIZE, font: bodyFont });
 
-      y -= 54;
+      y = labelY1 - 26;
+
+      const lineY2 = y;
+      drawHLine(page, leftX, lineY2, leftW, 0.7);
+
+      const labelY2 = lineY2 - 14;
+      page.drawText("Printed Name and Title", { x: leftX, y: labelY2, size: FONT_SIZE, font: bodyFont });
+
+      y = labelY2 - 22;
     }
 
-    function drawPrintedNameLine(){
-      const lineY = y - 2;
-      const labelY = y - 22;
+    for (let i = 0; i < paragraphs.length; i++){
+      const pRaw = paragraphs[i];
+      const p = trim(pRaw);
+      if (!p) continue;
 
-      ensureSpace(3);
+      const t = p.toLowerCase();
 
-      drawUnderline(page, M_LEFT, lineY, MAX_W);
-      page.drawText("Printed Name and Title", { x: M_LEFT, y: labelY, size: FONT_SIZE + 6, font: bodyFont });
+      // Signature block override (draw lines once, skip underscore/label paragraphs)
+      if (t === "signature of authorized signatory" || t === "signature of authorized signatory date"){
+        drawSignatureBlock();
 
-      y -= 54;
-    }
-
-    function drawBasisCheckboxRow(){
-      ensureSpace(2);
-
-      const boxSize = 10;
-      const labelSize = 10;
-
-      const baselineY = y;
-      const boxY = baselineY + 1;
-
-      function drawBox(x){
-        page.drawRectangle({
-          x,
-          y: boxY,
-          width: boxSize,
-          height: boxSize,
-          borderWidth: 1,
-          borderColor: lib.rgb(0,0,0),
-          color: lib.rgb(1,1,1)  // white fill so it stays an empty checkbox (not a black square)
-        });
+        // Skip forward through common signature labels and underline-only rows
+        for (let j = i + 1; j < paragraphs.length; j++){
+          const nx = trim(paragraphs[j]);
+          if (!nx) { i = j; continue; }
+          if (isUnderlineOnly(nx) || isSigLabel(nx)) { i = j; continue; }
+          break;
+        }
+        continue;
       }
 
-      function drawLabel(x, text){
-        page.drawText(text, { x, y: baselineY, size: labelSize, font: bodyFont });
+      if (isUnderlineOnly(p)){
+        continue;
       }
-
-      let x = M_LEFT;
-
-      drawBox(x);
-      x += boxSize + 6;
-      drawLabel(x, "Accrual Basis");
-      x += measureText(bodyFont, "Accrual Basis", labelSize) + 14;
-
-      drawBox(x);
-      x += boxSize + 6;
-      drawLabel(x, "Cash Basis");
-      x += measureText(bodyFont, "Cash Basis", labelSize) + 14;
-
-      drawBox(x);
-      x += boxSize + 6;
-      drawLabel(x, "Mixed Method");
-      x += measureText(bodyFont, "Mixed Method", labelSize) + 14;
-
-      drawBox(x);
-      x += boxSize + 6;
-      drawLabel(x, "Other:");
-      x += measureText(bodyFont, "Other:", labelSize) + 6;
-
-      const rem = (M_LEFT + MAX_W) - x;
-      if (rem > 30) drawUnderline(page, x, baselineY + 2, rem);
-
-      y -= LINE_H;
-      y -= 2;
-    }
-
-    for (const p of paragraphs){
-      if (isSignatureRowLine(p)) { drawSignatureRow(); continue; }
-      if (isPrintedNameLine(p)) { drawPrintedNameLine(); continue; }
-      if (isBasisCheckboxLine(p)) { drawBasisCheckboxRow(); continue; }
 
       if (isRomanSection(p)){
         const s = parseRomanSection(p);
@@ -470,39 +449,35 @@
         const romanX = M_LEFT;
         const titleX = M_LEFT + 22;
 
-        ensureSpace(1);
+        const titleW = Math.min(measureText(bodyFont, title, FONT_SIZE), MAX_W - 22);
 
+        ensureSpace(1);
         drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
         drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
+        drawUnderline(page, titleX, y, titleW);
         y -= LINE_H;
 
         continue;
       }
 
-      const lead = parseLeadLabel(p);
+      const lead = parseBoldLeadLabel(p);
       if (lead){
         const leadText = lead.lead + ".";
         const restText = lead.rest;
 
-        const maxFirst = Math.max(10, MAX_W - measureText(bodyFont, leadText + " ", FONT_SIZE));
-        const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
+        const leadW = measureText(bodyFont, leadText + " ", FONT_SIZE);
+        const maxFirst = Math.max(10, MAX_W - leadW);
 
+        const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
         ensureSpace(Math.max(1, restLines.length));
 
-        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
-        drawUnderline(page, M_LEFT, y, measureText(bodyFont, leadText, FONT_SIZE));
-
         const firstRest = restLines[0] || "";
-        page.drawText(" " + firstRest, {
-          x: M_LEFT + measureText(bodyFont, leadText, FONT_SIZE),
-          y,
-          size: FONT_SIZE,
-          font: bodyFont
-        });
+        drawBold(page, bodyFont, leadText, M_LEFT, y, FONT_SIZE);
+        page.drawText(" " + firstRest, { x: M_LEFT + measureText(bodyFont, leadText, FONT_SIZE), y, size: FONT_SIZE, font: bodyFont });
         y -= LINE_H;
 
-        for (let i=1;i<restLines.length;i++){
-          drawLine(restLines[i], M_LEFT);
+        for (let k=1;k<restLines.length;k++){
+          drawLine(restLines[k], M_LEFT, false);
         }
 
         continue;
@@ -511,7 +486,7 @@
       const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
       ensureSpace(Math.max(1, lines.length));
       for (const ln of lines){
-        drawLine(ln, M_LEFT);
+        drawLine(ln, M_LEFT, false);
       }
     }
 
