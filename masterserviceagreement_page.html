@@ -261,16 +261,14 @@
     page.drawText(text, { x: x + 0.35, y, size, font });
   }
 
-  function isSignatureRelated(p){
-    const t = normalize(p).toLowerCase();
-    if (!t) return false;
-    if (t.includes("signature of authorized signatory")) return true;
-    if (t === "date") return true;
-    if (t.includes("printed name and title")) return true;
-    if (/^_+$/.test(t.replace(/\s+/g,""))) return true;
-    if (t.includes("signature") && t.includes("date")) return true;
-    if (t.includes("printed name") && t.includes("title")) return true;
-    return false;
+  function isBasisCheckboxLine(p){
+    const t = normalize(p);
+    return (
+      t.includes("Accrual Basis") &&
+      t.includes("Cash Basis") &&
+      t.includes("Mixed Method") &&
+      t.includes("Other:")
+    );
   }
 
   async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
@@ -345,6 +343,8 @@
       }
 
       const footerY = M_BOTTOM - 6;
+
+      /* Center stays centered (as in your current code) */
       const cw = measureText(bodyFont, footerCenter, FONT_SIZE);
       p.drawText(footerCenter, { x: (PAGE_W - cw) / 2, y: footerY, size: FONT_SIZE, font: bodyFont });
 
@@ -361,54 +361,66 @@
       }
     }
 
-    function drawLine(text, x, isBold){
-      if (isBold){
-        drawBold(page, bodyFont, text, x, y, FONT_SIZE);
-      } else {
-        page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+    function drawLine(text, x){
+      page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+      y -= LINE_H;
+    }
+
+    function drawCheckbox(x, yTop, size){
+      try{
+        page.drawRectangle({
+          x: x,
+          y: yTop - size + 1,
+          width: size,
+          height: size,
+          borderWidth: 1,
+          borderColor: lib.rgb(0,0,0)
+        });
+      } catch {}
+    }
+
+    function drawBasisCheckboxRow(){
+      const box = 10;
+      const gapAfterBox = 6;
+      const itemGap = 16;
+
+      const items = [
+        { label: "Accrual Basis" },
+        { label: "Cash Basis" },
+        { label: "Mixed Method" },
+        { label: "Other:" }
+      ];
+
+      ensureSpace(2);
+
+      let x = M_LEFT;
+      const yText = y;
+
+      for (let i=0;i<items.length;i++){
+        drawCheckbox(x, yText + 2, box);
+        x += box + gapAfterBox;
+
+        if (items[i].label === "Other:") {
+          const otherLabel = "Other:";
+          page.drawText(otherLabel, { x, y: yText, size: FONT_SIZE, font: bodyFont });
+          x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
+
+          const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
+          page.drawLine({ start:{x:x,y:yText+2}, end:{x:x+lineW,y:yText+2}, thickness:0.9 });
+
+          break;
+        } else {
+          page.drawText(items[i].label, { x, y: yText, size: FONT_SIZE, font: bodyFont });
+          x += measureText(bodyFont, items[i].label, FONT_SIZE) + itemGap;
+        }
       }
-      y -= LINE_H;
-    }
-
-    function drawSignatureBlock(){
-      const sigLineW = 330;
-      const dateLineW = 130;
-
-      const sigX = M_LEFT;
-      const dateX = PAGE_W - M_RIGHT - dateLineW;
-
-      ensureSpace(7);
-
-      y -= (LINE_H * 2);
-
-      page.drawLine({ start:{x:sigX,y:y}, end:{x:sigX+sigLineW,y:y}, thickness:0.9 });
-      page.drawLine({ start:{x:dateX,y:y}, end:{x:dateX+dateLineW,y:y}, thickness:0.9 });
-
-      y -= LINE_H;
-
-      page.drawText("Signature of Authorized Signatory", { x:sigX, y:y, size:FONT_SIZE, font:bodyFont });
-      page.drawText("Date", { x:dateX, y:y, size:FONT_SIZE, font:bodyFont });
-
-      y -= (LINE_H * 3);
-
-      page.drawLine({ start:{x:sigX,y:y}, end:{x:sigX+sigLineW,y:y}, thickness:0.9 });
-
-      y -= LINE_H;
-
-      page.drawText("Printed Name and Title", { x:sigX, y:y, size:FONT_SIZE, font:bodyFont });
 
       y -= LINE_H;
     }
-
-    let signatureDrawn = false;
 
     for (const p of paragraphs){
-      if (!signatureDrawn && isSignatureRelated(p)) {
-        drawSignatureBlock();
-        signatureDrawn = true;
-        continue;
-      }
-      if (signatureDrawn && isSignatureRelated(p)) {
+      if (isBasisCheckboxLine(p)) {
+        drawBasisCheckboxRow();
         continue;
       }
 
@@ -422,14 +434,13 @@
         const romanX = M_LEFT;
         const titleX = M_LEFT + 22;
 
-        const titleW = Math.min(measureText(bodyFont, title, FONT_SIZE), MAX_W - 22);
-
         ensureSpace(1);
+
+        /* Roman section titles: BOLD ONLY (no underline) */
         drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
         drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
-        drawUnderline(page, titleX, y, titleW);
-        y -= LINE_H;
 
+        y -= LINE_H;
         continue;
       }
 
@@ -438,19 +449,27 @@
         const leadText = lead.lead + ".";
         const restText = lead.rest;
 
-        const leadW = measureText(bodyFont, leadText + " ", FONT_SIZE);
-        const maxFirst = Math.max(10, MAX_W - leadW);
+        const leadW = measureText(bodyFont, leadText, FONT_SIZE);
+        const maxFirst = Math.max(10, MAX_W - (leadW + 1));
 
         const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
         ensureSpace(Math.max(1, restLines.length));
 
+        /* Lead labels: UNDERLINED ONLY (not bold) */
+        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
+        drawUnderline(page, M_LEFT, y, leadW);
+
         const firstRest = restLines[0] || "";
-        drawBold(page, bodyFont, leadText, M_LEFT, y, FONT_SIZE);
-        page.drawText(" " + firstRest, { x: M_LEFT + measureText(bodyFont, leadText, FONT_SIZE), y, size: FONT_SIZE, font: bodyFont });
+        page.drawText(" " + firstRest, {
+          x: M_LEFT + leadW,
+          y,
+          size: FONT_SIZE,
+          font: bodyFont
+        });
         y -= LINE_H;
 
         for (let i=1;i<restLines.length;i++){
-          drawLine(restLines[i], M_LEFT, false);
+          drawLine(restLines[i], M_LEFT);
         }
 
         continue;
@@ -459,14 +478,7 @@
       const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
       ensureSpace(Math.max(1, lines.length));
       for (const ln of lines){
-        drawLine(ln, M_LEFT, false);
-      }
-    }
-
-    if (!signatureDrawn) {
-      const t = normalize(agreementText).toLowerCase();
-      if (t.includes("signature of authorized signatory") || t.includes("printed name and title")) {
-        drawSignatureBlock();
+        drawLine(ln, M_LEFT);
       }
     }
 
