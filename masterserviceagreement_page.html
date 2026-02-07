@@ -1,0 +1,334 @@
+<!-- masterserviceagreement_page.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Master Service Agreement</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+</head>
+<body>
+
+<template id="carbyne_master_service_agreement">
+  <style>
+    .ag-wrap{width:100%}
+
+    .ag-head{display:flex;flex-direction:column;gap:6px;padding:2px 2px 10px}
+    .ag-title{margin:0;font-size:20px;font-weight:950;color:#0b2f4e;letter-spacing:.2px;line-height:1.15}
+    .ag-sub{margin:0;font-size:13px;font-weight:900;color:#0f172a;opacity:.78;line-height:1.55}
+
+    .ag-card{
+      background:#fff;
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:12px;
+      box-shadow:0 10px 20px rgba(2,6,23,.08);
+      overflow:hidden;
+    }
+
+    .ag-card-h{
+      padding:10px 12px;
+      border-bottom:1px solid rgba(0,0,0,.08);
+      font-size:12px;
+      font-weight:950;
+      color:#0f172a;
+      opacity:.90;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .ag-pill{
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      color:#0f172a;
+      font-weight:950;
+      font-size:11px;
+      padding:7px 11px;
+      border-radius:999px;
+      cursor:pointer;
+      transition:transform .12s ease, opacity .12s ease, box-shadow .12s ease, background-color .12s ease;
+      white-space:nowrap;
+      box-shadow:0 8px 18px rgba(2,6,23,.06);
+    }
+    .ag-pill:hover{transform:translateY(-1px);opacity:.97;box-shadow:0 10px 20px rgba(2,6,23,.08)}
+    .ag-pill.primary{background:rgba(0,48,91,.08);border-color:rgba(0,48,91,.18);color:#00305B}
+    .ag-pill:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:0 8px 18px rgba(2,6,23,.05)}
+
+    .ag-view{
+      width:100%;
+      height:440px;
+      background:rgba(0,0,0,.02);
+      display:block;
+    }
+
+    .ag-iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      background:#fff;
+    }
+
+    .ag-fallback{
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      text-align:center;
+      font-size:13px;
+      font-weight:900;
+      color:#0f172a;
+      opacity:.82;
+      line-height:1.45;
+    }
+
+    .ag-actions{
+      margin-top:12px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:0 2px;
+    }
+
+    .ag-sign{
+      appearance:none;
+      border:0;
+      border-radius:12px;
+      padding:12px 14px;
+      font-size:13px;
+      font-weight:950;
+      letter-spacing:.2px;
+      background:linear-gradient(90deg,#00305B,#0A3D6F);
+      color:#fff;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(2,6,23,.10);
+      transition:transform .14s ease, opacity .14s ease, box-shadow .14s ease;
+      white-space:nowrap;
+    }
+    .ag-sign:hover{transform:translateY(-1px);opacity:.97;box-shadow:0 12px 24px rgba(2,6,23,.14)}
+    .ag-sign:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:0 10px 20px rgba(2,6,23,.06)}
+  </style>
+
+  <div class="ag-wrap" id="agRoot">
+    <div class="ag-head">
+      <h2 class="ag-title" id="agTitle">Master Service Agreement</h2>
+      <p class="ag-sub" id="agSub">Please review the Master Service Agreement below.</p>
+    </div>
+
+    <div class="ag-card">
+      <div class="ag-card-h">
+        <span id="agDocLabel">Agreement Viewer</span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button class="ag-pill" id="agReload" type="button">Reload</button>
+          <button class="ag-pill primary" id="agOpenNewTab" type="button">Open in New Tab</button>
+        </div>
+      </div>
+
+      <div class="ag-view" id="agViewer">
+        <iframe class="ag-iframe" id="agFrame" title="Master Service Agreement PDF"></iframe>
+      </div>
+    </div>
+
+    <div class="ag-actions">
+      <button class="ag-sign" id="agSignBtn" type="button">Electronically Sign</button>
+    </div>
+  </div>
+</template>
+
+<script>
+  (function(){
+    const AGREEMENT_ID = "master_service_agreement";
+    const AGREEMENT_TITLE = "Master Service Agreement";
+    const AGREEMENT_SUBTEXT = "Please review the Master Service Agreement below.";
+    const TEXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
+
+    function normalize(v){ return (v ?? "").toString().trim(); }
+
+    function stamp(){
+      const d = new Date();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      const yy = d.getFullYear();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mi = String(d.getMinutes()).padStart(2,"0");
+      return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
+    }
+
+    function wrapText(font, text, size, maxWidth){
+      const words = (text || "").split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = "";
+      for (const w of words){
+        const test = line ? (line + " " + w) : w;
+        const width = font.widthOfTextAtSize(test, size);
+        if (width <= maxWidth){
+          line = test;
+        } else {
+          if (line) lines.push(line);
+          line = w;
+        }
+      }
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    async function buildPdfBytesFromText(title, referenceNumber, text){
+      const lib = window.PDFLib;
+      if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
+
+      const { PDFDocument, StandardFonts } = lib;
+      const pdfDoc = await PDFDocument.create();
+
+      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+      const pageW = 612, pageH = 792;
+      const marginX = 54;
+      const marginTop = 54;
+      const marginBottom = 54;
+
+      const contentW = pageW - (marginX * 2);
+      const size = 10;
+      const lineH = 14;
+
+      const linesRaw = (text || "").replace(/\r\n/g,"\n").split("\n");
+      const paragraphs = linesRaw.map(l => l.replace(/\s+$/,""));
+
+      let page = pdfDoc.addPage([pageW, pageH]);
+      let y = pageH - marginTop;
+
+      function newPage(){
+        page = pdfDoc.addPage([pageW, pageH]);
+        y = pageH - marginTop;
+      }
+
+      function drawLine(str, bold){
+        if (y <= marginBottom) newPage();
+        page.drawText(str, { x: marginX, y: y, size, font: bold ? fontBold : font });
+        y -= lineH;
+      }
+
+      drawLine(normalize(title) || "Agreement", true);
+      drawLine("Reference Number: " + (normalize(referenceNumber) || ""), false);
+      drawLine("Generated: " + stamp(), false);
+      drawLine(" ", false);
+
+      for (let i=0;i<paragraphs.length;i++){
+        const p = paragraphs[i];
+        if (!normalize(p)){
+          drawLine(" ", false);
+          continue;
+        }
+        const wrapped = wrapText(font, p, size, contentW);
+        wrapped.forEach(l => drawLine(l, false));
+        drawLine(" ", false);
+      }
+
+      return await pdfDoc.save();
+    }
+
+    function bytesToBlobUrl(bytes){
+      const b = new Blob([bytes], { type: "application/pdf" });
+      return URL.createObjectURL(b);
+    }
+
+    async function fetchText(url){
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      return await res.text();
+    }
+
+    window.carbyne_master_service_agreement_mount = function(args){
+      const root = (args && args.root) ? args.root : document;
+      const referenceNumber = normalize(args && args.referenceNumber) || "";
+
+      const titleEl = root.querySelector("#agTitle");
+      const subEl = root.querySelector("#agSub");
+      const frame = root.querySelector("#agFrame");
+      const viewer = root.querySelector("#agViewer");
+
+      const reloadBtn = root.querySelector("#agReload");
+      const openBtn = root.querySelector("#agOpenNewTab");
+      const signBtn = root.querySelector("#agSignBtn");
+
+      let currentBlobUrl = "";
+
+      function revokeUrl(){
+        if (currentBlobUrl){
+          try{ URL.revokeObjectURL(currentBlobUrl); } catch {}
+          currentBlobUrl = "";
+        }
+      }
+
+      async function loadAgreement(){
+        if (reloadBtn) reloadBtn.disabled = true;
+        if (openBtn) openBtn.disabled = true;
+        if (signBtn) signBtn.disabled = true;
+
+        try{
+          const text = await fetchText(TEXT_URL);
+          const pdfBytes = await buildPdfBytesFromText(AGREEMENT_TITLE, referenceNumber, text);
+
+          revokeUrl();
+          currentBlobUrl = bytesToBlobUrl(pdfBytes);
+
+          if (frame){
+            frame.src = currentBlobUrl;
+          } else if (viewer){
+            viewer.innerHTML = "<div class='ag-fallback'>Viewer unavailable.</div>";
+          }
+
+          if (openBtn) openBtn.disabled = false;
+          if (signBtn) signBtn.disabled = false;
+        } catch {
+          if (viewer){
+            viewer.innerHTML = "<div class='ag-fallback'>Unable to load agreement.</div>";
+          }
+        } finally {
+          if (reloadBtn) reloadBtn.disabled = false;
+        }
+      }
+
+      function openInNewTab(){
+        if (!currentBlobUrl) return;
+        window.open(currentBlobUrl, "_blank");
+      }
+
+      function requestSign(){
+        window.dispatchEvent(new CustomEvent("carbyne:agreement:sign", {
+          detail: {
+            agreementId: AGREEMENT_ID,
+            title: AGREEMENT_TITLE,
+            referenceNumber: referenceNumber,
+            textUrl: TEXT_URL,
+            pdfBlobUrl: currentBlobUrl || ""
+          }
+        }));
+      }
+
+      if (titleEl) titleEl.textContent = AGREEMENT_TITLE;
+      if (subEl) subEl.textContent = AGREEMENT_SUBTEXT;
+
+      if (reloadBtn) reloadBtn.addEventListener("click", loadAgreement);
+      if (openBtn) openBtn.addEventListener("click", openInNewTab);
+      if (signBtn) signBtn.addEventListener("click", requestSign);
+
+      loadAgreement();
+
+      return function unmount(){
+        if (reloadBtn) reloadBtn.removeEventListener("click", loadAgreement);
+        if (openBtn) openBtn.removeEventListener("click", openInNewTab);
+        if (signBtn) signBtn.removeEventListener("click", requestSign);
+        revokeUrl();
+      };
+    };
+  })();
+</script>
+
+</body>
+</html>
