@@ -722,14 +722,6 @@
       } catch {}
     }
 
-    function findHeaderIndex(headers) {
-      const target = TARGET_HEADER.toLowerCase();
-      for (let i = 0; i < headers.length; i++) {
-        if (normalize(headers[i]).toLowerCase() === target) return i;
-      }
-      return -1;
-    }
-
     async function fetchValidCodes() {
       if (isFetching) {
         while (isFetching) await new Promise(r => setTimeout(r, 100));
@@ -750,19 +742,62 @@
         if (!rows || rows.length < 2) throw new Error("No rows");
         
         const headers = rows[0] || [];
-        const idx = findHeaderIndex(headers);
-        if (idx < 0) throw new Error("Missing header");
+        const uniqueIdIdx = headers.findIndex(h => normalize(h).toLowerCase() === "unique identifier");
+        
+        if (uniqueIdIdx < 0) throw new Error("Missing header");
 
         const codes = [];
         for (let r = 1; r < rows.length; r++) {
-          const cell = normalize((rows[r] || [])[idx] || "");
+          const cell = normalize((rows[r] || [])[uniqueIdIdx] || "");
           if (cell) codes.push(cell.toLowerCase());
         }
         
         setCachedCodes(codes);
+        
+        // NEW: Store the full data for A and R extraction
+        try {
+          localStorage.setItem("carbyne_excel_data", JSON.stringify({ headers, rows }));
+        } catch {}
+        
         return codes;
       } finally {
         isFetching = false;
+      }
+    }
+
+    function getColumnValuesForCode(code) {
+      try {
+        const rawData = localStorage.getItem("carbyne_excel_data");
+        if (!rawData) return { columnA: "", columnR: "" };
+        
+        const { headers, rows } = JSON.parse(rawData);
+        
+        const uniqueIdIdx = headers.findIndex(h => normalize(h).toLowerCase() === "unique identifier");
+        const columnAIdx = headers.findIndex(h => normalize(h).toLowerCase() === "a");
+        const columnRIdx = headers.findIndex(h => normalize(h).toLowerCase() === "r");
+        
+        if (uniqueIdIdx < 0 || columnAIdx < 0 || columnRIdx < 0) {
+          return { columnA: "", columnR: "" };
+        }
+        
+        const needle = normalize(code).toLowerCase();
+        
+        for (let r = 1; r < rows.length; r++) {
+          const row = rows[r] || [];
+          const rowCode = normalize(row[uniqueIdIdx] || "").toLowerCase();
+          
+          if (rowCode === needle) {
+            const columnA = normalize(row[columnAIdx] || "").trim();
+            const columnR = normalize(row[columnRIdx] || "").trim();
+            console.log("Found matching row - Column A:", columnA, "Column R:", columnR);
+            return { columnA, columnR };
+          }
+        }
+        
+        return { columnA: "", columnR: "" };
+      } catch (e) {
+        console.error("Error getting column values:", e);
+        return { columnA: "", columnR: "" };
       }
     }
 
@@ -772,12 +807,32 @@
       
       if (cached && Array.isArray(cached)) {
         fetchValidCodes().catch(() => {});
-        return cached.includes(needle);
+        const isValid = cached.includes(needle);
+        
+        // NEW: Store A and R values
+        if (isValid) {
+          const values = getColumnValuesForCode(code);
+          localStorage.setItem("carbyne_column_a", values.columnA);
+          localStorage.setItem("carbyne_column_r", values.columnR);
+          console.log("Stored column A:", values.columnA, "column R:", values.columnR);
+        }
+        
+        return isValid;
       }
       
       try {
         const codes = await fetchValidCodes();
-        return codes.includes(needle);
+        const isValid = codes.includes(needle);
+        
+        // NEW: Store A and R values
+        if (isValid) {
+          const values = getColumnValuesForCode(code);
+          localStorage.setItem("carbyne_column_a", values.columnA);
+          localStorage.setItem("carbyne_column_r", values.columnR);
+          console.log("Stored column A:", values.columnA, "column R:", values.columnR);
+        }
+        
+        return isValid;
       } catch {
         return false;
       }
@@ -982,6 +1037,9 @@
         localStorage.removeItem(STORAGE_KEY_PAGE);
         localStorage.removeItem(CACHE_KEY);
         localStorage.removeItem(CACHE_TS_KEY);
+        localStorage.removeItem("carbyne_column_a");
+        localStorage.removeItem("carbyne_column_r");
+        localStorage.removeItem("carbyne_excel_data");
         sessionStorage.removeItem(PACKET_KEY);
       } catch {}
     }
