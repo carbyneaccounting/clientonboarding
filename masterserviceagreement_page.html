@@ -310,7 +310,7 @@
     const BODY_BOTTOM_Y = M_BOTTOM + 20;
 
     const FONT_SIZE = 10;
-    const LINE_H = 13; // slightly more spacing
+    const LINE_H = 13;
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const headerLeft = "Carbyne Accounting";
@@ -347,7 +347,6 @@
 
       const footerY = M_BOTTOM - 6;
 
-      // Confidential aligned LEFT (per request)
       p.drawText(footerLeft, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
 
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
@@ -405,8 +404,11 @@
     function drawBasisCheckboxRow(){
       ensureSpace(2);
 
-      const boxSize = 12;
-      const boxY = y + 1;
+      const boxSize = 10;
+      const labelSize = 10;
+
+      const baselineY = y;
+      const boxY = baselineY + 1;
 
       function drawBox(x){
         page.drawRectangle({
@@ -415,42 +417,42 @@
           width: boxSize,
           height: boxSize,
           borderWidth: 1,
-          opacity: 1
+          borderColor: lib.rgb(0,0,0),
+          color: lib.rgb(1,1,1)  // white fill so it stays an empty checkbox (not a black square)
         });
       }
 
       function drawLabel(x, text){
-        page.drawText(text, { x, y, size: 18, font: bodyFont });
+        page.drawText(text, { x, y: baselineY, size: labelSize, font: bodyFont });
       }
 
       let x = M_LEFT;
 
       drawBox(x);
-      x += boxSize + 8;
+      x += boxSize + 6;
       drawLabel(x, "Accrual Basis");
-      x += measureText(bodyFont, "Accrual Basis", 18) + 18;
+      x += measureText(bodyFont, "Accrual Basis", labelSize) + 14;
 
       drawBox(x);
-      x += boxSize + 8;
+      x += boxSize + 6;
       drawLabel(x, "Cash Basis");
-      x += measureText(bodyFont, "Cash Basis", 18) + 18;
+      x += measureText(bodyFont, "Cash Basis", labelSize) + 14;
 
       drawBox(x);
-      x += boxSize + 8;
+      x += boxSize + 6;
       drawLabel(x, "Mixed Method");
-      x += measureText(bodyFont, "Mixed Method", 18) + 18;
+      x += measureText(bodyFont, "Mixed Method", labelSize) + 14;
 
       drawBox(x);
-      x += boxSize + 8;
+      x += boxSize + 6;
       drawLabel(x, "Other:");
-      x += measureText(bodyFont, "Other:", 18) + 8;
+      x += measureText(bodyFont, "Other:", labelSize) + 6;
 
-      // Other underline to end of line
       const rem = (M_LEFT + MAX_W) - x;
-      if (rem > 20) drawUnderline(page, x, y + 6, rem);
+      if (rem > 30) drawUnderline(page, x, baselineY + 2, rem);
 
       y -= LINE_H;
-      y -= 6;
+      y -= 2;
     }
 
     for (const p of paragraphs){
@@ -470,7 +472,6 @@
 
         ensureSpace(1);
 
-        // Section headers: bold only (no underline)
         drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
         drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
         y -= LINE_H;
@@ -483,13 +484,11 @@
         const leadText = lead.lead + ".";
         const restText = lead.rest;
 
-        const leadW = measureText(bodyFont, leadText + " ", FONT_SIZE);
-        const maxFirst = Math.max(10, MAX_W - leadW);
-
+        const maxFirst = Math.max(10, MAX_W - measureText(bodyFont, leadText + " ", FONT_SIZE));
         const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
+
         ensureSpace(Math.max(1, restLines.length));
 
-        // Lead labels: UNDERLINE ONLY (not bold)
         page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
         drawUnderline(page, M_LEFT, y, measureText(bodyFont, leadText, FONT_SIZE));
 
