@@ -190,22 +190,44 @@
   function getIntakeData(){
     try{
       const raw = localStorage.getItem(INTAKE_STORAGE_KEY);
+      console.log("Loading intake data from localStorage:", raw);
       if (!raw) return null;
-      return JSON.parse(raw);
-    } catch {
+      const parsed = JSON.parse(raw);
+      console.log("Parsed intake data:", parsed);
+      return parsed;
+    } catch (e) {
+      console.error("Error loading intake data:", e);
       return null;
     }
   }
 
   function replaceClientNamePlaceholder(text, businessName){
-    if (!businessName) return text;
+    console.log("Attempting to replace placeholder with business name:", businessName);
     
-    // Replace the blank line after "Firm to" with the business name in bold markers
-    // The pattern is: "Firm to ________________________________________ (hereinafter"
-    const pattern = /(Firm to\s+)_{10,}(\s+\(hereinafter "Client"\))/gi;
-    const replacement = `$1**${businessName}**$2`;
+    if (!businessName) {
+      console.log("No business name provided, returning original text");
+      return text;
+    }
     
-    return text.replace(pattern, replacement);
+    // Look for the pattern with underscores after "Firm to"
+    const pattern = /Firm to\s+_{5,}\s+\(hereinafter/gi;
+    
+    // Test if pattern exists
+    const matches = text.match(pattern);
+    console.log("Pattern matches found:", matches);
+    
+    if (!matches) {
+      console.log("No placeholder pattern found in text");
+      return text;
+    }
+    
+    // Replace with business name wrapped in bold markers
+    const replacement = `Firm to **${businessName}** (hereinafter`;
+    const result = text.replace(pattern, replacement);
+    
+    console.log("Replacement performed. Text contains ** markers:", result.includes("**"));
+    
+    return result;
   }
 
   function splitParagraphsKeepGrid(text){
@@ -300,39 +322,41 @@
   }
 
   function parseInlineBold(text){
+    console.log("Parsing inline bold for text:", text.substring(0, 100));
+    
     // Parse **text** markers for bold
     const parts = [];
-    let remaining = text;
-    let match;
-    const boldRegex = /\*\*([^\*]+)\*\*/g;
+    const boldRegex = /\*\*(.+?)\*\*/g;
     let lastIndex = 0;
+    let match;
 
     while ((match = boldRegex.exec(text)) !== null) {
+      console.log("Found bold match:", match[1]);
+      
       // Add normal text before the bold part
       if (match.index > lastIndex) {
-        parts.push({
-          text: text.substring(lastIndex, match.index),
-          bold: false
-        });
+        const normalText = text.substring(lastIndex, match.index);
+        if (normalText) {
+          parts.push({ text: normalText, bold: false });
+        }
       }
       
       // Add bold text
-      parts.push({
-        text: match[1],
-        bold: true
-      });
+      parts.push({ text: match[1], bold: true });
       
       lastIndex = match.index + match[0].length;
     }
 
     // Add remaining normal text
     if (lastIndex < text.length) {
-      parts.push({
-        text: text.substring(lastIndex),
-        bold: false
-      });
+      const remainingText = text.substring(lastIndex);
+      if (remainingText) {
+        parts.push({ text: remainingText, bold: false });
+      }
     }
 
+    console.log("Parsed parts:", parts.length, "parts");
+    
     return parts.length > 0 ? parts : [{ text: text, bold: false }];
   }
 
@@ -384,9 +408,15 @@
     // Get intake data and replace placeholder
     const intakeData = getIntakeData();
     const businessName = intakeData && intakeData.bi_name ? normalize(intakeData.bi_name).trim() : "";
+    
+    console.log("Business name extracted:", businessName);
+    
     const processedText = replaceClientNamePlaceholder(agreementText, businessName);
 
     const paragraphs = splitParagraphsKeepGrid(processedText);
+    
+    console.log("Total paragraphs:", paragraphs.length);
+    console.log("Paragraphs with ** markers:", paragraphs.filter(p => p.includes("**")).length);
 
     const pages = [];
     function newPage(){
@@ -413,9 +443,11 @@
       }
 
       const footerY = M_BOTTOM - 6;
-      const cw = measureText(bodyFont, footerCenter, FONT_SIZE);
-      p.drawText(footerCenter, { x: (PAGE_W - cw) / 2, y: footerY, size: FONT_SIZE, font: bodyFont });
+      
+      // LEFT: Confidential
+      p.drawText(footerCenter, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
 
+      // RIGHT: Page numbers
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
       const prw = measureText(bodyFont, pr, FONT_SIZE);
       p.drawText(pr, { x: PAGE_W - M_RIGHT - prw, y: footerY, size: FONT_SIZE, font: bodyFont });
@@ -439,12 +471,14 @@
       let currentX = x;
       
       for (const part of parts) {
-        if (part.bold) {
-          drawBold(page, bodyFont, part.text, currentX, y, FONT_SIZE);
-        } else {
-          page.drawText(part.text, { x: currentX, y, size: FONT_SIZE, font: bodyFont });
+        if (part.text) {
+          if (part.bold) {
+            drawBold(page, bodyFont, part.text, currentX, y, FONT_SIZE);
+          } else {
+            page.drawText(part.text, { x: currentX, y, size: FONT_SIZE, font: bodyFont });
+          }
+          currentX += measureText(bodyFont, part.text, FONT_SIZE);
         }
-        currentX += measureText(bodyFont, part.text, FONT_SIZE);
       }
       
       y -= LINE_H;
@@ -613,6 +647,8 @@
 
       // Check if paragraph contains bold markers
       if (p.includes("**")) {
+        console.log("Processing paragraph with bold markers");
+        
         const parts = parseInlineBold(p);
         const lines = [];
         let currentLine = [];
@@ -648,6 +684,8 @@
         }
 
         ensureSpace(Math.max(1, lines.length));
+        
+        console.log("Drawing", lines.length, "lines with mixed formatting");
         
         for (const line of lines) {
           drawMixedLine(line, M_LEFT);
