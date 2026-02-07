@@ -229,8 +229,8 @@
   function drawUnderline(page, x, y, w){
     try{
       page.drawLine({
-        start: { x, y: y - 1.2 },
-        end: { x: x + w, y: y - 1.2 },
+        start: { x, y: y - 1.15 },
+        end: { x: x + w, y: y - 1.15 },
         thickness: 0.7,
         opacity: 1
       });
@@ -249,7 +249,6 @@
     const { PDFDocument } = lib;
 
     const pdfDoc = await PDFDocument.create();
-
     const arialNarrow = await pdfDoc.embedFont(fontBytes, { subset: true });
 
     const PAGE_W = 612;
@@ -257,23 +256,27 @@
 
     const M_LEFT = 54;
     const M_RIGHT = 54;
-    const M_TOP = 60;
-    const M_BOTTOM = 44;
-
-    const BODY_TOP_Y = PAGE_H - M_TOP - 24;
-    const BODY_BOTTOM_Y = M_BOTTOM + 20;
+    const M_TOP = 56;
+    const M_BOTTOM = 46;
 
     const FONT_SIZE = 10;
-    const LINE_H = 12; // 10pt font + 2pt spacing
+    const LINE_H = 12; // 10pt font + ~2pt line spacing
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const headerLeft = "Carbyne Accounting";
-    const headerRight = DOC_TITLE;
+    const headerRight = referenceNumber ? ("Reference: " + referenceNumber) : "Reference:";
 
-    const footerCenter = "Confidential";
+    const footerCenter = "Confidential & Proprietary";
     const footerRightPrefix = "Page ";
 
-    const paragraphs = splitParagraphsKeepGrid(agreementText);
+    const rawParagraphs = splitParagraphsKeepGrid(agreementText);
+
+    // Skip a leading title line if the txt includes it
+    let paragraphs = rawParagraphs.slice();
+    if (paragraphs.length){
+      const first = trim(paragraphs[0]).toLowerCase();
+      if (first === DOC_TITLE.toLowerCase()) paragraphs = paragraphs.slice(1);
+    }
 
     const pages = [];
     function newPage(){
@@ -282,31 +285,29 @@
       return p;
     }
 
-    let page = newPage();
-    let y = BODY_TOP_Y;
-
     function drawHeaderFooter(pageIndex, totalPages){
       const p = pages[pageIndex];
-      const headerY = PAGE_H - M_TOP + 10;
 
+      const headerY = PAGE_H - M_TOP + 10;
       drawBold(p, arialNarrow, headerLeft, M_LEFT, headerY, FONT_SIZE);
+
       const hrw = measureText(arialNarrow, headerRight, FONT_SIZE);
       drawBold(p, arialNarrow, headerRight, PAGE_W - M_RIGHT - hrw, headerY, FONT_SIZE);
-
-      if (referenceNumber){
-        const refText = "Reference: " + referenceNumber;
-        const rw = measureText(arialNarrow, refText, FONT_SIZE);
-        p.drawText(refText, { x: PAGE_W - M_RIGHT - rw, y: headerY - 14, size: FONT_SIZE, font: arialNarrow });
-      }
 
       const footerY = M_BOTTOM - 6;
       const cw = measureText(arialNarrow, footerCenter, FONT_SIZE);
       p.drawText(footerCenter, { x: (PAGE_W - cw) / 2, y: footerY, size: FONT_SIZE, font: arialNarrow });
 
-      const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
+      const pr = footerRightPrefix + (pageIndex + 1);
       const prw = measureText(arialNarrow, pr, FONT_SIZE);
       p.drawText(pr, { x: PAGE_W - M_RIGHT - prw, y: footerY, size: FONT_SIZE, font: arialNarrow });
     }
+
+    const BODY_TOP_Y = PAGE_H - M_TOP - 36;
+    const BODY_BOTTOM_Y = M_BOTTOM + 18;
+
+    let page = newPage();
+    let y = BODY_TOP_Y;
 
     function ensureSpace(linesNeeded){
       const need = linesNeeded * LINE_H;
@@ -325,9 +326,22 @@
       y -= LINE_H;
     }
 
-    for (const p of paragraphs){
-      if (isRomanSection(p)){
-        const s = parseRomanSection(p);
+    function blankLine(){
+      y -= LINE_H;
+    }
+
+    // Title (matches the original layout)
+    ensureSpace(2);
+    drawBold(page, arialNarrow, DOC_TITLE, M_LEFT, y, FONT_SIZE + 2);
+    y -= (LINE_H + 2);
+    blankLine();
+
+    // Body rendering
+    for (let pi = 0; pi < paragraphs.length; pi++){
+      const ptxt = paragraphs[pi];
+
+      if (isRomanSection(ptxt)){
+        const s = parseRomanSection(ptxt);
         if (!s) continue;
 
         const roman = s.roman + ".";
@@ -336,19 +350,19 @@
         const romanX = M_LEFT;
         const titleX = M_LEFT + 22;
 
-        const romanW = measureText(arialNarrow, roman, FONT_SIZE);
         const titleW = Math.min(measureText(arialNarrow, title, FONT_SIZE), MAX_W - 22);
 
-        ensureSpace(1);
+        // Section heading, then a blank line (matches original spacing)
+        ensureSpace(2);
         drawBold(page, arialNarrow, roman, romanX, y, FONT_SIZE);
         drawBold(page, arialNarrow, title, titleX, y, FONT_SIZE);
         drawUnderline(page, titleX, y, titleW);
         y -= LINE_H;
-
+        blankLine();
         continue;
       }
 
-      const lead = parseBoldLeadLabel(p);
+      const lead = parseBoldLeadLabel(ptxt);
       if (lead){
         const leadText = lead.lead + ".";
         const restText = lead.rest;
@@ -357,27 +371,38 @@
         const maxFirst = Math.max(10, MAX_W - leadW);
 
         const restLines = wrapWords(arialNarrow, restText, FONT_SIZE, maxFirst);
-
         const totalLines = Math.max(1, restLines.length);
-        ensureSpace(totalLines);
+
+        // add spacing between paragraphs
+        ensureSpace(totalLines + 1);
+
+        // lead is bold + underlined like the original
+        drawBold(page, arialNarrow, leadText, M_LEFT, y, FONT_SIZE);
+        drawUnderline(page, M_LEFT, y, measureText(arialNarrow, leadText, FONT_SIZE));
 
         const firstRest = restLines[0] || "";
-        drawBold(page, arialNarrow, leadText, M_LEFT, y, FONT_SIZE);
-        page.drawText(" " + firstRest, { x: M_LEFT + measureText(arialNarrow, leadText, FONT_SIZE), y, size: FONT_SIZE, font: arialNarrow });
+        page.drawText(" " + firstRest, {
+          x: M_LEFT + measureText(arialNarrow, leadText, FONT_SIZE),
+          y,
+          size: FONT_SIZE,
+          font: arialNarrow
+        });
         y -= LINE_H;
 
         for (let i=1;i<restLines.length;i++){
           drawLine(restLines[i], M_LEFT, false);
         }
 
+        blankLine();
         continue;
       }
 
-      const lines = wrapWords(arialNarrow, p, FONT_SIZE, MAX_W);
-      ensureSpace(Math.max(1, lines.length));
+      const lines = wrapWords(arialNarrow, ptxt, FONT_SIZE, MAX_W);
+      ensureSpace(lines.length + 1);
       for (const ln of lines){
         drawLine(ln, M_LEFT, false);
       }
+      blankLine();
     }
 
     const totalPages = pages.length;
