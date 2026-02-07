@@ -111,7 +111,8 @@
 
 <script>
 (function(){
-  const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
+  // FIXED: correct raw GitHub URLs (no /refs/heads/)
+  const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/MasterServiceAgreement.txt";
   const ARIAL_NARROW_TTF_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/ARIALN.TTF";
 
   const DOC_ID = "master_service_agreement";
@@ -260,7 +261,7 @@
     const M_BOTTOM = 46;
 
     const FONT_SIZE = 10;
-    const LINE_H = 12; // 10pt font + ~2pt line spacing
+    const LINE_H = 12;
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const headerLeft = "Carbyne Accounting";
@@ -271,7 +272,6 @@
 
     const rawParagraphs = splitParagraphsKeepGrid(agreementText);
 
-    // Skip a leading title line if the txt includes it
     let paragraphs = rawParagraphs.slice();
     if (paragraphs.length){
       const first = trim(paragraphs[0]).toLowerCase();
@@ -330,13 +330,11 @@
       y -= LINE_H;
     }
 
-    // Title (matches the original layout)
     ensureSpace(2);
     drawBold(page, arialNarrow, DOC_TITLE, M_LEFT, y, FONT_SIZE + 2);
     y -= (LINE_H + 2);
     blankLine();
 
-    // Body rendering
     for (let pi = 0; pi < paragraphs.length; pi++){
       const ptxt = paragraphs[pi];
 
@@ -352,7 +350,6 @@
 
         const titleW = Math.min(measureText(arialNarrow, title, FONT_SIZE), MAX_W - 22);
 
-        // Section heading, then a blank line (matches original spacing)
         ensureSpace(2);
         drawBold(page, arialNarrow, roman, romanX, y, FONT_SIZE);
         drawBold(page, arialNarrow, title, titleX, y, FONT_SIZE);
@@ -371,12 +368,9 @@
         const maxFirst = Math.max(10, MAX_W - leadW);
 
         const restLines = wrapWords(arialNarrow, restText, FONT_SIZE, maxFirst);
-        const totalLines = Math.max(1, restLines.length);
 
-        // add spacing between paragraphs
-        ensureSpace(totalLines + 1);
+        ensureSpace(restLines.length + 1);
 
-        // lead is bold + underlined like the original
         drawBold(page, arialNarrow, leadText, M_LEFT, y, FONT_SIZE);
         drawUnderline(page, M_LEFT, y, measureText(arialNarrow, leadText, FONT_SIZE));
 
@@ -432,12 +426,8 @@
 
     let done = false;
 
-    function safeDisable(){
-      try{ if (signBtn) signBtn.disabled = true; } catch {}
-    }
-    function safeEnable(){
-      try{ if (signBtn) signBtn.disabled = false; } catch {}
-    }
+    function safeDisable(){ try{ if (signBtn) signBtn.disabled = true; } catch {} }
+    function safeEnable(){ try{ if (signBtn) signBtn.disabled = false; } catch {} }
 
     safeDisable();
     setStatus(root, "Loading agreement…");
@@ -483,18 +473,12 @@
       }));
     }
 
-    try{
-      if (signBtn) signBtn.addEventListener("click", onSign);
-    } catch {}
+    try{ if (signBtn) signBtn.addEventListener("click", onSign); } catch {}
 
     return function unmount(){
       done = true;
-      try{
-        if (signBtn) signBtn.removeEventListener("click", onSign);
-      } catch {}
-      try{
-        if (frame) frame.src = "about:blank";
-      } catch {}
+      try{ if (signBtn) signBtn.removeEventListener("click", onSign); } catch {}
+      try{ if (frame) frame.src = "about:blank"; } catch {}
     };
   };
 })();
