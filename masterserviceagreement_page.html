@@ -111,15 +111,15 @@
 
 <script>
 (function(){
-  // FIXED: correct raw GitHub URLs (no /refs/heads/)
-  const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/MasterServiceAgreement.txt";
+  const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
   const ARIAL_NARROW_TTF_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/ARIALN.TTF";
+
+  const FONTKIT_URL = "https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js";
 
   const DOC_ID = "master_service_agreement";
   const DOC_TITLE = "Master Service Agreement";
 
   function normalize(v){ return (v ?? "").toString(); }
-  function trim(v){ return normalize(v).trim(); }
 
   function bytesToB64(bytes){
     let s = "";
@@ -161,24 +161,43 @@
     return new Uint8Array(ab);
   }
 
+  function loadScriptOnce(id, src){
+    return new Promise((resolve, reject) => {
+      const existing = document.getElementById(id);
+      if (existing) { resolve(); return; }
+      const s = document.createElement("script");
+      s.id = id;
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load " + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureFontkit(){
+    try{
+      if (window.fontkit) return true;
+      await loadScriptOnce("carbyne_fontkit_umd", FONTKIT_URL);
+      return !!window.fontkit;
+    } catch {
+      return false;
+    }
+  }
+
   function splitParagraphsKeepGrid(text){
     const lines = normalize(text).replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n");
     const out = [];
     let buf = [];
-
     function flush(){
       if (!buf.length) return;
       const p = buf.join(" ").replace(/\s+/g," ").trim();
       if (p) out.push(p);
       buf = [];
     }
-
     for (const rawLine of lines){
       const line = rawLine.replace(/\t/g," ").trim();
-      if (!line){
-        flush();
-        continue;
-      }
+      if (!line){ flush(); continue; }
       buf.push(line);
     }
     flush();
@@ -213,7 +232,6 @@
     const words = text.split(/\s+/).filter(Boolean);
     const lines = [];
     let cur = "";
-
     for (const w of words){
       const test = cur ? (cur + " " + w) : w;
       if (measureText(font, test, size) <= maxWidth){
@@ -230,8 +248,8 @@
   function drawUnderline(page, x, y, w){
     try{
       page.drawLine({
-        start: { x, y: y - 1.15 },
-        end: { x: x + w, y: y - 1.15 },
+        start: { x, y: y - 1.2 },
+        end: { x: x + w, y: y - 1.2 },
         thickness: 0.7,
         opacity: 1
       });
@@ -247,36 +265,48 @@
     const lib = window.PDFLib;
     if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
 
-    const { PDFDocument } = lib;
+    const { PDFDocument, StandardFonts } = lib;
 
     const pdfDoc = await PDFDocument.create();
-    const arialNarrow = await pdfDoc.embedFont(fontBytes, { subset: true });
+
+    let bodyFont = null;
+    const fontkitReady = await ensureFontkit();
+
+    if (fontkitReady && typeof pdfDoc.registerFontkit === "function") {
+      try{
+        pdfDoc.registerFontkit(window.fontkit);
+        bodyFont = await pdfDoc.embedFont(fontBytes, { subset: true });
+      } catch {
+        bodyFont = null;
+      }
+    }
+
+    if (!bodyFont){
+      bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    }
 
     const PAGE_W = 612;
     const PAGE_H = 792;
 
     const M_LEFT = 54;
     const M_RIGHT = 54;
-    const M_TOP = 56;
-    const M_BOTTOM = 46;
+    const M_TOP = 60;
+    const M_BOTTOM = 44;
+
+    const BODY_TOP_Y = PAGE_H - M_TOP - 24;
+    const BODY_BOTTOM_Y = M_BOTTOM + 20;
 
     const FONT_SIZE = 10;
     const LINE_H = 12;
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const headerLeft = "Carbyne Accounting";
-    const headerRight = referenceNumber ? ("Reference: " + referenceNumber) : "Reference:";
+    const headerRight = DOC_TITLE;
 
-    const footerCenter = "Confidential & Proprietary";
+    const footerCenter = "Confidential";
     const footerRightPrefix = "Page ";
 
-    const rawParagraphs = splitParagraphsKeepGrid(agreementText);
-
-    let paragraphs = rawParagraphs.slice();
-    if (paragraphs.length){
-      const first = trim(paragraphs[0]).toLowerCase();
-      if (first === DOC_TITLE.toLowerCase()) paragraphs = paragraphs.slice(1);
-    }
+    const paragraphs = splitParagraphsKeepGrid(agreementText);
 
     const pages = [];
     function newPage(){
@@ -285,29 +315,31 @@
       return p;
     }
 
-    function drawHeaderFooter(pageIndex, totalPages){
-      const p = pages[pageIndex];
-
-      const headerY = PAGE_H - M_TOP + 10;
-      drawBold(p, arialNarrow, headerLeft, M_LEFT, headerY, FONT_SIZE);
-
-      const hrw = measureText(arialNarrow, headerRight, FONT_SIZE);
-      drawBold(p, arialNarrow, headerRight, PAGE_W - M_RIGHT - hrw, headerY, FONT_SIZE);
-
-      const footerY = M_BOTTOM - 6;
-      const cw = measureText(arialNarrow, footerCenter, FONT_SIZE);
-      p.drawText(footerCenter, { x: (PAGE_W - cw) / 2, y: footerY, size: FONT_SIZE, font: arialNarrow });
-
-      const pr = footerRightPrefix + (pageIndex + 1);
-      const prw = measureText(arialNarrow, pr, FONT_SIZE);
-      p.drawText(pr, { x: PAGE_W - M_RIGHT - prw, y: footerY, size: FONT_SIZE, font: arialNarrow });
-    }
-
-    const BODY_TOP_Y = PAGE_H - M_TOP - 36;
-    const BODY_BOTTOM_Y = M_BOTTOM + 18;
-
     let page = newPage();
     let y = BODY_TOP_Y;
+
+    function drawHeaderFooter(pageIndex, totalPages){
+      const p = pages[pageIndex];
+      const headerY = PAGE_H - M_TOP + 10;
+
+      drawBold(p, bodyFont, headerLeft, M_LEFT, headerY, FONT_SIZE);
+      const hrw = measureText(bodyFont, headerRight, FONT_SIZE);
+      drawBold(p, bodyFont, headerRight, PAGE_W - M_RIGHT - hrw, headerY, FONT_SIZE);
+
+      if (referenceNumber){
+        const refText = "Reference: " + referenceNumber;
+        const rw = measureText(bodyFont, refText, FONT_SIZE);
+        p.drawText(refText, { x: PAGE_W - M_RIGHT - rw, y: headerY - 14, size: FONT_SIZE, font: bodyFont });
+      }
+
+      const footerY = M_BOTTOM - 6;
+      const cw = measureText(bodyFont, footerCenter, FONT_SIZE);
+      p.drawText(footerCenter, { x: (PAGE_W - cw) / 2, y: footerY, size: FONT_SIZE, font: bodyFont });
+
+      const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
+      const prw = measureText(bodyFont, pr, FONT_SIZE);
+      p.drawText(pr, { x: PAGE_W - M_RIGHT - prw, y: footerY, size: FONT_SIZE, font: bodyFont });
+    }
 
     function ensureSpace(linesNeeded){
       const need = linesNeeded * LINE_H;
@@ -319,27 +351,16 @@
 
     function drawLine(text, x, isBold){
       if (isBold){
-        drawBold(page, arialNarrow, text, x, y, FONT_SIZE);
+        drawBold(page, bodyFont, text, x, y, FONT_SIZE);
       } else {
-        page.drawText(text, { x, y, size: FONT_SIZE, font: arialNarrow });
+        page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
       }
       y -= LINE_H;
     }
 
-    function blankLine(){
-      y -= LINE_H;
-    }
-
-    ensureSpace(2);
-    drawBold(page, arialNarrow, DOC_TITLE, M_LEFT, y, FONT_SIZE + 2);
-    y -= (LINE_H + 2);
-    blankLine();
-
-    for (let pi = 0; pi < paragraphs.length; pi++){
-      const ptxt = paragraphs[pi];
-
-      if (isRomanSection(ptxt)){
-        const s = parseRomanSection(ptxt);
+    for (const p of paragraphs){
+      if (isRomanSection(p)){
+        const s = parseRomanSection(p);
         if (!s) continue;
 
         const roman = s.roman + ".";
@@ -348,55 +369,45 @@
         const romanX = M_LEFT;
         const titleX = M_LEFT + 22;
 
-        const titleW = Math.min(measureText(arialNarrow, title, FONT_SIZE), MAX_W - 22);
+        const titleW = Math.min(measureText(bodyFont, title, FONT_SIZE), MAX_W - 22);
 
-        ensureSpace(2);
-        drawBold(page, arialNarrow, roman, romanX, y, FONT_SIZE);
-        drawBold(page, arialNarrow, title, titleX, y, FONT_SIZE);
+        ensureSpace(1);
+        drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
+        drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
         drawUnderline(page, titleX, y, titleW);
         y -= LINE_H;
-        blankLine();
+
         continue;
       }
 
-      const lead = parseBoldLeadLabel(ptxt);
+      const lead = parseBoldLeadLabel(p);
       if (lead){
         const leadText = lead.lead + ".";
         const restText = lead.rest;
 
-        const leadW = measureText(arialNarrow, leadText + " ", FONT_SIZE);
+        const leadW = measureText(bodyFont, leadText + " ", FONT_SIZE);
         const maxFirst = Math.max(10, MAX_W - leadW);
 
-        const restLines = wrapWords(arialNarrow, restText, FONT_SIZE, maxFirst);
-
-        ensureSpace(restLines.length + 1);
-
-        drawBold(page, arialNarrow, leadText, M_LEFT, y, FONT_SIZE);
-        drawUnderline(page, M_LEFT, y, measureText(arialNarrow, leadText, FONT_SIZE));
+        const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
+        ensureSpace(Math.max(1, restLines.length));
 
         const firstRest = restLines[0] || "";
-        page.drawText(" " + firstRest, {
-          x: M_LEFT + measureText(arialNarrow, leadText, FONT_SIZE),
-          y,
-          size: FONT_SIZE,
-          font: arialNarrow
-        });
+        drawBold(page, bodyFont, leadText, M_LEFT, y, FONT_SIZE);
+        page.drawText(" " + firstRest, { x: M_LEFT + measureText(bodyFont, leadText, FONT_SIZE), y, size: FONT_SIZE, font: bodyFont });
         y -= LINE_H;
 
         for (let i=1;i<restLines.length;i++){
           drawLine(restLines[i], M_LEFT, false);
         }
 
-        blankLine();
         continue;
       }
 
-      const lines = wrapWords(arialNarrow, ptxt, FONT_SIZE, MAX_W);
-      ensureSpace(lines.length + 1);
+      const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
+      ensureSpace(Math.max(1, lines.length));
       for (const ln of lines){
         drawLine(ln, M_LEFT, false);
       }
-      blankLine();
     }
 
     const totalPages = pages.length;
