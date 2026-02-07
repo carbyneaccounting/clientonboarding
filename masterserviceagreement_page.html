@@ -201,23 +201,6 @@
     }
   }
 
-  function getColumnValues(){
-    try {
-      const columnA = localStorage.getItem("carbyne_column_a") || "";
-      const columnR = localStorage.getItem("carbyne_column_r") || "";
-      
-      console.log("Retrieved from localStorage - Column A:", columnA, "Column R:", columnR);
-      
-      return {
-        serviceFees: normalize(columnA).trim(),
-        retainerAmount: normalize(columnR).trim()
-      };
-    } catch (e) {
-      console.error("Error getting column values from localStorage:", e);
-      return { serviceFees: "", retainerAmount: "" };
-    }
-  }
-
   function replaceClientNamePlaceholder(text, businessName){
     console.log("Attempting to replace placeholder with business name:", businessName);
     
@@ -226,7 +209,10 @@
       return text;
     }
     
+    // Look for the pattern with underscores after "Firm to"
     const pattern = /Firm to\s+_{5,}\s+\(hereinafter/gi;
+    
+    // Test if pattern exists
     const matches = text.match(pattern);
     console.log("Pattern matches found:", matches);
     
@@ -235,6 +221,7 @@
       return text;
     }
     
+    // Replace with business name wrapped in bold markers
     const replacement = `Firm to **${businessName}** (hereinafter`;
     const result = text.replace(pattern, replacement);
     
@@ -329,16 +316,6 @@
     );
   }
 
-  function isServiceFeesLine(p){
-    const t = normalize(p).toLowerCase();
-    return t.includes("service fees") && t.includes("total service fees charged per month");
-  }
-
-  function isRetainerAmountLine(p){
-    const t = normalize(p).toLowerCase();
-    return t.includes("retainer fee amount") && t.includes("total retainer amount to be paid");
-  }
-
   function isSignatureTrigger(p){
     const t = normalize(p).toLowerCase();
     return t.includes("signature of authorized signatory");
@@ -347,6 +324,7 @@
   function parseInlineBold(text){
     console.log("Parsing inline bold for text:", text.substring(0, 100));
     
+    // Parse **text** markers for bold
     const parts = [];
     const boldRegex = /\*\*(.+?)\*\*/g;
     let lastIndex = 0;
@@ -355,6 +333,7 @@
     while ((match = boldRegex.exec(text)) !== null) {
       console.log("Found bold match:", match[1]);
       
+      // Add normal text before the bold part
       if (match.index > lastIndex) {
         const normalText = text.substring(lastIndex, match.index);
         if (normalText) {
@@ -362,11 +341,13 @@
         }
       }
       
+      // Add bold text
       parts.push({ text: match[1], bold: true });
       
       lastIndex = match.index + match[0].length;
     }
 
+    // Add remaining normal text
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex);
       if (remainingText) {
@@ -424,20 +405,15 @@
     const footerCenter = "Confidential";
     const footerRightPrefix = "Page ";
 
+    // Get intake data
     const intakeData = getIntakeData();
     const businessName = intakeData && intakeData.bi_name ? normalize(intakeData.bi_name).trim() : "";
     const selectedBasis = intakeData && intakeData.boa_basis ? normalize(intakeData.boa_basis).trim() : "";
     const otherBasisText = intakeData && intakeData.boa_other_text ? normalize(intakeData.boa_other_text).trim() : "";
     
-    const tableData = getColumnValues();
-    const serviceFees = tableData.serviceFees;
-    const retainerAmount = tableData.retainerAmount;
-    
     console.log("Business name extracted:", businessName);
     console.log("Selected basis of accounting:", selectedBasis);
     console.log("Other basis text:", otherBasisText);
-    console.log("Service Fees:", serviceFees);
-    console.log("Retainer Amount:", retainerAmount);
     
     const processedText = replaceClientNamePlaceholder(agreementText, businessName);
 
@@ -472,8 +448,10 @@
 
       const footerY = M_BOTTOM - 6;
       
+      // LEFT: Confidential
       p.drawText(footerCenter, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
 
+      // RIGHT: Page numbers
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
       const prw = measureText(bodyFont, pr, FONT_SIZE);
       p.drawText(pr, { x: PAGE_W - M_RIGHT - prw, y: footerY, size: FONT_SIZE, font: bodyFont });
@@ -493,6 +471,7 @@
     }
 
     function drawMixedLine(parts, x){
+      // Draw a line with mixed bold/normal text
       let currentX = x;
       
       for (const part of parts) {
@@ -523,6 +502,7 @@
     }
 
     function drawCheckmark(x, baselineY, size){
+      // Draw an "X" inside the checkbox
       const ascent = 9;
       const boxTopY = baselineY + ascent;
       const boxBottomY = boxTopY - size;
@@ -533,6 +513,7 @@
       const y1 = boxBottomY + padding;
       const y2 = boxTopY - padding;
       
+      // Draw X - two diagonal lines
       page.drawLine({
         start: { x: x1, y: y1 },
         end: { x: x2, y: y2 },
@@ -568,12 +549,15 @@
       for (let i=0;i<items.length;i++){
         const item = items[i];
         
+        // Draw checkbox
         drawCheckboxAtBaseline(x, baselineY, box);
         
+        // Check if this option is selected
         const isSelected = (selectedBasis === item.value);
         
         console.log(`Checkbox "${item.label}": selected=${isSelected} (selectedBasis="${selectedBasis}", item.value="${item.value}")`);
         
+        // Draw X if selected
         if (isSelected) {
           drawCheckmark(x, baselineY, box);
         }
@@ -585,9 +569,12 @@
           page.drawText(otherLabel, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
           x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
 
+          // If "Other" is selected and there's custom text
           if (isSelected && otherBasisText) {
+            // Draw the text
             page.drawText(otherBasisText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
             
+            // Draw underline beneath the text
             const textWidth = measureText(bodyFont, otherBasisText, FONT_SIZE);
             page.drawLine({ 
               start: {x: x, y: baselineY - 1.2}, 
@@ -595,6 +582,7 @@
               thickness: 0.7 
             });
           } else {
+            // No text selected - draw the blank line as usual
             const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
             page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
           }
@@ -606,37 +594,6 @@
         }
       }
 
-      y -= LINE_H;
-    }
-
-    function drawAmountLine(labelText, amount){
-      ensureSpace(1);
-      
-      const baselineY = y;
-      let x = M_LEFT;
-      
-      page.drawText(labelText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-      x += measureText(bodyFont, labelText, FONT_SIZE);
-      
-      const dollarText = " $";
-      page.drawText(dollarText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-      x += measureText(bodyFont, dollarText, FONT_SIZE);
-      
-      if (amount) {
-        page.drawText(amount, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-        
-        const amountWidth = measureText(bodyFont, amount, FONT_SIZE);
-        page.drawLine({ 
-          start: {x: x, y: baselineY - 1.2}, 
-          end: {x: x + amountWidth, y: baselineY - 1.2}, 
-          thickness: 0.7 
-        });
-        x += amountWidth;
-      } else {
-        const lineW = Math.max(100, (M_LEFT + MAX_W) - x - 50);
-        page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
-      }
-      
       y -= LINE_H;
     }
 
@@ -679,18 +636,6 @@
 
       if (isBasisCheckboxLine(p)) {
         drawBasisCheckboxRow();
-        continue;
-      }
-
-      if (isServiceFeesLine(p)) {
-        const labelText = "Service Fees. The total service fees charged per month by Firm to Client shall be:";
-        drawAmountLine(labelText, serviceFees);
-        continue;
-      }
-
-      if (isRetainerAmountLine(p)) {
-        const labelText = "Retainer Fee Amount. The total retainer amount to be paid by Client shall be:";
-        drawAmountLine(labelText, retainerAmount);
         continue;
       }
 
@@ -762,6 +707,7 @@
         continue;
       }
 
+      // Check if paragraph contains bold markers
       if (p.includes("**")) {
         console.log("Processing paragraph with bold markers");
         
@@ -810,6 +756,7 @@
         continue;
       }
 
+      // Regular paragraph without bold
       const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
       ensureSpace(Math.max(1, lines.length));
       for (const ln of lines){
