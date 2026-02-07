@@ -5,65 +5,51 @@
   <meta charset="utf-8">
   <title>Master Service Agreement</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
 </head>
 <body>
 
-<template id="carbyne_master_service_agreement">
+<template id="carbyne_masterserviceagreement_page">
   <style>
-    .ag-wrap{width:100%}
+    *{box-sizing:border-box}
 
-    .ag-head{display:flex;flex-direction:column;gap:6px;padding:2px 2px 10px}
-    .ag-title{margin:0;font-size:20px;font-weight:950;color:#0b2f4e;letter-spacing:.2px;line-height:1.15}
-    .ag-sub{margin:0;font-size:13px;font-weight:900;color:#0f172a;opacity:.78;line-height:1.55}
+    .msa-wrap{width:100%}
+    .msa-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:0 2px 7px;margin-bottom:7px}
+    .msa-titlebox{display:flex;flex-direction:column;gap:4px}
+    .msa-title{margin:0;font-size:18px;font-weight:950;color:#0b2f4e;letter-spacing:.2px}
+    .msa-sub{margin:0;font-size:12px;font-weight:900;color:#334155;opacity:.85}
 
-    .ag-card{
-      background:#fff;
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:12px;
-      box-shadow:0 10px 20px rgba(2,6,23,.08);
-      overflow:hidden;
-    }
-
-    .ag-card-h{
-      padding:10px 12px;
-      border-bottom:1px solid rgba(0,0,0,.08);
-      font-size:12px;
-      font-weight:950;
-      color:#0f172a;
-      opacity:.90;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .ag-pill{
+    .msa-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+    .msa-pill{
       border:1px solid rgba(0,0,0,.12);
       background:#fff;
       color:#0f172a;
-      font-weight:950;
+      font-weight:900;
       font-size:11px;
       padding:7px 11px;
       border-radius:999px;
       cursor:pointer;
-      transition:transform .12s ease, opacity .12s ease, box-shadow .12s ease, background-color .12s ease;
+      transition:all .12s ease;
       white-space:nowrap;
-      box-shadow:0 8px 18px rgba(2,6,23,.06);
+      user-select:none;
     }
-    .ag-pill:hover{transform:translateY(-1px);opacity:.97;box-shadow:0 10px 20px rgba(2,6,23,.08)}
-    .ag-pill.primary{background:rgba(0,48,91,.08);border-color:rgba(0,48,91,.18);color:#00305B}
-    .ag-pill:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:0 8px 18px rgba(2,6,23,.05)}
+    .msa-pill.primary{background:rgba(0,48,91,.08);border-color:rgba(0,48,91,.18);color:#00305B}
+    .msa-pill:disabled{opacity:.55;cursor:not-allowed}
+    .msa-pill:hover:not(:disabled){transform:translateY(-1px);opacity:.96}
 
-    .ag-view{
+    .msa-card{background:#fff;border:1px solid rgba(0,0,0,.10);border-radius:10px;box-shadow:0 6px 13px rgba(2,6,23,.08);overflow:hidden}
+    .msa-card-h{padding:8px 10px;border-bottom:1px solid rgba(0,0,0,.08);font-size:11px;font-weight:950;color:#0f172a;opacity:.90;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .msa-status{font-size:10px;font-weight:900;color:#0f172a;opacity:.70;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .msa-body{padding:10px}
+
+    .msa-viewer{
       width:100%;
-      height:440px;
-      background:rgba(0,0,0,.02);
-      display:block;
+      height:520px;
+      border:1px solid rgba(0,0,0,.14);
+      border-radius:8px;
+      overflow:hidden;
+      background:#f8fafc;
     }
-
-    .ag-iframe{
+    .msa-iframe{
       width:100%;
       height:100%;
       border:0;
@@ -71,81 +57,63 @@
       background:#fff;
     }
 
-    .ag-fallback{
-      height:100%;
+    .msa-signbar{
+      margin-top:10px;
       display:flex;
       align-items:center;
-      justify-content:center;
-      padding:18px;
-      text-align:center;
-      font-size:13px;
-      font-weight:900;
-      color:#0f172a;
-      opacity:.82;
-      line-height:1.45;
-    }
-
-    .ag-actions{
-      margin-top:12px;
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
+      justify-content:flex-end;
       gap:10px;
       flex-wrap:wrap;
-      padding:0 2px;
+    }
+    .msa-hint{
+      margin-right:auto;
+      font-size:11px;
+      font-weight:900;
+      color:#334155;
+      opacity:.82;
     }
 
-    .ag-sign{
-      appearance:none;
-      border:0;
-      border-radius:12px;
-      padding:12px 14px;
-      font-size:13px;
-      font-weight:950;
-      letter-spacing:.2px;
-      background:linear-gradient(90deg,#00305B,#0A3D6F);
-      color:#fff;
-      cursor:pointer;
-      box-shadow:0 10px 20px rgba(2,6,23,.10);
-      transition:transform .14s ease, opacity .14s ease, box-shadow .14s ease;
-      white-space:nowrap;
+    @media (max-width:900px){
+      .msa-viewer{height:60vh}
     }
-    .ag-sign:hover{transform:translateY(-1px);opacity:.97;box-shadow:0 12px 24px rgba(2,6,23,.14)}
-    .ag-sign:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:0 10px 20px rgba(2,6,23,.06)}
   </style>
 
-  <div class="ag-wrap" id="agRoot">
-    <div class="ag-head">
-      <h2 class="ag-title" id="agTitle">Master Service Agreement</h2>
-      <p class="ag-sub" id="agSub">Please review the Master Service Agreement below.</p>
+  <div class="msa-wrap" id="msaRoot">
+    <div class="msa-header">
+      <div class="msa-titlebox">
+        <h2 class="msa-title">Master Service Agreement</h2>
+        <p class="msa-sub">Review the agreement below, then electronically sign.</p>
+      </div>
+      <div class="msa-actions">
+        <button class="msa-pill" id="msaReload" type="button">Reload</button>
+        <button class="msa-pill primary" id="msaBuild" type="button">Build PDF</button>
+      </div>
     </div>
 
-    <div class="ag-card">
-      <div class="ag-card-h">
-        <span id="agDocLabel">Agreement Viewer</span>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-          <button class="ag-pill" id="agReload" type="button">Reload</button>
-          <button class="ag-pill primary" id="agOpenNewTab" type="button">Open in New Tab</button>
+    <div class="msa-card">
+      <div class="msa-card-h">
+        <span>Agreement Viewer</span>
+        <span class="msa-status" id="msaStatus">Idle</span>
+      </div>
+      <div class="msa-body">
+        <div class="msa-viewer">
+          <iframe class="msa-iframe" id="msaFrame" title="Master Service Agreement"></iframe>
+        </div>
+
+        <div class="msa-signbar">
+          <div class="msa-hint">You can scroll within the agreement viewer.</div>
+          <button class="msa-pill primary" id="msaSignBtn" type="button">Electronically Sign</button>
         </div>
       </div>
-
-      <div class="ag-view" id="agViewer">
-        <iframe class="ag-iframe" id="agFrame" title="Master Service Agreement PDF"></iframe>
-      </div>
-    </div>
-
-    <div class="ag-actions">
-      <button class="ag-sign" id="agSignBtn" type="button">Electronically Sign</button>
     </div>
   </div>
 </template>
 
 <script>
   (function(){
-    const AGREEMENT_ID = "master_service_agreement";
-    const AGREEMENT_TITLE = "Master Service Agreement";
-    const AGREEMENT_SUBTEXT = "Please review the Master Service Agreement below.";
-    const TEXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
+    const DOC_ID = "master_service_agreement";
+    const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
+    const ARIALN_TTF_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/ARIALN.TTF";
 
     function normalize(v){ return (v ?? "").toString().trim(); }
 
@@ -159,82 +127,62 @@
       return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
     }
 
-    function wrapText(font, text, size, maxWidth){
+    function bytesToB64(bytes){
+      let s = "";
+      const chunk = 0x8000;
+      for (let i=0;i<bytes.length;i+=chunk){
+        s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+      }
+      return btoa(s);
+    }
+
+    function wrapText(font, text, fontSize, maxWidth){
       const words = (text || "").split(/\s+/).filter(Boolean);
       const lines = [];
-      let line = "";
+      let cur = "";
+
       for (const w of words){
-        const test = line ? (line + " " + w) : w;
-        const width = font.widthOfTextAtSize(test, size);
+        const test = cur ? (cur + " " + w) : w;
+        const width = font.widthOfTextAtSize(test, fontSize);
         if (width <= maxWidth){
-          line = test;
+          cur = test;
         } else {
-          if (line) lines.push(line);
-          line = w;
+          if (cur) lines.push(cur);
+          cur = w;
         }
       }
-      if (line) lines.push(line);
-      return lines;
+      if (cur) lines.push(cur);
+
+      return lines.length ? lines : [""];
     }
 
-    async function buildPdfBytesFromText(title, referenceNumber, text){
-      const lib = window.PDFLib;
-      if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
-
-      const { PDFDocument, StandardFonts } = lib;
-      const pdfDoc = await PDFDocument.create();
-
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-      const pageW = 612, pageH = 792;
-      const marginX = 54;
-      const marginTop = 54;
-      const marginBottom = 54;
-
-      const contentW = pageW - (marginX * 2);
-      const size = 10;
-      const lineH = 14;
-
-      const linesRaw = (text || "").replace(/\r\n/g,"\n").split("\n");
-      const paragraphs = linesRaw.map(l => l.replace(/\s+$/,""));
-
-      let page = pdfDoc.addPage([pageW, pageH]);
-      let y = pageH - marginTop;
-
-      function newPage(){
-        page = pdfDoc.addPage([pageW, pageH]);
-        y = pageH - marginTop;
-      }
-
-      function drawLine(str, bold){
-        if (y <= marginBottom) newPage();
-        page.drawText(str, { x: marginX, y: y, size, font: bold ? fontBold : font });
-        y -= lineH;
-      }
-
-      drawLine(normalize(title) || "Agreement", true);
-      drawLine("Reference Number: " + (normalize(referenceNumber) || ""), false);
-      drawLine("Generated: " + stamp(), false);
-      drawLine(" ", false);
-
-      for (let i=0;i<paragraphs.length;i++){
-        const p = paragraphs[i];
-        if (!normalize(p)){
-          drawLine(" ", false);
-          continue;
-        }
-        const wrapped = wrapText(font, p, size, contentW);
-        wrapped.forEach(l => drawLine(l, false));
-        drawLine(" ", false);
-      }
-
-      return await pdfDoc.save();
+    function isRomanHeading(line){
+      const s = normalize(line);
+      return /^[IVXLCDM]+\.\s+/.test(s);
     }
 
-    function bytesToBlobUrl(bytes){
-      const b = new Blob([bytes], { type: "application/pdf" });
-      return URL.createObjectURL(b);
+    function isTopTitle(line){
+      const s = normalize(line);
+      return s.toLowerCase() === "master service agreement" || s.toLowerCase() === "master services agreement";
+    }
+
+    function isSectionLabel(line){
+      const s = normalize(line);
+      if (!s) return false;
+      if (isTopTitle(s)) return false;
+      return isRomanHeading(s);
+    }
+
+    function isParagraphStart(line){
+      const s = normalize(line);
+      if (!s) return false;
+      if (isSectionLabel(s)) return false;
+      return true;
+    }
+
+    function boldDraw(page, font, text, x, y, size){
+      page.drawText(text, { x, y, size, font });
+      page.drawText(text, { x: x + 0.35, y, size, font });
     }
 
     async function fetchText(url){
@@ -243,88 +191,260 @@
       return await res.text();
     }
 
-    window.carbyne_master_service_agreement_mount = function(args){
-      const root = (args && args.root) ? args.root : document;
-      const referenceNumber = normalize(args && args.referenceNumber) || "";
+    async function fetchBytes(url){
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const ab = await res.arrayBuffer();
+      return new Uint8Array(ab);
+    }
 
-      const titleEl = root.querySelector("#agTitle");
-      const subEl = root.querySelector("#agSub");
-      const frame = root.querySelector("#agFrame");
-      const viewer = root.querySelector("#agViewer");
+    async function buildMSAPdfBytes(referenceNumber){
+      const lib = window.PDFLib;
+      if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
 
-      const reloadBtn = root.querySelector("#agReload");
-      const openBtn = root.querySelector("#agOpenNewTab");
-      const signBtn = root.querySelector("#agSignBtn");
+      const { PDFDocument, StandardFonts } = lib;
 
-      let currentBlobUrl = "";
+      const [txt, ttfBytes] = await Promise.all([
+        fetchText(AGREEMENT_TXT_URL),
+        fetchBytes(ARIALN_TTF_URL)
+      ]);
 
-      function revokeUrl(){
-        if (currentBlobUrl){
-          try{ URL.revokeObjectURL(currentBlobUrl); } catch {}
-          currentBlobUrl = "";
+      const pdfDoc = await PDFDocument.create();
+
+      const arialN = await pdfDoc.embedFont(ttfBytes, { subset: true });
+      const helv = await pdfDoc.embedFont(StandardFonts.Helvetica);
+
+      const PAGE_W = 612;
+      const PAGE_H = 792;
+
+      const marginX = 72;
+      const topMargin = 64;
+      const bottomMargin = 64;
+
+      const headerY = PAGE_H - 42;
+      const footerY = 26;
+
+      const bodyTopY = PAGE_H - topMargin;
+      const bodyBottomY = bottomMargin + 18;
+
+      const bodyMaxW = PAGE_W - (marginX * 2);
+
+      const baseSize = 10;
+      const headingSize = 10;
+      const titleSize = 10;
+
+      const leading = 20;        // double-space (10pt * 2)
+      const paraGap = 20;        // one blank line (also 20)
+      const sectionGap = 20;     // one blank line
+
+      const firmHeaderLeft = "Carbyne Accounting";
+      const footerCenter = "Confidential & Proprietary";
+
+      const rawLines = (txt || "").replace(/\r/g, "").split("\n");
+      const lines = rawLines.map(l => l.replace(/\t/g, " ").trimRight());
+
+      const blocks = [];
+      for (let i=0;i<lines.length;i++){
+        const s = normalize(lines[i]);
+        if (!s) continue;
+
+        if (isTopTitle(s)){
+          blocks.push({ type:"title", text:"Master Service Agreement" });
+          continue;
+        }
+
+        if (isSectionLabel(s)){
+          blocks.push({ type:"section", text:s });
+          continue;
+        }
+
+        blocks.push({ type:"para", text:s });
+      }
+
+      let page = null;
+      let y = 0;
+      let pageNo = 0;
+
+      function newPage(){
+        page = pdfDoc.addPage([PAGE_W, PAGE_H]);
+        pageNo++;
+
+        // Header
+        boldDraw(page, helv, firmHeaderLeft, marginX, headerY, 10);
+
+        const ref = "Reference: " + (referenceNumber || "");
+        const refW = helv.widthOfTextAtSize(ref, 10);
+        boldDraw(page, helv, ref, PAGE_W - marginX - refW, headerY, 10);
+
+        // Footer
+        const cW = helv.widthOfTextAtSize(footerCenter, 10);
+        page.drawText(footerCenter, { x: (PAGE_W - cW)/2, y: footerY, size: 10, font: helv });
+
+        const pText = "Page " + pageNo;
+        const pW = helv.widthOfTextAtSize(pText, 10);
+        page.drawText(pText, { x: PAGE_W - marginX - pW, y: footerY, size: 10, font: helv });
+
+        y = bodyTopY;
+      }
+
+      function needSpace(h){
+        return (y - h) < bodyBottomY;
+      }
+
+      function drawLine(font, text, size){
+        if (needSpace(leading)) newPage();
+        page.drawText(text, { x: marginX, y: y, size, font });
+        y -= leading;
+      }
+
+      function drawBoldLine(font, text, size){
+        if (needSpace(leading)) newPage();
+        boldDraw(page, font, text, marginX, y, size);
+        y -= leading;
+      }
+
+      function gap(amount){
+        if (needSpace(amount)) newPage();
+        y -= amount;
+      }
+
+      newPage();
+
+      for (const b of blocks){
+        if (b.type === "title"){
+          drawBoldLine(arialN, b.text, titleSize);
+          gap(sectionGap);
+          continue;
+        }
+
+        if (b.type === "section"){
+          drawBoldLine(arialN, b.text, headingSize);
+          gap(sectionGap);
+          continue;
+        }
+
+        if (b.type === "para"){
+          const t = normalize(b.text);
+
+          // Keep checkbox line intact if present
+          if (/^\s*/.test(t) || /^□\s*/.test(t)){
+            drawLine(arialN, t, baseSize);
+            gap(paraGap);
+            continue;
+          }
+
+          const wrapped = wrapText(arialN, t, baseSize, bodyMaxW);
+          for (const ln of wrapped) drawLine(arialN, ln, baseSize);
+          gap(paraGap);
+          continue;
         }
       }
 
-      async function loadAgreement(){
-        if (reloadBtn) reloadBtn.disabled = true;
-        if (openBtn) openBtn.disabled = true;
-        if (signBtn) signBtn.disabled = true;
+      const outBytes = await pdfDoc.save();
+      return outBytes;
+    }
+
+    function setStatus(root, msg){
+      const el = root.querySelector("#msaStatus");
+      if (el) el.textContent = msg;
+    }
+
+    function showPdfInFrame(root, bytes){
+      const frame = root.querySelector("#msaFrame");
+      if (!frame) return;
+
+      const blob = new Blob([bytes], { type:"application/pdf" });
+      const url = URL.createObjectURL(blob);
+
+      const prev = frame.getAttribute("data-msa-url") || "";
+      frame.setAttribute("data-msa-url", url);
+      frame.src = url;
+
+      if (prev){
+        try{ URL.revokeObjectURL(prev); } catch {}
+      }
+    }
+
+    window.carbyne_masterserviceagreement_page_mount = function(args){
+      const root = (args && args.root) ? args.root : document;
+      const referenceNumber = (args && args.referenceNumber) ? args.referenceNumber : "";
+
+      const reloadBtn = root.querySelector("#msaReload");
+      const buildBtn = root.querySelector("#msaBuild");
+      const signBtn = root.querySelector("#msaSignBtn");
+
+      let destroyed = false;
+
+      async function buildAndRender(){
+        setStatus(root, "Building PDF...");
+        if (buildBtn) buildBtn.disabled = true;
 
         try{
-          const text = await fetchText(TEXT_URL);
-          const pdfBytes = await buildPdfBytesFromText(AGREEMENT_TITLE, referenceNumber, text);
+          const bytes = await buildMSAPdfBytes(referenceNumber);
+          if (destroyed) return;
 
-          revokeUrl();
-          currentBlobUrl = bytesToBlobUrl(pdfBytes);
+          showPdfInFrame(root, bytes);
 
-          if (frame){
-            frame.src = currentBlobUrl;
-          } else if (viewer){
-            viewer.innerHTML = "<div class='ag-fallback'>Viewer unavailable.</div>";
-          }
+          const b64 = bytesToB64(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes));
 
-          if (openBtn) openBtn.disabled = false;
-          if (signBtn) signBtn.disabled = false;
-        } catch {
-          if (viewer){
-            viewer.innerHTML = "<div class='ag-fallback'>Unable to load agreement.</div>";
-          }
+          window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+            detail: {
+              id: DOC_ID,
+              title: "Master Service Agreement",
+              b64: b64,
+              meta: {
+                referenceNumber: referenceNumber || "",
+                createdAt: stamp()
+              }
+            }
+          }));
+
+          setStatus(root, "Loaded");
+        } catch (e){
+          setStatus(root, "Unable to load agreement.");
+          try{ console.error("MSA build error:", e); } catch {}
         } finally {
-          if (reloadBtn) reloadBtn.disabled = false;
+          if (buildBtn) buildBtn.disabled = false;
         }
       }
 
-      function openInNewTab(){
-        if (!currentBlobUrl) return;
-        window.open(currentBlobUrl, "_blank");
+      function onReload(){
+        buildAndRender();
       }
 
-      function requestSign(){
+      function onBuild(){
+        buildAndRender();
+      }
+
+      function onSign(){
         window.dispatchEvent(new CustomEvent("carbyne:agreement:sign", {
-          detail: {
-            agreementId: AGREEMENT_ID,
-            title: AGREEMENT_TITLE,
-            referenceNumber: referenceNumber,
-            textUrl: TEXT_URL,
-            pdfBlobUrl: currentBlobUrl || ""
-          }
+          detail: { id: DOC_ID, title: "Master Service Agreement" }
         }));
       }
 
-      if (titleEl) titleEl.textContent = AGREEMENT_TITLE;
-      if (subEl) subEl.textContent = AGREEMENT_SUBTEXT;
+      if (reloadBtn) reloadBtn.addEventListener("click", onReload);
+      if (buildBtn) buildBtn.addEventListener("click", onBuild);
+      if (signBtn) signBtn.addEventListener("click", onSign);
 
-      if (reloadBtn) reloadBtn.addEventListener("click", loadAgreement);
-      if (openBtn) openBtn.addEventListener("click", openInNewTab);
-      if (signBtn) signBtn.addEventListener("click", requestSign);
-
-      loadAgreement();
+      // Auto-build on mount
+      buildAndRender();
 
       return function unmount(){
-        if (reloadBtn) reloadBtn.removeEventListener("click", loadAgreement);
-        if (openBtn) openBtn.removeEventListener("click", openInNewTab);
-        if (signBtn) signBtn.removeEventListener("click", requestSign);
-        revokeUrl();
+        destroyed = true;
+
+        if (reloadBtn) reloadBtn.replaceWith(reloadBtn.cloneNode(true));
+        if (buildBtn) buildBtn.replaceWith(buildBtn.cloneNode(true));
+        if (signBtn) signBtn.replaceWith(signBtn.cloneNode(true));
+
+        const frame = root.querySelector("#msaFrame");
+        if (frame){
+          const prev = frame.getAttribute("data-msa-url") || "";
+          frame.removeAttribute("data-msa-url");
+          frame.src = "about:blank";
+          if (prev){
+            try{ URL.revokeObjectURL(prev); } catch {}
+          }
+        }
       };
     };
   })();
