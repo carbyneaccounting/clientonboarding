@@ -120,6 +120,7 @@
   const DOC_TITLE = "Master Service Agreement";
 
   const INTAKE_STORAGE_KEY = "carbyne_intake_business_info";
+  const STORAGE_KEY_CODE = "carbyne_access_code";
 
   function normalize(v){ return (v ?? "").toString(); }
 
@@ -199,6 +200,70 @@
       console.error("Error loading intake data:", e);
       return null;
     }
+  }
+
+  function getAccessCode(){
+    try{
+      const code = localStorage.getItem(STORAGE_KEY_CODE);
+      return normalize(code).trim();
+    } catch {
+      return "";
+    }
+  }
+
+  function getDataFromTable(accessCode){
+    console.log("Attempting to get data from table for access code:", accessCode);
+    
+    // Try to access the global table data from index.html
+    if (!window.CARBYNE_TABLE_DATA) {
+      console.log("CARBYNE_TABLE_DATA not found in window");
+      return { serviceFees: "", retainerAmount: "" };
+    }
+
+    const tableData = window.CARBYNE_TABLE_DATA;
+    const headers = tableData.headers || [];
+    const rows = tableData.rows || [];
+
+    console.log("Table headers:", headers);
+    console.log("Total rows:", rows.length);
+
+    // Find column indices
+    const uniqueIdIndex = headers.findIndex(h => 
+      normalize(h).toLowerCase() === "unique identifier"
+    );
+    const columnAIndex = headers.findIndex(h => 
+      normalize(h).toLowerCase() === "a"
+    );
+    const columnRIndex = headers.findIndex(h => 
+      normalize(h).toLowerCase() === "r"
+    );
+
+    console.log("Column indices - Unique ID:", uniqueIdIndex, "A:", columnAIndex, "R:", columnRIndex);
+
+    if (uniqueIdIndex < 0 || columnAIndex < 0 || columnRIndex < 0) {
+      console.log("Required columns not found");
+      return { serviceFees: "", retainerAmount: "" };
+    }
+
+    // Find the row matching the access code
+    const matchingRow = rows.find(row => {
+      const rowCode = normalize(row[uniqueIdIndex] || "").toLowerCase();
+      return rowCode === accessCode.toLowerCase();
+    });
+
+    if (!matchingRow) {
+      console.log("No matching row found for access code:", accessCode);
+      return { serviceFees: "", retainerAmount: "" };
+    }
+
+    console.log("Found matching row:", matchingRow);
+
+    const serviceFees = normalize(matchingRow[columnAIndex] || "").trim();
+    const retainerAmount = normalize(matchingRow[columnRIndex] || "").trim();
+
+    console.log("Extracted - Service Fees:", serviceFees, "Retainer Amount:", retainerAmount);
+
+    return { serviceFees, retainerAmount };
   }
 
   function replaceClientNamePlaceholder(text, businessName){
@@ -316,6 +381,16 @@
     );
   }
 
+  function isServiceFeesLine(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("service fees") && t.includes("total service fees charged per month");
+  }
+
+  function isRetainerAmountLine(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("retainer fee amount") && t.includes("total retainer amount to be paid");
+  }
+
   function isSignatureTrigger(p){
     const t = normalize(p).toLowerCase();
     return t.includes("signature of authorized signatory");
@@ -411,9 +486,17 @@
     const selectedBasis = intakeData && intakeData.boa_basis ? normalize(intakeData.boa_basis).trim() : "";
     const otherBasisText = intakeData && intakeData.boa_other_text ? normalize(intakeData.boa_other_text).trim() : "";
     
+    // Get data from table
+    const accessCode = getAccessCode();
+    const tableData = getDataFromTable(accessCode);
+    const serviceFees = tableData.serviceFees;
+    const retainerAmount = tableData.retainerAmount;
+    
     console.log("Business name extracted:", businessName);
     console.log("Selected basis of accounting:", selectedBasis);
     console.log("Other basis text:", otherBasisText);
+    console.log("Service Fees:", serviceFees);
+    console.log("Retainer Amount:", retainerAmount);
     
     const processedText = replaceClientNamePlaceholder(agreementText, businessName);
 
@@ -597,6 +680,42 @@
       y -= LINE_H;
     }
 
+    function drawAmountLine(labelText, amount){
+      ensureSpace(1);
+      
+      const baselineY = y;
+      let x = M_LEFT;
+      
+      // Draw the label text
+      page.drawText(labelText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+      x += measureText(bodyFont, labelText, FONT_SIZE);
+      
+      // Draw the dollar sign
+      const dollarText = " $";
+      page.drawText(dollarText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+      x += measureText(bodyFont, dollarText, FONT_SIZE);
+      
+      if (amount) {
+        // Draw the amount
+        page.drawText(amount, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+        
+        // Draw underline beneath the amount
+        const amountWidth = measureText(bodyFont, amount, FONT_SIZE);
+        page.drawLine({ 
+          start: {x: x, y: baselineY - 1.2}, 
+          end: {x: x + amountWidth, y: baselineY - 1.2}, 
+          thickness: 0.7 
+        });
+        x += amountWidth;
+      } else {
+        // No amount - draw the blank line
+        const lineW = Math.max(100, (M_LEFT + MAX_W) - x - 50);
+        page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
+      }
+      
+      y -= LINE_H;
+    }
+
     function drawSignatureBlock(){
       const gapBefore = 5 * LINE_H;
       const gapBetweenRows = 3 * LINE_H;
@@ -636,6 +755,18 @@
 
       if (isBasisCheckboxLine(p)) {
         drawBasisCheckboxRow();
+        continue;
+      }
+
+      if (isServiceFeesLine(p)) {
+        const labelText = "Service Fees. The total service fees charged per month by Firm to Client shall be:";
+        drawAmountLine(labelText, serviceFees);
+        continue;
+      }
+
+      if (isRetainerAmountLine(p)) {
+        const labelText = "Retainer Fee Amount. The total retainer amount to be paid by Client shall be:";
+        drawAmountLine(labelText, retainerAmount);
         continue;
       }
 
