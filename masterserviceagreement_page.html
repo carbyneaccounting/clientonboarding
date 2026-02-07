@@ -369,23 +369,28 @@
       y -= LINE_H;
     }
 
-    function drawCheckbox(x, yTop, size){
-      try{
-        page.drawRectangle({
-          x: x,
-          y: yTop - size + 1,
-          width: size,
-          height: size,
-          borderWidth: 1,
-          borderColor: rgb(0,0,0)
-        });
-      } catch {}
+    function drawCheckboxAtBaseline(x, baselineY, size){
+      const ascent = 7;
+      const boxTopY = baselineY + ascent;
+      page.drawRectangle({
+        x: x,
+        y: boxTopY - size,
+        width: size,
+        height: size,
+        borderWidth: 1,
+        borderColor: rgb(0,0,0)
+      });
     }
 
     function drawBasisCheckboxRow(){
       const box = 10;
       const gapAfterBox = 6;
       const itemGap = 16;
+
+      ensureSpace(2);
+
+      const baselineY = y;
+      let x = M_LEFT;
 
       const items = [
         { label: "Accrual Basis" },
@@ -394,26 +399,20 @@
         { label: "Other:" }
       ];
 
-      ensureSpace(2);
-
-      let x = M_LEFT;
-      const yText = y;
-
       for (let i=0;i<items.length;i++){
-        drawCheckbox(x, yText + 2, box);
+        drawCheckboxAtBaseline(x, baselineY, box);
         x += box + gapAfterBox;
 
         if (items[i].label === "Other:") {
           const otherLabel = "Other:";
-          page.drawText(otherLabel, { x, y: yText, size: FONT_SIZE, font: bodyFont });
+          page.drawText(otherLabel, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
           x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
 
           const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
-          page.drawLine({ start:{x:x,y:yText+2}, end:{x:x+lineW,y:yText+2}, thickness:0.9 });
-
+          page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
           break;
         } else {
-          page.drawText(items[i].label, { x, y: yText, size: FONT_SIZE, font: bodyFont });
+          page.drawText(items[i].label, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
           x += measureText(bodyFont, items[i].label, FONT_SIZE) + itemGap;
         }
       }
