@@ -214,7 +214,7 @@
     return { roman: m[1], title: m[2] };
   }
 
-  function parseLeadLabel(p){
+  function parseBoldLeadLabel(p){
     const m = p.match(/^([A-Za-z][A-Za-z\s\-&]+)\.\s+(.+)$/);
     if (!m) return null;
     const lead = m[1].trim();
@@ -261,26 +261,37 @@
     page.drawText(text, { x: x + 0.35, y, size, font });
   }
 
-  function isBasisCheckboxLine(p){
-    const t = normalize(p);
-    return (
-      t.includes("Accrual Basis") &&
-      t.includes("Cash Basis") &&
-      t.includes("Mixed Method") &&
-      t.includes("Other:")
-    );
+  function parseBasisCheckboxLine(p){
+    const s = normalize(p).replace(/\s+/g," ").trim();
+    if (!s) return null;
+
+    const hasAccrual = /Accrual Basis/i.test(s);
+    const hasCash = /Cash Basis/i.test(s);
+    const hasMixed = /Mixed Method/i.test(s);
+    const hasOther = /Other\s*:/i.test(s);
+
+    if (!(hasAccrual && hasCash && hasMixed && hasOther)) return null;
+    return true;
   }
 
-  function isSignatureTrigger(p){
-    const t = normalize(p).toLowerCase();
-    return t.includes("signature of authorized signatory");
+  function drawCheckbox(page, x, baselineY, size, upAdjust){
+    const y = baselineY + upAdjust; /* baseline-relative adjustment */
+    try{
+      page.drawRectangle({
+        x: x,
+        y: y - size + 7,
+        width: size,
+        height: size,
+        borderWidth: 1
+      });
+    } catch {}
   }
 
   async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
     const lib = window.PDFLib;
     if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
 
-    const { PDFDocument, StandardFonts, rgb } = lib;
+    const { PDFDocument, StandardFonts } = lib;
 
     const pdfDoc = await PDFDocument.create();
 
@@ -312,7 +323,7 @@
     const BODY_BOTTOM_Y = M_BOTTOM + 20;
 
     const FONT_SIZE = 10;
-    const LINE_H = 13;
+    const LINE_H = 13; /* was 12 */
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const headerLeft = "Carbyne Accounting";
@@ -364,120 +375,59 @@
       }
     }
 
-    function drawLineText(text, x){
-      page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+    function drawLine(text, x, isBold){
+      if (isBold){
+        drawBold(page, bodyFont, text, x, y, FONT_SIZE);
+      } else {
+        page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+      }
       y -= LINE_H;
     }
 
-    function drawCheckboxAtBaseline(x, baselineY, size){
-      const ascent = 7;
-      const boxTopY = baselineY + ascent;
-      page.drawRectangle({
-        x: x,
-        y: boxTopY - size,
-        width: size,
-        height: size,
-        borderWidth: 1,
-        borderColor: rgb(0,0,0)
-      });
-    }
+    for (const p of paragraphs){
+      if (parseBasisCheckboxLine(p)){
+        ensureSpace(1);
 
-    function drawBasisCheckboxRow(){
-      const box = 10;
-      const gapAfterBox = 6;
-      const itemGap = 16;
+        const boxSize = 10;
+        const gap = 6;
+        const groupGap = 18;
+        const boxUp = 4; /* moved UP a little bit more */
 
-      ensureSpace(2);
+        let x = M_LEFT;
 
-      const baselineY = y;
-      let x = M_LEFT;
+        drawCheckbox(page, x, y, boxSize, boxUp);
+        x += boxSize + gap;
+        page.drawText("Accrual Basis", { x, y, size: FONT_SIZE, font: bodyFont });
+        x += measureText(bodyFont, "Accrual Basis", FONT_SIZE) + groupGap;
 
-      const items = [
-        { label: "Accrual Basis" },
-        { label: "Cash Basis" },
-        { label: "Mixed Method" },
-        { label: "Other:" }
-      ];
+        drawCheckbox(page, x, y, boxSize, boxUp);
+        x += boxSize + gap;
+        page.drawText("Cash Basis", { x, y, size: FONT_SIZE, font: bodyFont });
+        x += measureText(bodyFont, "Cash Basis", FONT_SIZE) + groupGap;
 
-      for (let i=0;i<items.length;i++){
-        drawCheckboxAtBaseline(x, baselineY, box);
-        x += box + gapAfterBox;
+        drawCheckbox(page, x, y, boxSize, boxUp);
+        x += boxSize + gap;
+        page.drawText("Mixed Method", { x, y, size: FONT_SIZE, font: bodyFont });
+        x += measureText(bodyFont, "Mixed Method", FONT_SIZE) + groupGap;
 
-        if (items[i].label === "Other:") {
-          const otherLabel = "Other:";
-          page.drawText(otherLabel, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-          x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
+        drawCheckbox(page, x, y, boxSize, boxUp);
+        x += boxSize + gap;
+        page.drawText("Other:", { x, y, size: FONT_SIZE, font: bodyFont });
 
-          const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
-          page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
-          break;
-        } else {
-          page.drawText(items[i].label, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-          x += measureText(bodyFont, items[i].label, FONT_SIZE) + itemGap;
-        }
-      }
+        const otherLabelW = measureText(bodyFont, "Other:", FONT_SIZE);
+        const lineStart = x + otherLabelW + 6;
+        const lineEnd = Math.min(PAGE_W - M_RIGHT, lineStart + 260);
 
-      y -= LINE_H;
-    }
+        try{
+          page.drawLine({
+            start: { x: lineStart, y: y + 2 },
+            end: { x: lineEnd, y: y + 2 },
+            thickness: 0.9,
+            opacity: 1
+          });
+        } catch {}
 
-    function drawSignatureBlock(){
-      const gapBefore = 5 * LINE_H;
-      const gapBetweenRows = 3 * LINE_H;
-
-      ensureSpace(10);
-
-      y -= gapBefore;
-
-      const leftLineX = M_LEFT;
-      const rightLineX = M_LEFT + MAX_W * 0.70;
-
-      const leftLineW = (rightLineX - leftLineX) - 22;
-      const rightLineW = (M_LEFT + MAX_W) - rightLineX;
-
-      const lineY = y + 6;
-
-      page.drawLine({ start:{x:leftLineX,y:lineY}, end:{x:leftLineX+leftLineW,y:lineY}, thickness:0.9 });
-      page.drawLine({ start:{x:rightLineX,y:lineY}, end:{x:rightLineX+rightLineW,y:lineY}, thickness:0.9 });
-
-      const labelY = y - (LINE_H - 2);
-      page.drawText("Signature of Authorized Signatory", { x: leftLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
-      page.drawText("Date", { x: rightLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
-
-      y -= gapBetweenRows;
-
-      const pnLineY = y + 6;
-      page.drawLine({ start:{x:leftLineX,y:pnLineY}, end:{x:leftLineX+leftLineW,y:pnLineY}, thickness:0.9 });
-      page.drawText("Printed Name and Title", { x: leftLineX, y: y - (LINE_H - 2), size: FONT_SIZE, font: bodyFont });
-
-      y -= (2 * LINE_H);
-    }
-
-    let signatureDrawn = false;
-
-    for (let i=0;i<paragraphs.length;i++){
-      const p = paragraphs[i];
-
-      if (isBasisCheckboxLine(p)) {
-        drawBasisCheckboxRow();
-        continue;
-      }
-
-      if (!signatureDrawn && isSignatureTrigger(p)) {
-        drawSignatureBlock();
-        signatureDrawn = true;
-
-        while (i + 1 < paragraphs.length) {
-          const nxt = normalize(paragraphs[i+1]).toLowerCase();
-          if (
-            nxt === "date" ||
-            nxt.includes("printed name and title") ||
-            nxt.includes("signature of authorized signatory")
-          ) {
-            i++;
-            continue;
-          }
-          break;
-        }
+        y -= LINE_H;
         continue;
       }
 
@@ -492,39 +442,39 @@
         const titleX = M_LEFT + 22;
 
         ensureSpace(1);
-
         drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
         drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
-
         y -= LINE_H;
+
         continue;
       }
 
-      const lead = parseLeadLabel(p);
+      const lead = parseBoldLeadLabel(p);
       if (lead){
         const leadText = lead.lead + ".";
         const restText = lead.rest;
 
-        const leadW = measureText(bodyFont, leadText, FONT_SIZE);
-        const maxFirst = Math.max(10, MAX_W - (leadW + 1));
+        const leadW = measureText(bodyFont, leadText + " ", FONT_SIZE);
+        const maxFirst = Math.max(10, MAX_W - leadW);
 
         const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
         ensureSpace(Math.max(1, restLines.length));
 
-        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
-        drawUnderline(page, M_LEFT, y, leadW);
-
         const firstRest = restLines[0] || "";
+
+        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
+        drawUnderline(page, M_LEFT, y, measureText(bodyFont, leadText, FONT_SIZE));
+
         page.drawText(" " + firstRest, {
-          x: M_LEFT + leadW,
+          x: M_LEFT + measureText(bodyFont, leadText, FONT_SIZE),
           y,
           size: FONT_SIZE,
           font: bodyFont
         });
         y -= LINE_H;
 
-        for (let j=1;j<restLines.length;j++){
-          drawLineText(restLines[j], M_LEFT);
+        for (let i=1;i<restLines.length;i++){
+          drawLine(restLines[i], M_LEFT, false);
         }
 
         continue;
@@ -533,7 +483,7 @@
       const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
       ensureSpace(Math.max(1, lines.length));
       for (const ln of lines){
-        drawLineText(ln, M_LEFT);
+        drawLine(ln, M_LEFT, false);
       }
     }
 
