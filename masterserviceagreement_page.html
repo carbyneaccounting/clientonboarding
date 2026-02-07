@@ -405,11 +405,15 @@
     const footerCenter = "Confidential";
     const footerRightPrefix = "Page ";
 
-    // Get intake data and replace placeholder
+    // Get intake data
     const intakeData = getIntakeData();
     const businessName = intakeData && intakeData.bi_name ? normalize(intakeData.bi_name).trim() : "";
+    const selectedBasis = intakeData && intakeData.boa_basis ? normalize(intakeData.boa_basis).trim() : "";
+    const otherBasisText = intakeData && intakeData.boa_other_text ? normalize(intakeData.boa_other_text).trim() : "";
     
     console.log("Business name extracted:", businessName);
+    console.log("Selected basis of accounting:", selectedBasis);
+    console.log("Other basis text:", otherBasisText);
     
     const processedText = replaceClientNamePlaceholder(agreementText, businessName);
 
@@ -497,6 +501,34 @@
       });
     }
 
+    function drawCheckmark(x, baselineY, size){
+      // Draw an "X" inside the checkbox
+      const ascent = 9;
+      const boxTopY = baselineY + ascent;
+      const boxBottomY = boxTopY - size;
+      
+      const padding = 2;
+      const x1 = x + padding;
+      const x2 = x + size - padding;
+      const y1 = boxBottomY + padding;
+      const y2 = boxTopY - padding;
+      
+      // Draw X - two diagonal lines
+      page.drawLine({
+        start: { x: x1, y: y1 },
+        end: { x: x2, y: y2 },
+        thickness: 1.2,
+        color: rgb(0, 0, 0)
+      });
+      
+      page.drawLine({
+        start: { x: x2, y: y1 },
+        end: { x: x1, y: y2 },
+        thickness: 1.2,
+        color: rgb(0, 0, 0)
+      });
+    }
+
     function drawBasisCheckboxRow(){
       const box = 10;
       const gapAfterBox = 6;
@@ -508,27 +540,47 @@
       let x = M_LEFT;
 
       const items = [
-        { label: "Accrual Basis" },
-        { label: "Cash Basis" },
-        { label: "Mixed Method" },
-        { label: "Other:" }
+        { label: "Accrual Basis", value: "Accrual Basis" },
+        { label: "Cash Basis", value: "Cash Basis" },
+        { label: "Mixed Method", value: "Mixed Method" },
+        { label: "Other:", value: "Other" }
       ];
 
       for (let i=0;i<items.length;i++){
+        const item = items[i];
+        
+        // Draw checkbox
         drawCheckboxAtBaseline(x, baselineY, box);
+        
+        // Check if this option is selected
+        const isSelected = (selectedBasis === item.value);
+        
+        console.log(`Checkbox "${item.label}": selected=${isSelected} (selectedBasis="${selectedBasis}", item.value="${item.value}")`);
+        
+        // Draw X if selected
+        if (isSelected) {
+          drawCheckmark(x, baselineY, box);
+        }
+        
         x += box + gapAfterBox;
 
-        if (items[i].label === "Other:") {
+        if (item.label === "Other:") {
           const otherLabel = "Other:";
           page.drawText(otherLabel, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
           x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
 
           const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
           page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
+          
+          // If "Other" is selected and there's custom text, draw it on the line
+          if (isSelected && otherBasisText) {
+            page.drawText(otherBasisText, { x: x + 4, y: baselineY, size: FONT_SIZE, font: bodyFont });
+          }
+          
           break;
         } else {
-          page.drawText(items[i].label, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-          x += measureText(bodyFont, items[i].label, FONT_SIZE) + itemGap;
+          page.drawText(item.label, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+          x += measureText(bodyFont, item.label, FONT_SIZE) + itemGap;
         }
       }
 
