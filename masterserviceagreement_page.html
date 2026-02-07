@@ -569,12 +569,22 @@
           page.drawText(otherLabel, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
           x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
 
-          const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
-          page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
-          
-          // If "Other" is selected and there's custom text, draw it on the line
+          // If "Other" is selected and there's custom text
           if (isSelected && otherBasisText) {
-            page.drawText(otherBasisText, { x: x + 4, y: baselineY, size: FONT_SIZE, font: bodyFont });
+            // Draw the text
+            page.drawText(otherBasisText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+            
+            // Draw underline beneath the text
+            const textWidth = measureText(bodyFont, otherBasisText, FONT_SIZE);
+            page.drawLine({ 
+              start: {x: x, y: baselineY - 1.2}, 
+              end: {x: x + textWidth, y: baselineY - 1.2}, 
+              thickness: 0.7 
+            });
+          } else {
+            // No text selected - draw the blank line as usual
+            const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
+            page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
           }
           
           break;
