@@ -120,7 +120,6 @@
   const DOC_TITLE = "Master Service Agreement";
 
   const INTAKE_STORAGE_KEY = "carbyne_intake_business_info";
-  const STORAGE_KEY_CODE = "carbyne_access_code";
 
   function normalize(v){ return (v ?? "").toString(); }
 
@@ -202,68 +201,21 @@
     }
   }
 
-  function getAccessCode(){
-    try{
-      const code = localStorage.getItem(STORAGE_KEY_CODE);
-      return normalize(code).trim();
-    } catch {
-      return "";
-    }
-  }
-
-  function getDataFromTable(accessCode){
-    console.log("Attempting to get data from table for access code:", accessCode);
-    
-    // Try to access the global table data from index.html
-    if (!window.CARBYNE_TABLE_DATA) {
-      console.log("CARBYNE_TABLE_DATA not found in window");
+  function getColumnValues(){
+    try {
+      const columnA = localStorage.getItem("carbyne_column_a") || "";
+      const columnR = localStorage.getItem("carbyne_column_r") || "";
+      
+      console.log("Retrieved from localStorage - Column A:", columnA, "Column R:", columnR);
+      
+      return {
+        serviceFees: normalize(columnA).trim(),
+        retainerAmount: normalize(columnR).trim()
+      };
+    } catch (e) {
+      console.error("Error getting column values from localStorage:", e);
       return { serviceFees: "", retainerAmount: "" };
     }
-
-    const tableData = window.CARBYNE_TABLE_DATA;
-    const headers = tableData.headers || [];
-    const rows = tableData.rows || [];
-
-    console.log("Table headers:", headers);
-    console.log("Total rows:", rows.length);
-
-    // Find column indices
-    const uniqueIdIndex = headers.findIndex(h => 
-      normalize(h).toLowerCase() === "unique identifier"
-    );
-    const columnAIndex = headers.findIndex(h => 
-      normalize(h).toLowerCase() === "a"
-    );
-    const columnRIndex = headers.findIndex(h => 
-      normalize(h).toLowerCase() === "r"
-    );
-
-    console.log("Column indices - Unique ID:", uniqueIdIndex, "A:", columnAIndex, "R:", columnRIndex);
-
-    if (uniqueIdIndex < 0 || columnAIndex < 0 || columnRIndex < 0) {
-      console.log("Required columns not found");
-      return { serviceFees: "", retainerAmount: "" };
-    }
-
-    // Find the row matching the access code
-    const matchingRow = rows.find(row => {
-      const rowCode = normalize(row[uniqueIdIndex] || "").toLowerCase();
-      return rowCode === accessCode.toLowerCase();
-    });
-
-    if (!matchingRow) {
-      console.log("No matching row found for access code:", accessCode);
-      return { serviceFees: "", retainerAmount: "" };
-    }
-
-    console.log("Found matching row:", matchingRow);
-
-    const serviceFees = normalize(matchingRow[columnAIndex] || "").trim();
-    const retainerAmount = normalize(matchingRow[columnRIndex] || "").trim();
-
-    console.log("Extracted - Service Fees:", serviceFees, "Retainer Amount:", retainerAmount);
-
-    return { serviceFees, retainerAmount };
   }
 
   function replaceClientNamePlaceholder(text, businessName){
@@ -486,9 +438,8 @@
     const selectedBasis = intakeData && intakeData.boa_basis ? normalize(intakeData.boa_basis).trim() : "";
     const otherBasisText = intakeData && intakeData.boa_other_text ? normalize(intakeData.boa_other_text).trim() : "";
     
-    // Get data from table
-    const accessCode = getAccessCode();
-    const tableData = getDataFromTable(accessCode);
+    // Get data from localStorage
+    const tableData = getColumnValues();
     const serviceFees = tableData.serviceFees;
     const retainerAmount = tableData.retainerAmount;
     
