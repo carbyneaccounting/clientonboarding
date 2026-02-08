@@ -1100,7 +1100,7 @@
     try { return b64ToBytes(outB64); } catch { return pngBytes; }
   }
 
-  async function signPdfBytes(pdfBytes, fontBytes){
+  async function signPdfBytes(pdfBytes, fontBytes, intakeData){
     const lib = window.PDFLib;
     if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
     const { PDFDocument, StandardFonts, rgb } = lib;
@@ -1242,8 +1242,6 @@
     const gapBetweenRows = 3 * LINE_H;
     const printedNameLineY = lineY - gapBetweenRows;
 
-    // Get intake data for name and title
-    const intakeData = getIntakeData();
     let printedNameAndTitle = "";
 
     if (intakeData) {
@@ -1342,7 +1340,8 @@
       setStatus(root, "Signing…");
 
       try{
-        const signedBytes = await signPdfBytes(latestPdfBytes, latestFontBytes);
+        const intakeData = getIntakeData(); // Get intake data here
+        const signedBytes = await signPdfBytes(latestPdfBytes, latestFontBytes, intakeData); // Pass it to signPdfBytes
         latestPdfBytes = signedBytes;
 
         if (frame) setIframePdf(frame, signedBytes);
