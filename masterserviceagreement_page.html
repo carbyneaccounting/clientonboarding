@@ -51,17 +51,13 @@
       background:#fff;
     }
 
-    /* Floating action bar at top right of PDF viewer */
+    /* Actions moved ABOVE the viewer */
     .msa-actions{
-      position:absolute;
-      top:12px;
-      right:12px;
-      z-index:10;
       display:flex;
-      flex-direction:column;
-      align-items:flex-end;
+      align-items:center;
+      justify-content:flex-end;
       gap:8px;
-      pointer-events:none;
+      margin:0 0 10px;
     }
 
     .msa-btn{
@@ -110,14 +106,14 @@
       <p class="msa-sub">Review the agreement below. When you are ready, select Electronic Sign.</p>
     </div>
 
+    <!-- MOVED ABOVE PDF VIEWER -->
+    <div class="msa-actions">
+      <div class="msa-status" id="msaStatus">Loading agreement…</div>
+      <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Electronic Sign</button>
+    </div>
+
     <div class="msa-view">
       <iframe class="msa-iframe" id="msaFrame" title="Master Service Agreement"></iframe>
-      
-      <!-- Actions now inside the viewer, positioned at top right -->
-      <div class="msa-actions">
-        <div class="msa-status" id="msaStatus">Loading agreement…</div>
-        <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Electronic Sign</button>
-      </div>
     </div>
   </div>
 </template>
@@ -218,29 +214,22 @@
     try {
       const columnA = localStorage.getItem("carbyne_column_a") || "";
       const columnR = localStorage.getItem("carbyne_column_r") || "";
-      
+
       console.log("Retrieved from localStorage - Column A:", columnA, "Column R:", columnR);
-      
-      // Format the numbers with commas and 2 decimal places
+
       function formatCurrency(value) {
         if (!value) return "";
-        
-        // Remove any existing formatting (commas, dollar signs, spaces)
+
         const cleaned = String(value).replace(/[$,\s]/g, '');
-        
-        // Parse as a number
         const num = parseFloat(cleaned);
-        
-        // Return empty if not a valid number
         if (isNaN(num)) return "";
-        
-        // Format with commas and 2 decimal places
+
         return num.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         });
       }
-      
+
       return {
         serviceFees: formatCurrency(columnA),
         retainerAmount: formatCurrency(columnR)
@@ -253,26 +242,26 @@
 
   function replaceClientNamePlaceholder(text, businessName){
     console.log("Attempting to replace placeholder with business name:", businessName);
-    
+
     if (!businessName) {
       console.log("No business name provided, returning original text");
       return text;
     }
-    
+
     const pattern = /Firm to\s+_{5,}\s+\(hereinafter/gi;
     const matches = text.match(pattern);
     console.log("Pattern matches found:", matches);
-    
+
     if (!matches) {
       console.log("No placeholder pattern found in text");
       return text;
     }
-    
+
     const replacement = `Firm to **${businessName}** (hereinafter`;
     const result = text.replace(pattern, replacement);
-    
+
     console.log("Replacement performed. Text contains ** markers:", result.includes("**"));
-    
+
     return result;
   }
 
@@ -379,7 +368,7 @@
 
   function parseInlineBold(text){
     console.log("Parsing inline bold for text:", text.substring(0, 100));
-    
+
     const parts = [];
     const boldRegex = /\*\*(.+?)\*\*/g;
     let lastIndex = 0;
@@ -387,16 +376,16 @@
 
     while ((match = boldRegex.exec(text)) !== null) {
       console.log("Found bold match:", match[1]);
-      
+
       if (match.index > lastIndex) {
         const normalText = text.substring(lastIndex, match.index);
         if (normalText) {
           parts.push({ text: normalText, bold: false });
         }
       }
-      
+
       parts.push({ text: match[1], bold: true });
-      
+
       lastIndex = match.index + match[0].length;
     }
 
@@ -408,7 +397,7 @@
     }
 
     console.log("Parsed parts:", parts.length, "parts");
-    
+
     return parts.length > 0 ? parts : [{ text: text, bold: false }];
   }
 
@@ -461,21 +450,21 @@
     const businessName = intakeData && intakeData.bi_name ? normalize(intakeData.bi_name).trim() : "";
     const selectedBasis = intakeData && intakeData.boa_basis ? normalize(intakeData.boa_basis).trim() : "";
     const otherBasisText = intakeData && intakeData.boa_other_text ? normalize(intakeData.boa_other_text).trim() : "";
-    
+
     const tableData = getColumnValues();
     const serviceFees = tableData.serviceFees;
     const retainerAmount = tableData.retainerAmount;
-    
+
     console.log("Business name extracted:", businessName);
     console.log("Selected basis of accounting:", selectedBasis);
     console.log("Other basis text:", otherBasisText);
     console.log("Service Fees:", serviceFees);
     console.log("Retainer Amount:", retainerAmount);
-    
+
     const processedText = replaceClientNamePlaceholder(agreementText, businessName);
 
     const paragraphs = splitParagraphsKeepGrid(processedText);
-    
+
     console.log("Total paragraphs:", paragraphs.length);
     console.log("Paragraphs with ** markers:", paragraphs.filter(p => p.includes("**")).length);
 
@@ -504,7 +493,7 @@
       }
 
       const footerY = M_BOTTOM - 6;
-      
+
       p.drawText(footerCenter, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
 
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
@@ -527,7 +516,7 @@
 
     function drawMixedLine(parts, x){
       let currentX = x;
-      
+
       for (const part of parts) {
         if (part.text) {
           if (part.bold) {
@@ -538,7 +527,7 @@
           currentX += measureText(bodyFont, part.text, FONT_SIZE);
         }
       }
-      
+
       y -= LINE_H;
     }
 
@@ -559,20 +548,20 @@
       const ascent = 9;
       const boxTopY = baselineY + ascent;
       const boxBottomY = boxTopY - size;
-      
+
       const padding = 2;
       const x1 = x + padding;
       const x2 = x + size - padding;
       const y1 = boxBottomY + padding;
       const y2 = boxTopY - padding;
-      
+
       page.drawLine({
         start: { x: x1, y: y1 },
         end: { x: x2, y: y2 },
         thickness: 1.2,
         color: rgb(0, 0, 0)
       });
-      
+
       page.drawLine({
         start: { x: x2, y: y1 },
         end: { x: x1, y: y2 },
@@ -600,17 +589,17 @@
 
       for (let i=0;i<items.length;i++){
         const item = items[i];
-        
+
         drawCheckboxAtBaseline(x, baselineY, box);
-        
+
         const isSelected = (selectedBasis === item.value);
-        
+
         console.log(`Checkbox "${item.label}": selected=${isSelected} (selectedBasis="${selectedBasis}", item.value="${item.value}")`);
-        
+
         if (isSelected) {
           drawCheckmark(x, baselineY, box);
         }
-        
+
         x += box + gapAfterBox;
 
         if (item.label === "Other:") {
@@ -620,18 +609,18 @@
 
           if (isSelected && otherBasisText) {
             page.drawText(otherBasisText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-            
+
             const textWidth = measureText(bodyFont, otherBasisText, FONT_SIZE);
-            page.drawLine({ 
-              start: {x: x, y: baselineY - 1.2}, 
-              end: {x: x + textWidth, y: baselineY - 1.2}, 
-              thickness: 0.7 
+            page.drawLine({
+              start: {x: x, y: baselineY - 1.2},
+              end: {x: x + textWidth, y: baselineY - 1.2},
+              thickness: 0.7
             });
           } else {
             const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
             page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
           }
-          
+
           break;
         } else {
           page.drawText(item.label, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
@@ -644,32 +633,28 @@
 
     function drawAmountLine(labelText, amount){
       ensureSpace(1);
-      
+
       const baselineY = y;
       let x = M_LEFT;
-      
-      // Draw the label text (which already includes "shall be: $")
+
       page.drawText(labelText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
       x += measureText(bodyFont, labelText, FONT_SIZE);
-      
+
       if (amount) {
-        // Draw the formatted amount directly (no extra dollar sign)
         page.drawText(amount, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-        
-        // Draw underline beneath the amount
+
         const amountWidth = measureText(bodyFont, amount, FONT_SIZE);
-        page.drawLine({ 
-          start: {x: x, y: baselineY - 1.2}, 
-          end: {x: x + amountWidth, y: baselineY - 1.2}, 
-          thickness: 0.7 
+        page.drawLine({
+          start: {x: x, y: baselineY - 1.2},
+          end: {x: x + amountWidth, y: baselineY - 1.2},
+          thickness: 0.7
         });
         x += amountWidth;
       } else {
-        // No amount - draw the blank line
         const lineW = Math.max(100, (M_LEFT + MAX_W) - x - 50);
         page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
       }
-      
+
       y -= LINE_H;
     }
 
@@ -797,7 +782,7 @@
 
       if (p.includes("**")) {
         console.log("Processing paragraph with bold markers");
-        
+
         const parts = parseInlineBold(p);
         const lines = [];
         let currentLine = [];
@@ -805,7 +790,7 @@
 
         for (const part of parts) {
           const words = part.text.split(/\s+/).filter(Boolean);
-          
+
           for (const word of words) {
             const wordWidth = measureText(bodyFont, word, FONT_SIZE);
             const spaceWidth = measureText(bodyFont, " ", FONT_SIZE);
@@ -833,9 +818,9 @@
         }
 
         ensureSpace(Math.max(1, lines.length));
-        
+
         console.log("Drawing", lines.length, "lines with mixed formatting");
-        
+
         for (const line of lines) {
           drawMixedLine(line, M_LEFT);
         }
