@@ -758,6 +758,7 @@
         // Store the full data for A and R extraction
         try {
           localStorage.setItem("carbyne_excel_data", JSON.stringify({ headers, rows }));
+          console.log("Stored Excel data with", rows.length, "rows");
         } catch {}
         
         return codes;
@@ -769,35 +770,47 @@
     function getColumnValuesForCode(code) {
       try {
         const rawData = localStorage.getItem("carbyne_excel_data");
-        if (!rawData) return { columnA: "", columnR: "" };
+        if (!rawData) {
+          console.log("❌ No Excel data in localStorage");
+          return { columnA: "", columnR: "" };
+        }
         
         const { headers, rows } = JSON.parse(rawData);
+        
+        console.log("📊 All headers:", headers);
         
         const uniqueIdIdx = headers.findIndex(h => normalize(h).toLowerCase() === "unique identifier");
         const columnAIdx = headers.findIndex(h => normalize(h).toLowerCase() === "a");
         const columnRIdx = headers.findIndex(h => normalize(h).toLowerCase() === "r");
         
+        console.log("📍 Column indices - Unique ID:", uniqueIdIdx, "A:", columnAIdx, "R:", columnRIdx);
+        
         if (uniqueIdIdx < 0 || columnAIdx < 0 || columnRIdx < 0) {
+          console.log("❌ Required columns not found");
           return { columnA: "", columnR: "" };
         }
         
         const needle = normalize(code).toLowerCase();
+        console.log("🔍 Looking for access code:", needle);
         
         for (let r = 1; r < rows.length; r++) {
           const row = rows[r] || [];
           const rowCode = normalize(row[uniqueIdIdx] || "").toLowerCase();
           
+          console.log(`   Row ${r}: code="${rowCode}", A="${row[columnAIdx]}", R="${row[columnRIdx]}"`);
+          
           if (rowCode === needle) {
             const columnA = normalize(row[columnAIdx] || "").trim();
             const columnR = normalize(row[columnRIdx] || "").trim();
-            console.log("Found matching row - Column A:", columnA, "Column R:", columnR);
+            console.log("✅ Found matching row - Column A:", columnA, "Column R:", columnR);
             return { columnA, columnR };
           }
         }
         
+        console.log("❌ No matching row found for code:", code);
         return { columnA: "", columnR: "" };
       } catch (e) {
-        console.error("Error getting column values:", e);
+        console.error("❌ Error getting column values:", e);
         return { columnA: "", columnR: "" };
       }
     }
@@ -814,7 +827,7 @@
           const values = getColumnValuesForCode(code);
           localStorage.setItem("carbyne_column_a", values.columnA);
           localStorage.setItem("carbyne_column_r", values.columnR);
-          console.log("Stored column A:", values.columnA, "column R:", values.columnR);
+          console.log("💾 Stored column A:", values.columnA, "column R:", values.columnR);
         }
         
         return isValid;
@@ -828,7 +841,7 @@
           const values = getColumnValuesForCode(code);
           localStorage.setItem("carbyne_column_a", values.columnA);
           localStorage.setItem("carbyne_column_r", values.columnR);
-          console.log("Stored column A:", values.columnA, "column R:", values.columnR);
+          console.log("💾 Stored column A:", values.columnA, "column R:", values.columnR);
         }
         
         return isValid;
