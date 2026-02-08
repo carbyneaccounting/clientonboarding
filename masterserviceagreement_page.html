@@ -1242,24 +1242,35 @@
     const gapBetweenRows = 3 * LINE_H;
     const printedNameLineY = lineY - gapBetweenRows;
 
+    console.log("🔍 Debugging printed name:");
+    console.log("  intakeData:", intakeData);
+
     let printedNameAndTitle = "";
 
     if (intakeData) {
-      const firstName = normalize(intakeData.bi_first_name || "").trim();
-      const lastName = normalize(intakeData.bi_last_name || "").trim();
+      // FIXED: Use bi_fullname instead of bi_first_name and bi_last_name
+      const fullName = normalize(intakeData.bi_fullname || "").trim();
       const title = normalize(intakeData.bi_title || "").trim();
 
-      const fullName = [firstName, lastName].filter(Boolean).join(" ");
+      console.log("  fullName:", fullName);
+      console.log("  title:", title);
       
       if (fullName && title) {
         printedNameAndTitle = `${fullName}, ${title}`;
       } else if (fullName) {
         printedNameAndTitle = fullName;
       }
+      
+      console.log("  printedNameAndTitle:", printedNameAndTitle);
+    } else {
+      console.log("  ❌ No intakeData available");
     }
 
     if (printedNameAndTitle) {
       const printedFontSize = 10; // Arial Narrow 10pt
+
+      console.log("  📝 Drawing printed name and title:", printedNameAndTitle);
+      console.log("  Position: x =", leftLineX, "y =", printedNameLineY + 2);
 
       // Draw printed name and title ABOVE the Printed Name and Title line
       lastPage.drawText(printedNameAndTitle, {
@@ -1270,7 +1281,9 @@
         color: rgb(0, 0, 0)
       });
 
-      console.log("✅ Printed name and title drawn:", printedNameAndTitle, "at x:", leftLineX, "y:", printedNameLineY + 2);
+      console.log("✅ Printed name and title drawn successfully");
+    } else {
+      console.log("❌ printedNameAndTitle is empty, not drawing");
     }
 
     const out = await pdfDoc.save();
