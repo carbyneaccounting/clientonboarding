@@ -168,6 +168,11 @@
     return out;
   }
 
+  function bytesToDataUrlPng(bytes){
+    const b64 = bytesToB64(bytes);
+    return "data:image/png;base64," + b64;
+  }
+
   function stamp(){
     const d = new Date();
     const mm = String(d.getMonth()+1).padStart(2,"0");
@@ -909,20 +914,49 @@
     return "";
   }
 
-  function getAdoptedSignatureValue(){
-    const candidates = [
+  function getAdoptedTypedSignatureText(){
+    const keys = [
       "carbyne_adopted_signature_text",
       "carbyne_adopted_signature_typed",
-      "carbyne_adopted_signature_name",
+      "carbyne_adopted_signature_typed_text",
       "carbyne_typed_signature",
+      "carbyne_typed_signature_text",
       "carbyne_signature_text",
       "carbyne_signature_typed",
+      "carbyne_signature_typed_text",
       "adopted_signature_text",
       "adopted_signature_typed",
+      "adopted_signature_typed_text",
       "typed_signature",
+      "typed_signature_text",
       "signature_text",
       "signature_typed",
+      "signature_typed_text"
+    ];
 
+    const globals = [
+      window.__carbyne_adopted_signature_text,
+      window.carbyne_adopted_signature_text,
+      window.carbyneAdoptedSignatureText,
+      window.adoptedSignatureText
+    ].filter(Boolean).map(v => normalize(v));
+
+    for (const g of globals){
+      const s = normalize(g).trim();
+      if (s) return s;
+    }
+
+    for (const k of keys){
+      const v = getStoredValue(k);
+      const s = normalize(v).trim();
+      if (s) return s;
+    }
+
+    return "";
+  }
+
+  function getAdoptedSignatureImageValue(){
+    const keys = [
       "carbyne_adopted_signature",
       "carbyne_adopted_signature_png",
       "carbyne_adopted_signature_b64",
@@ -946,12 +980,7 @@
       window.carbyneAdoptedSignatureDataUrl,
       window.carbyneAdoptedSignature,
       window.adoptedSignatureDataUrl,
-      window.adoptedSignature,
-
-      window.__carbyne_adopted_signature_text,
-      window.carbyne_adopted_signature_text,
-      window.carbyneAdoptedSignatureText,
-      window.adoptedSignatureText
+      window.adoptedSignature
     ].filter(Boolean).map(v => normalize(v));
 
     for (const g of globals){
@@ -959,8 +988,8 @@
       if (s) return s;
     }
 
-    for (const key of candidates){
-      const v = getStoredValue(key);
+    for (const k of keys){
+      const v = getStoredValue(k);
       const s = normalize(v).trim();
       if (s) return s;
     }
@@ -969,27 +998,101 @@
   }
 
   function getAdoptedSignature(){
-    const raw = getAdoptedSignatureValue();
-    const s = normalize(raw).trim();
-    if (!s) return null;
+    const typed = getAdoptedTypedSignatureText();
+    if (typed) return { kind:"text", text: typed };
 
-    if (/^data:image\/png;base64,/i.test(s)){
-      const b64 = s.split(",")[1] || "";
+    const raw = normalize(getAdoptedSignatureImageValue()).trim();
+    if (!raw) return null;
+
+    if (/^data:image\/png;base64,/i.test(raw)){
+      const b64 = raw.split(",")[1] || "";
       if (!b64) return null;
       return { kind:"png", bytes: b64ToBytes(b64) };
     }
 
-    if (/^data:image\/jpeg;base64,/i.test(s) || /^data:image\/jpg;base64,/i.test(s)){
-      const b64 = s.split(",")[1] || "";
+    if (/^data:image\/jpeg;base64,/i.test(raw) || /^data:image\/jpg;base64,/i.test(raw)){
+      const b64 = raw.split(",")[1] || "";
       if (!b64) return null;
       return { kind:"jpg", bytes: b64ToBytes(b64) };
     }
 
-    if (/^[A-Za-z0-9+/=]+$/.test(s) && s.length > 200){
-      try { return { kind:"png", bytes: b64ToBytes(s) }; } catch {}
+    if (/^[A-Za-z0-9+/=]+$/.test(raw) && raw.length > 200){
+      try { return { kind:"png", bytes: b64ToBytes(raw) }; } catch {}
     }
 
-    return { kind:"text", text: s };
+    return null;
+  }
+
+  async function cropPngToInk(pngBytes){
+    const dataUrl = bytesToDataUrlPng(pngBytes);
+
+    const img = new Image();
+    img.decoding = "async";
+
+    const loaded = await new Promise((resolve, reject) => {
+      img.onload = () => resolve(true);
+      img.onerror = () => reject(new Error("Image load failed"));
+      img.src = dataUrl;
+    });
+
+    if (!loaded) return pngBytes;
+
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (!w || !h) return pngBytes;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return pngBytes;
+
+    ctx.clearRect(0,0,w,h);
+    ctx.drawImage(img, 0, 0);
+
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    let minX = w, minY = h, maxX = -1, maxY = -1;
+
+    for (let y = 0; y < h; y++){
+      for (let x = 0; x < w; x++){
+        const idx = (y * w + x) * 4;
+        const a = data[idx + 3];
+        if (a > 10){
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    if (maxX < 0 || maxY < 0) return pngBytes;
+
+    const pad = 3;
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(w - 1, maxX + pad);
+    maxY = Math.min(h - 1, maxY + pad);
+
+    const cw = Math.max(1, (maxX - minX + 1));
+    const ch = Math.max(1, (maxY - minY + 1));
+
+    const cropCanvas = document.createElement("canvas");
+    cropCanvas.width = cw;
+    cropCanvas.height = ch;
+    const cctx = cropCanvas.getContext("2d");
+    if (!cctx) return pngBytes;
+
+    cctx.clearRect(0,0,cw,ch);
+    cctx.drawImage(canvas, minX, minY, cw, ch, 0, 0, cw, ch);
+
+    const outUrl = cropCanvas.toDataURL("image/png");
+    const outB64 = outUrl.split(",")[1] || "";
+    if (!outB64) return pngBytes;
+
+    try { return b64ToBytes(outB64); } catch { return pngBytes; }
   }
 
   async function signPdfBytes(pdfBytes, fontBytes){
@@ -1020,46 +1123,52 @@
     const lastPage = pages[pages.length - 1];
 
     const PAGE_W = 612;
-    const M_BOTTOM = 28.8;
     const M_LEFT = 36;
     const M_RIGHT = 36;
+    const M_BOTTOM = 28.8;
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
 
     const signatureBlockY = M_BOTTOM + 160;
     const leftLineX = M_LEFT;
     const rightLineX = M_LEFT + MAX_W * 0.70;
-
     const leftLineW = (rightLineX - leftLineX) - 22;
     const lineY = signatureBlockY + 6;
 
     if (sig.kind === "text"){
       const fontSize = 10;
       const maxTextW = Math.max(40, leftLineW - 2);
-      let text = normalize(sig.text).replace(/\s+/g, " ").trim();
 
-      if (text){
-        while (text.length > 0 && measureText(bodyFont, text, fontSize) > maxTextW){
-          text = text.slice(0, -1);
-        }
-        if (text){
-          lastPage.drawText(text, {
-            x: leftLineX,
-            y: lineY + 2,
-            size: fontSize,
-            font: bodyFont,
-            color: rgb(0,0,0)
-          });
-        }
+      let text = normalize(sig.text).replace(/\s+/g, " ").trim();
+      if (!text) throw new Error("No typed signature text available");
+
+      while (text.length > 0 && measureText(bodyFont, text, fontSize) > maxTextW){
+        text = text.slice(0, -1);
       }
+
+      if (!text) throw new Error("Typed signature did not fit");
+
+      lastPage.drawText(text, {
+        x: leftLineX,
+        y: lineY + 2,
+        size: fontSize,
+        font: bodyFont,
+        color: rgb(0,0,0)
+      });
+
     } else {
       let embeddedImg = null;
-      if (sig.kind === "png") embeddedImg = await pdfDoc.embedPng(sig.bytes);
-      else embeddedImg = await pdfDoc.embedJpg(sig.bytes);
+
+      if (sig.kind === "png"){
+        const cropped = await cropPngToInk(sig.bytes);
+        embeddedImg = await pdfDoc.embedPng(cropped);
+      } else {
+        embeddedImg = await pdfDoc.embedJpg(sig.bytes);
+      }
 
       const imgNaturalW = embeddedImg.width;
       const imgNaturalH = embeddedImg.height;
 
-      const maxW = Math.max(60, leftLineW - 0);
+      const maxW = Math.max(60, leftLineW);
       const maxH = 26;
 
       const scaleW = maxW / imgNaturalW;
