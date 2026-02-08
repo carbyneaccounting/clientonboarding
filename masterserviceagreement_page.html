@@ -673,7 +673,6 @@
       const savedY = y;
 
       page = pages[pages.length - 1];
-
       y = M_BOTTOM + 160;
 
       const gapBetweenRows = 3 * LINE_H;
@@ -689,17 +688,17 @@
       page.drawLine({ start:{x:leftLineX,y:lineY}, end:{x:leftLineX+leftLineW,y:lineY}, thickness:0.9 });
       page.drawLine({ start:{x:rightLineX,y:lineY}, end:{x:rightLineX+rightLineW,y:lineY}, thickness:0.9 });
 
-      const labelY = y - (LINE_H - 2);
-      page.drawText("Signature of Authorized Signatory", { x: leftLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
-      page.drawText("Date", { x: rightLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
+      const labelY = y - (13 - 2);
+      page.drawText("Signature of Authorized Signatory", { x: leftLineX, y: labelY, size: 10, font: bodyFont });
+      page.drawText("Date", { x: rightLineX, y: labelY, size: 10, font: bodyFont });
 
       y -= gapBetweenRows;
 
       const pnLineY = y + 6;
       page.drawLine({ start:{x:leftLineX,y:pnLineY}, end:{x:leftLineX+leftLineW,y:pnLineY}, thickness:0.9 });
-      page.drawText("Printed Name and Title", { x: leftLineX, y: y - (LINE_H - 2), size: FONT_SIZE, font: bodyFont });
+      page.drawText("Printed Name and Title", { x: leftLineX, y: y - (13 - 2), size: 10, font: bodyFont });
 
-      y -= (2 * LINE_H);
+      y -= (2 * 13);
 
       page = savedPage;
       y = savedY;
@@ -750,9 +749,9 @@
 
         ensureSpace(2);
 
-        drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
-        drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
-        y -= LINE_H;
+        drawBold(page, bodyFont, roman, romanX, y, 10);
+        drawBold(page, bodyFont, title, titleX, y, 10);
+        y -= 13;
         continue;
       }
 
@@ -761,14 +760,14 @@
         const leadText = lead.lead + ".";
         const restText = lead.rest;
 
-        const leadW = measureText(bodyFont, leadText, FONT_SIZE);
-        const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+        const leadW = measureText(bodyFont, leadText, 10);
+        const spaceW = measureText(bodyFont, " ", 10);
 
         const firstX = M_LEFT + leadW + spaceW;
         const firstW = Math.max(20, (M_LEFT + MAX_W) - firstX);
 
         const restWords = tokenizePlain(restText);
-        const widths = restWords.map(w => measureText(bodyFont, w, FONT_SIZE));
+        const widths = restWords.map(w => measureText(bodyFont, w, 10));
 
         let bestK = 0;
         let bestScore = 1e18;
@@ -784,7 +783,7 @@
           const remWords = restWords.slice(k+1);
           let remCost = 0;
           if (remWords.length){
-            const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
+            const remWidths = remWords.map(w => measureText(bodyFont, w, 10));
             const remLines = breakLinesDP(remWords, remWidths, spaceW, MAX_W);
             remCost = 0;
             for (let li=0; li<remLines.length; li++){
@@ -811,19 +810,19 @@
 
         ensureSpace(1);
 
-        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
+        page.drawText(leadText, { x: M_LEFT, y, size: 10, font: bodyFont });
         drawUnderline(page, M_LEFT, y, leadW);
 
         if (restWords.length){
           const firstWords = restWords.slice(0, bestK+1);
           drawJustifiedPlainLine(firstWords, firstX, firstW, true);
         } else {
-          y -= LINE_H;
+          y -= 13;
         }
 
         const remWords = restWords.slice(bestK+1);
         if (remWords.length){
-          const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
+          const remWidths = remWords.map(w => measureText(bodyFont, w, 10));
           const lines = breakLinesDP(remWords, remWidths, spaceW, MAX_W);
 
           ensureSpace(lines.length);
@@ -842,8 +841,8 @@
         const parts = parseInlineBold(p);
         const tokens = tokenizeStyled(parts);
 
-        const spaceW = measureText(bodyFont, " ", FONT_SIZE);
-        const widths2 = tokens.map(t => measureText(bodyFont, t.text, FONT_SIZE));
+        const spaceW = measureText(bodyFont, " ", 10);
+        const widths2 = tokens.map(t => measureText(bodyFont, t.text, 10));
         const words2 = tokens.map(t => t.text);
 
         const lines2 = breakLinesDP(words2, widths2, spaceW, MAX_W);
@@ -862,8 +861,8 @@
       const words = tokenizePlain(p);
       if (!words.length) continue;
 
-      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
-      const widths3 = words.map(w => measureText(bodyFont, w, FONT_SIZE));
+      const spaceW = measureText(bodyFont, " ", 10);
+      const widths3 = words.map(w => measureText(bodyFont, w, 10));
       const lines3 = breakLinesDP(words, widths3, spaceW, MAX_W);
 
       ensureSpace(Math.max(1, lines3.length));
@@ -1002,8 +1001,6 @@
     const lastPage = pages[pages.length - 1];
 
     const PAGE_W = 612;
-    const PAGE_H = 792;
-
     const M_BOTTOM = 28.8;
     const M_LEFT = 36;
     const M_RIGHT = 36;
@@ -1023,7 +1020,7 @@
     const imgNaturalW = embeddedImg.width;
     const imgNaturalH = embeddedImg.height;
 
-    const maxW = Math.max(60, leftLineW - 10);
+    const maxW = Math.max(60, leftLineW - 0);
     const maxH = 26;
 
     const scaleW = maxW / imgNaturalW;
@@ -1033,7 +1030,8 @@
     const drawW = imgNaturalW * scale;
     const drawH = imgNaturalH * scale;
 
-    const imgX = leftLineX + 6;
+    /* ALIGN SIGNATURE TO THE LEFT EDGE OF THE LINE */
+    const imgX = leftLineX;
     const imgY = lineY + 2;
 
     lastPage.drawImage(embeddedImg, {
