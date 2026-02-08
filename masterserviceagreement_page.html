@@ -1149,7 +1149,7 @@
 
     // Draw the signature (typed or image)
     if (sig.kind === "text"){
-      const fontSize = 12;  // Arial Narrow 12pt for typed signatures
+      const fontSize = 10;  // Arial Narrow 10pt for typed signatures
       const maxTextW = Math.max(40, leftLineW - 2);
 
       let text = normalize(sig.text).replace(/\s+/g, " ").trim();
@@ -1169,7 +1169,7 @@
 
       if (!text) throw new Error("Typed signature did not fit");
 
-      // Draw typed signature at Arial Narrow 12pt, left-aligned ABOVE the signature line
+      // Draw typed signature at Arial Narrow 10pt, left-aligned ABOVE the signature line
       lastPage.drawText(text, {
         x: leftLineX,
         y: lineY + 2,  // Position ABOVE the line
@@ -1217,7 +1217,7 @@
       console.log("✅ Image signature drawn at x:", imgX, "y:", imgY);
     }
 
-    // NEW: Add today's date above the Date line
+    // Add today's date above the Date line
     const today = new Date();
     const month = String(today.getMonth() + 1).padStart(2, "0");
     const day = String(today.getDate()).padStart(2, "0");
