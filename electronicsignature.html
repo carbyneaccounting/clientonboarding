@@ -1,679 +1,1322 @@
-<!-- electronicsignature.html -->
+<!-- masterserviceagreement_page.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Electronic Signature</title>
+  <title>Master Service Agreement</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-<template id="carbyne_electronic_signature">
+<template id="carbyne_masterserviceagreement_page">
   <style>
-    .es-wrap{width:100%}
-    .es-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px 7px;margin-bottom:7px}
-    .es-title{margin:0;font-size:18px;font-weight:950;color:#0b2f4e;letter-spacing:.2px}
-    .es-header-actions{display:flex;align-items:center;gap:6px}
-    .es-mode-toggle{display:flex;gap:5px;margin-right:7px}
+    .msa-wrap{width:100%}
 
-    .es-pill{
+    .msa-h{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      padding:2px 2px 12px;
+    }
+
+    .msa-headrow{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .msa-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+
+    .msa-title{
+      margin:0;
+      font-size:18px;
+      font-weight:950;
+      color:#0b2f4e;
+      letter-spacing:.2px;
+    }
+
+    .msa-sub{
+      margin:0;
+      font-size:12px;
+      font-weight:850;
+      color:#334155;
+      opacity:.88;
+      line-height:1.45;
+    }
+
+    .msa-actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      flex-shrink:0;
+    }
+
+    .msa-btn{
       border:1px solid rgba(0,0,0,.12);
       background:#fff;
       color:#0f172a;
-      font-weight:900;
-      font-size:11px;
-      padding:6px 11px;
-      border-radius:999px;
+      font-weight:950;
+      font-size:12px;
+      padding:9px 12px;
+      border-radius:10px;
       cursor:pointer;
-      transition:all .12s ease;
-      white-space:nowrap;
-    }
-    .es-pill.primary{background:rgba(0,48,91,.08);border-color:rgba(0,48,91,.18);color:#00305B}
-    .es-pill.danger{background:rgba(185,28,28,.06);border-color:rgba(185,28,28,.20);color:#b91c1c}
-    .es-pill:hover{transform:translateY(-1px);opacity:.96}
-    .es-pill.active{background:rgba(0,48,91,.14);border-color:rgba(0,48,91,.28)}
-
-    .es-main{display:grid;grid-template-columns:1.55fr .45fr;gap:9px}
-    .es-card{background:#fff;border:1px solid rgba(0,0,0,.10);border-radius:10px;box-shadow:0 6px 13px rgba(2,6,23,.08);overflow:hidden}
-    .es-card-h{padding:6px 9px;border-bottom:1px solid rgba(0,0,0,.08);font-size:11px;font-weight:950;color:#0f172a;opacity:.90;display:flex;align-items:center;justify-content:space-between}
-    .es-canvas-area{padding:9px}
-    canvas{width:100%;height:135px;border:1px solid rgba(0,0,0,.14);border-radius:8px;background:#fff;display:block;touch-action:none}
-    .es-controls{padding:6px 9px 9px;display:flex;align-items:center;justify-content:space-between;gap:7px}
-    .es-slider{display:flex;align-items:center;gap:6px}
-    .es-slider label{font-size:10px;font-weight:900;color:#0f172a;opacity:.82}
-    .es-slider input{width:85px;height:17px}
-
-    .es-status{font-size:10px;font-weight:900;color:#0f172a;opacity:.75}
-    .es-status.good{color:#0a7a3a;opacity:1}
-    .es-status.bad{color:#b91c1c;opacity:1}
-
-    .es-type-area{padding:9px}
-    .es-type-input{
-      width:100%;
-      border:1px solid rgba(0,0,0,.14);
-      border-radius:8px;
-      padding:8px 11px;
-      font-size:13px;
-      font-weight:900;
-      outline:none;
-      background:#fff;
-      box-shadow:0 6px 13px rgba(2,6,23,.08);
-      color:#0f172a;
-    }
-    .es-type-preview{margin-top:6px;border:1px dashed rgba(0,0,0,.18);border-radius:8px;padding:9px;min-height:40px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.02)}
-    .es-script{
-      font-family:"Arial Narrow", Arial, "Helvetica Neue", Helvetica, sans-serif;
-      font-size:14px;
-      font-weight:700;
-      color:#0f172a;
-      line-height:1;
+      transition:transform .12s ease, opacity .12s ease;
+      box-shadow:0 8px 18px rgba(2,6,23,.06);
       user-select:none;
       white-space:nowrap;
+      pointer-events:auto;
     }
-    .es-type-controls{padding-top:6px;display:flex;justify-content:flex-end}
+    .msa-btn.primary{
+      background:linear-gradient(90deg, #00305B, #0A3D6F);
+      color:#fff;
+      border-color:rgba(0,48,91,.25);
+    }
+    .msa-btn:hover{transform:translateY(-1px);opacity:.97}
+    .msa-btn:active{transform:translateY(0);opacity:.96}
+    .msa-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
 
-    .es-sidebar{display:flex;flex-direction:column;gap:9px}
-    .es-info{padding:9px}
-    .es-info-grid{display:grid;grid-template-columns:1fr;gap:6px;margin-top:6px}
-    .es-info-item{border:1px solid rgba(0,0,0,.10);border-radius:8px;padding:6px 8px;background:#fff}
-    .es-info-label{font-size:8px;font-weight:900;color:#0f172a;opacity:.65;text-transform:uppercase;letter-spacing:.3px}
-    .es-info-value{margin-top:2px;font-size:11px;font-weight:900;color:#0f172a}
-
-    .es-adopted-area{padding:9px}
-    .es-adopted-box{
-      border:1px dashed rgba(0,0,0,.18);
+    .msa-status{
+      font-size:11px;
+      font-weight:900;
+      color:#0f172a;
+      opacity:.78;
+      background:rgba(255,255,255,.95);
+      padding:6px 10px;
       border-radius:8px;
-      background:rgba(0,0,0,.02);
-      min-height:58px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px;
-      overflow:hidden;
-      text-align:center;
+      box-shadow:0 4px 12px rgba(2,6,23,.08);
+      border:1px solid rgba(0,0,0,.08);
+      pointer-events:auto;
+      white-space:nowrap;
     }
-    .es-adopted-img{max-width:100%;max-height:52px;display:block}
-    .es-adopted-empty{font-size:10px;font-weight:900;color:#334155;opacity:.80}
+    .msa-status.bad{color:#b91c1c;opacity:1}
+    .msa-status.good{color:#0a7a3a;opacity:1}
 
-    @media (max-width:900px){
-      .es-main{grid-template-columns:1fr}
+    .msa-view{
+      width:100%;
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow:0 10px 22px rgba(2,6,23,.08);
+      position:relative;
+    }
+
+    .msa-iframe{
+      width:100%;
+      height:430px;
+      border:0;
+      display:block;
+      background:#fff;
     }
   </style>
 
-  <div class="es-wrap" id="esRoot">
-    <div class="es-header">
-      <h2 class="es-title">Electronic Signature</h2>
-      <div class="es-header-actions">
-        <div class="es-mode-toggle">
-          <button class="es-pill active" id="esModeDraw" type="button">Draw</button>
-          <button class="es-pill" id="esModeType" type="button">Type</button>
+  <div class="msa-wrap" id="msaRoot">
+    <div class="msa-h">
+      <div class="msa-headrow">
+        <div class="msa-left">
+          <h2 class="msa-title">Master Service Agreement</h2>
+          <p class="msa-sub">Review the agreement below. When you are ready, select Electronic Sign.</p>
         </div>
-        <button class="es-pill danger" id="esClearTop" type="button">Clear</button>
-        <button class="es-pill primary" id="esAdoptTop" type="button">Adopt</button>
+
+        <div class="msa-actions">
+          <div class="msa-status" id="msaStatus">Loading agreement…</div>
+          <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Sign Document</button>
+        </div>
       </div>
     </div>
 
-    <div class="es-main">
-      <div class="es-card">
-        <div class="es-card-h">
-          <span>Signature Input</span>
-          <span class="es-status" id="esDrawStatus">Empty</span>
-        </div>
-
-        <div class="es-canvas-area" id="esDrawWrap">
-          <canvas id="esCanvas"></canvas>
-          <div class="es-controls">
-            <div class="es-slider">
-              <label for="esStroke">Stroke</label>
-              <input id="esStroke" type="range" min="1" max="8" value="3">
-            </div>
-            <button class="es-pill danger" id="esClearDraw" type="button">Clear</button>
-          </div>
-        </div>
-
-        <div class="es-type-area" id="esTypeWrap" style="display:none;">
-          <input class="es-type-input" id="esTypeInput" type="text" placeholder="Type your name">
-          <div class="es-type-preview">
-            <div class="es-script" id="esTypePreview"></div>
-          </div>
-          <div class="es-type-controls">
-            <button class="es-pill danger" id="esClearType" type="button">Clear</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="es-sidebar">
-        <div class="es-card">
-          <div class="es-card-h">Status</div>
-          <div class="es-info">
-            <div class="es-info-grid">
-              <div class="es-info-item">
-                <div class="es-info-label">Mode</div>
-                <div class="es-info-value" id="esModeVal">Draw</div>
-              </div>
-              <div class="es-info-item">
-                <div class="es-info-label">Ready</div>
-                <div class="es-info-value" id="esHasVal">No</div>
-              </div>
-              <div class="es-info-item">
-                <div class="es-info-label">Adopt</div>
-                <div class="es-info-value" id="esAdoptVal">No</div>
-              </div>
-              <div class="es-info-item">
-                <div class="es-info-label">Time</div>
-                <div class="es-info-value" id="esLastVal">—</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="es-card">
-          <div class="es-card-h">Adopted</div>
-          <div class="es-adopted-area">
-            <div class="es-adopted-box" id="esAdoptedBox">
-              <div class="es-adopted-empty" id="esAdoptedEmpty">None</div>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="msa-view">
+      <iframe class="msa-iframe" id="msaFrame" title="Master Service Agreement"></iframe>
     </div>
   </div>
 </template>
 
 <script>
-  (function(){
-    const SIG_KEY = "carbyne_adopted_signature_dataurl";
-    const SIG_META_KEY = "carbyne_adopted_signature_meta";
-    const DOC_ID_SIG = "electronic_signature";
+(function(){
+  const AGREEMENT_TXT_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/MasterServiceAgreement.txt";
+  const ARIAL_NARROW_TTF_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/main/ARIALN.TTF";
 
-    function nowStamp(){
-      const d = new Date();
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const dd = String(d.getDate()).padStart(2,"0");
-      const yy = d.getFullYear();
-      const hh = String(d.getHours()).padStart(2,"0");
-      const mi = String(d.getMinutes()).padStart(2,"0");
-      return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
+  const FONTKIT_URL = "https://cdn.jsdelivr.net/npm/@pdf-lib/fontkit@1.1.1/dist/fontkit.umd.min.js";
+
+  const DOC_ID = "master_service_agreement";
+  const DOC_TITLE = "Master Service Agreement";
+
+  const INTAKE_STORAGE_KEY = "carbyne_intake_business_info";
+
+  function normalize(v){ return (v ?? "").toString(); }
+
+  function bytesToB64(bytes){
+    let s = "";
+    const chunk = 0x8000;
+    for (let i=0;i<bytes.length;i+=chunk){
+      s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
     }
+    return btoa(s);
+  }
 
-    function normalize(v){ return (v ?? "").toString().trim(); }
+  function b64ToBytes(b64){
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
 
-    function clearStored(){
-      try{ sessionStorage.removeItem(SIG_KEY); sessionStorage.removeItem(SIG_META_KEY); } catch {}
-      try{ localStorage.removeItem(SIG_KEY); localStorage.removeItem(SIG_META_KEY); } catch {}
+  function bytesToDataUrlPng(bytes){
+    const b64 = bytesToB64(bytes);
+    return "data:image/png;base64," + b64;
+  }
+
+  function stamp(){
+    const d = new Date();
+    const mm = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    const yy = d.getFullYear();
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mi = String(d.getMinutes()).padStart(2,"0");
+    return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
+  }
+
+  function setStatus(root, msg, cls){
+    const el = root.querySelector("#msaStatus");
+    if (!el) return;
+    el.classList.remove("bad","good");
+    if (cls) el.classList.add(cls);
+    el.textContent = msg || "";
+  }
+
+  async function fetchText(url){
+    const res = await fetch(url, { cache:"no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return await res.text();
+  }
+
+  async function fetchBytes(url){
+    const res = await fetch(url, { cache:"no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const ab = await res.arrayBuffer();
+    return new Uint8Array(ab);
+  }
+
+  function loadScriptOnce(id, src){
+    return new Promise((resolve, reject) => {
+      const existing = document.getElementById(id);
+      if (existing) { resolve(); return; }
+      const s = document.createElement("script");
+      s.id = id;
+      s.src = src;
+      s.async = true;
+      s.onload = () => resolve();
+      s.onerror = () => reject(new Error("Failed to load " + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async function ensureFontkit(){
+    try{
+      if (window.fontkit) return true;
+      await loadScriptOnce("carbyne_fontkit_umd", FONTKIT_URL);
+      return !!window.fontkit;
+    } catch {
+      return false;
     }
+  }
 
-    function setStored(dataUrl, meta){
-      clearStored();
-      try{
-        sessionStorage.setItem(SIG_KEY, dataUrl);
-        sessionStorage.setItem(SIG_META_KEY, JSON.stringify(meta || {}));
-      } catch {
-        try{
-          localStorage.setItem(SIG_KEY, dataUrl);
-          localStorage.setItem(SIG_META_KEY, JSON.stringify(meta || {}));
-        } catch {}
-      }
+  function getIntakeData(){
+    try{
+      const raw = localStorage.getItem(INTAKE_STORAGE_KEY);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch {
+      return null;
     }
+  }
 
-    function getStored(){
-      let dataUrl = "";
-      let meta = {};
-      try{
-        dataUrl = sessionStorage.getItem(SIG_KEY) || "";
-        meta = JSON.parse(sessionStorage.getItem(SIG_META_KEY) || "{}");
-      } catch {}
-      if (!dataUrl){
-        try{
-          dataUrl = localStorage.getItem(SIG_KEY) || "";
-          meta = JSON.parse(localStorage.getItem(SIG_META_KEY) || "{}");
-        } catch {}
-      }
-      return { dataUrl, meta };
-    }
+  function getColumnValues(){
+    try {
+      const columnA = localStorage.getItem("carbyne_column_a") || "";
+      const columnR = localStorage.getItem("carbyne_column_r") || "";
 
-    function setAdoptedUI(root, dataUrl){
-      const box = root.querySelector("#esAdoptedBox");
-      if (!box) return;
-
-      box.innerHTML = "";
-      if (!dataUrl){
-        const d = document.createElement("div");
-        d.className = "es-adopted-empty";
-        d.textContent = "None";
-        box.appendChild(d);
-        return;
-      }
-
-      const img = document.createElement("img");
-      img.className = "es-adopted-img";
-      img.alt = "Adopted signature";
-      img.src = dataUrl;
-      box.appendChild(img);
-    }
-
-    function resizeCanvasToCSS(canvas){
-      const rect = canvas.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
-      const w = Math.max(1, Math.floor(rect.width * dpr));
-      const h = Math.max(1, Math.floor(rect.height * dpr));
-      if (canvas.width !== w || canvas.height !== h){
-        canvas.width = w;
-        canvas.height = h;
-      }
-      return dpr;
-    }
-
-    function getPoint(e, canvas){
-      const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const x = (clientX - rect.left);
-      const y = (clientY - rect.top);
-      return { x, y };
-    }
-
-    function renderStatus(root, mode, hasSig, last){
-      root.querySelector("#esModeVal").textContent = mode;
-      root.querySelector("#esHasVal").textContent = hasSig ? "Yes" : "No";
-      root.querySelector("#esAdoptVal").textContent = hasSig ? "Yes" : "No";
-      root.querySelector("#esLastVal").textContent = last || "—";
-    }
-
-    function bytesToB64(bytes){
-      let s = "";
-      const chunk = 0x8000;
-      for (let i=0;i<bytes.length;i+=chunk){
-        s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
-      }
-      return btoa(s);
-    }
-
-    async function getPublicIP(){
-      try{
-        if (typeof window.carbyne_get_public_ip === "function"){
-          const ip = await window.carbyne_get_public_ip();
-          return normalize(ip) || "Unavailable";
-        }
-      } catch {}
-      try{
-        const res = await fetch("https://api.ipify.org?format=json", { cache:"no-store" });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const j = await res.json();
-        const ip = normalize(j && j.ip);
-        return ip || "Unavailable";
-      } catch {
-        return "Unavailable";
-      }
-    }
-
-    function stamp(){
-      const d = new Date();
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const dd = String(d.getDate()).padStart(2,"0");
-      const yy = d.getFullYear();
-      const hh = String(d.getHours()).padStart(2,"0");
-      const mi = String(d.getMinutes()).padStart(2,"0");
-      return mm + "/" + dd + "/" + yy + " " + hh + ":" + mi;
-    }
-
-    async function buildSignaturePdfB64(referenceNumber, dataUrl, meta){
-      const lib = window.PDFLib;
-      if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
-
-      const { PDFDocument, StandardFonts } = lib;
-
-      const pdfDoc = await PDFDocument.create();
-      const page = pdfDoc.addPage([612, 792]);
-
-      const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-      const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
-
-      const marginX = 54;
-      let y = 742;
-
-      function line(text, bold){
-        page.drawText(text, { x: marginX, y: y, size:10, font: bold ? fontBold : font });
-        y -= 14;
+      function formatCurrency(value) {
+        if (!value) return "";
+        const cleaned = String(value).replace(/[$,\s]/g, '');
+        const num = parseFloat(cleaned);
+        if (isNaN(num)) return "";
+        return num.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
       }
 
-      line("Electronic Signature", true);
-      line("Reference Number: " + (referenceNumber || ""), false);
-      line(" ", false);
-
-      line("Signature", true);
-
-      const mode = normalize(meta && meta.mode);
-      const typedText = normalize(meta && meta.typedText);
-      const displayTyped = typedText ? ("/s/ " + typedText) : "";
-
-      if (mode === "Type" && displayTyped){
-        page.drawText(displayTyped, { x: marginX, y: y, size:10, font: fontBold });
-        y -= 20;
-      }
-
-      if (dataUrl){
-        try{
-          const isPng = dataUrl.startsWith("data:image/png");
-          const bytes = Uint8Array.from(atob(dataUrl.split(",")[1] || ""), c => c.charCodeAt(0));
-          const img = isPng ? await pdfDoc.embedPng(bytes) : await pdfDoc.embedJpg(bytes);
-          const iw = img.width, ih = img.height;
-
-          const maxW = 504;
-          const maxH = 160;
-
-          const scale = Math.min(maxW / iw, maxH / ih, 1);
-          const w = iw * scale;
-          const h = ih * scale;
-
-          page.drawImage(img, { x: marginX, y: y - h, width: w, height: h });
-          y = y - h - 18;
-        } catch {}
-      }
-
-      line(" ", false);
-      line("Audit Log", true);
-
-      const audit = {
-        timestamp: normalize(meta && meta.lastAdopted) || "",
-        publicIP: normalize(meta && meta.publicIP) || "",
-        timezone: normalize(meta && meta.timezone) || "",
-        platform: normalize(meta && meta.platform) || "",
-        userAgent: normalize(meta && meta.userAgent) || ""
+      return {
+        serviceFees: formatCurrency(columnA),
+        retainerAmount: formatCurrency(columnR)
       };
+    } catch {
+      return { serviceFees: "", retainerAmount: "" };
+    }
+  }
 
-      line("Timestamp: " + audit.timestamp, false);
-      line("Public IP: " + audit.publicIP, false);
-      line("Time Zone: " + audit.timezone, false);
-      line("Platform: " + audit.platform, false);
+  function replaceClientNamePlaceholder(text, businessName){
+    if (!businessName) return text;
+    const pattern = /Firm to\s+_{5,}\s+\(hereinafter/gi;
+    const replacement = `Firm to **${businessName}** (hereinafter`;
+    return text.replace(pattern, replacement);
+  }
 
-      line("User Agent:", false);
-      const ua = audit.userAgent || "";
-      const words = ua.split(/\s+/).filter(Boolean);
-      const maxWidth = 504;
-      const size = 10;
+  function splitParagraphsKeepGrid(text){
+    const lines = normalize(text).replace(/\r\n/g,"\n").replace(/\r/g,"\n").split("\n");
+    const out = [];
+    let buf = [];
+    function flush(){
+      if (!buf.length) return;
+      const p = buf.join(" ").replace(/\s+/g," ").trim();
+      if (p) out.push(p);
+      buf = [];
+    }
+    for (const rawLine of lines){
+      const line = rawLine.replace(/\t/g," ").trim();
+      if (!line){ flush(); continue; }
+      buf.push(line);
+    }
+    flush();
+    return out;
+  }
 
-      let cur = "";
-      for (const w of words){
-        const test = cur ? (cur + " " + w) : w;
-        const width = font.widthOfTextAtSize(test, size);
-        if (width <= maxWidth){
-          cur = test;
-        } else {
-          if (cur){
-            page.drawText(cur, { x: marginX, y: y, size, font });
-            y -= 14;
-          }
-          cur = w;
-        }
+  function isRomanSection(p){
+    return /^([IVXLCDM]+)\.\s+/.test(p);
+  }
+
+  function parseRomanSection(p){
+    const m = p.match(/^([IVXLCDM]+)\.\s+(.+)$/);
+    if (!m) return null;
+    return { roman: m[1], title: m[2] };
+  }
+
+  function parseLeadLabel(p){
+    const m = p.match(/^([A-Za-z][A-Za-z\s\-&]+)\.\s+(.+)$/);
+    if (!m) return null;
+    const lead = m[1].trim();
+    const rest = m[2].trim();
+    if (!lead || lead.length > 42) return null;
+    if (!rest) return null;
+    return { lead, rest };
+  }
+
+  function measureText(font, text, size){
+    try { return font.widthOfTextAtSize(text, size); } catch { return text.length * (size * 0.5); }
+  }
+
+  function drawUnderline(page, x, y, w){
+    try{
+      page.drawLine({
+        start: { x, y: y - 1.2 },
+        end: { x: x + w, y: y - 1.2 },
+        thickness: 0.7,
+        opacity: 1
+      });
+    } catch {}
+  }
+
+  function drawBold(page, font, text, x, y, size){
+    page.drawText(text, { x, y, size, font });
+    page.drawText(text, { x: x + 0.35, y, size, font });
+  }
+
+  function isBasisCheckboxLine(p){
+    const t = normalize(p);
+    return (t.includes("Accrual Basis") && t.includes("Cash Basis") && t.includes("Mixed Method") && t.includes("Other:"));
+  }
+
+  function isServiceFeesLine(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("service fees") && t.includes("total service fees charged per month");
+  }
+
+  function isRetainerAmountLine(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("retainer fee amount") && t.includes("total retainer amount to be paid");
+  }
+
+  function isSignatureTrigger(p){
+    const t = normalize(p).toLowerCase();
+    return t.includes("signature of authorized signatory");
+  }
+
+  function parseInlineBold(text){
+    const parts = [];
+    const boldRegex = /\*\*(.+?)\*\*/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = boldRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        const normalText = text.substring(lastIndex, match.index);
+        if (normalText) parts.push({ text: normalText, bold: false });
       }
-      if (cur){
-        page.drawText(cur, { x: marginX, y: y, size, font });
-        y -= 14;
-      }
-
-      const outBytes = await pdfDoc.save();
-      return bytesToB64(outBytes);
+      parts.push({ text: match[1], bold: true });
+      lastIndex = match.index + match[0].length;
     }
 
-    window.carbyne_electronic_signature_mount = function(args){
-      const root = args && args.root ? args.root : document;
-      const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
+    if (lastIndex < text.length) {
+      const remainingText = text.substring(lastIndex);
+      if (remainingText) parts.push({ text: remainingText, bold: false });
+    }
 
-      const canvas = root.querySelector("#esCanvas");
-      const ctx = canvas.getContext("2d");
-      const stroke = root.querySelector("#esStroke");
-      const drawStatus = root.querySelector("#esDrawStatus");
+    return parts.length > 0 ? parts : [{ text: text, bold: false }];
+  }
 
-      const modeDrawBtn = root.querySelector("#esModeDraw");
-      const modeTypeBtn = root.querySelector("#esModeType");
-      const drawWrap = root.querySelector("#esDrawWrap");
-      const typeWrap = root.querySelector("#esTypeWrap");
+  function tokenizePlain(text){
+    return normalize(text).trim().split(/\s+/).filter(Boolean);
+  }
 
-      const typeInput = root.querySelector("#esTypeInput");
-      const typePreview = root.querySelector("#esTypePreview");
+  function tokenizeStyled(parts){
+    const out = [];
+    for (const part of parts){
+      const raw = normalize(part.text);
+      const words = raw.split(/\s+/).filter(Boolean);
+      for (const w of words){
+        out.push({ text: w, bold: !!part.bold });
+      }
+    }
+    return out;
+  }
 
-      const clearTop = root.querySelector("#esClearTop");
-      const adoptTop = root.querySelector("#esAdoptTop");
-      const clearDraw = root.querySelector("#esClearDraw");
-      const clearType = root.querySelector("#esClearType");
+  function breakLinesDP(words, widths, spaceW, maxWidth){
+    const n = words.length;
+    const INF = 1e18;
+    const cost = new Array(n + 1).fill(INF);
+    const next = new Array(n + 1).fill(-1);
+    cost[n] = 0;
 
-      let mode = "Draw";
-      let drawing = false;
-      let hasDrawInk = false;
-      let hasTypeInk = false;
+    for (let i = n - 1; i >= 0; i--){
+      let lineW = 0;
+      for (let j = i; j < n; j++){
+        if (j === i) lineW = widths[j];
+        else lineW += spaceW + widths[j];
+        if (lineW > maxWidth) break;
 
-      function setMode(next){
-        if (mode === next) return;
+        const slack = maxWidth - lineW;
+        const isLast = (j === n - 1);
 
-        if (next === "Draw"){
-          typeInput.value = "";
-          typePreview.textContent = "";
-          hasTypeInk = false;
-        } else {
-          clearCanvas();
-          hasDrawInk = false;
+        let penalty = 0;
+        if (!isLast){
+          const shortLinePenalty = (slack > maxWidth * 0.35) ? (slack * slack * 6) : 0;
+          penalty = (slack * slack) + shortLinePenalty;
         }
 
-        mode = next;
-        modeDrawBtn.classList.toggle("active", mode === "Draw");
-        modeTypeBtn.classList.toggle("active", mode === "Type");
+        const cand = penalty + cost[j + 1];
+        if (cand < cost[i]){
+          cost[i] = cand;
+          next[i] = j + 1;
+        }
+      }
+    }
 
-        drawWrap.style.display = (mode === "Draw") ? "" : "none";
-        typeWrap.style.display = (mode === "Type") ? "" : "none";
+    const lines = [];
+    let i = 0;
+    while (i < n && next[i] !== -1){
+      const j = next[i];
+      lines.push({ start:i, end:j });
+      i = j;
+    }
+    if (!lines.length && n){
+      lines.push({ start:0, end:n });
+    }
+    return lines;
+  }
 
-        refreshUI();
+  async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
+    const lib = window.PDFLib;
+    if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
+
+    const { PDFDocument, StandardFonts, rgb } = lib;
+
+    const pdfDoc = await PDFDocument.create();
+
+    let bodyFont = null;
+    const fontkitReady = await ensureFontkit();
+
+    if (fontkitReady && typeof pdfDoc.registerFontkit === "function") {
+      try{
+        pdfDoc.registerFontkit(window.fontkit);
+        bodyFont = await pdfDoc.embedFont(fontBytes, { subset: true });
+      } catch {
+        bodyFont = null;
+      }
+    }
+
+    if (!bodyFont){
+      bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    }
+
+    const PAGE_W = 612;
+    const PAGE_H = 792;
+
+    const M_TOP = 28.8;
+    const M_BOTTOM = 28.8;
+    const M_LEFT = 36;
+    const M_RIGHT = 36;
+
+    const BODY_TOP_Y = PAGE_H - M_TOP - 24;
+    const BODY_BOTTOM_Y = M_BOTTOM + 20;
+
+    const FONT_SIZE = 10;
+    const LINE_H = 13;
+    const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
+
+    const headerLeft = "Carbyne Accounting";
+    const headerRight = DOC_TITLE;
+
+    const footerCenter = "Confidential";
+    const footerRightPrefix = "Page ";
+
+    const intakeData = getIntakeData();
+    const businessName = intakeData && intakeData.bi_name ? normalize(intakeData.bi_name).trim() : "";
+    const selectedBasis = intakeData && intakeData.boa_basis ? normalize(intakeData.boa_basis).trim() : "";
+    const otherBasisText = intakeData && intakeData.boa_other_text ? normalize(intakeData.boa_other_text).trim() : "";
+
+    const tableData = getColumnValues();
+    const serviceFees = tableData.serviceFees;
+    const retainerAmount = tableData.retainerAmount;
+
+    const processedText = replaceClientNamePlaceholder(agreementText, businessName);
+    const paragraphs = splitParagraphsKeepGrid(processedText);
+
+    const pages = [];
+    function newPage(){
+      const p = pdfDoc.addPage([PAGE_W, PAGE_H]);
+      pages.push(p);
+      return p;
+    }
+
+    let page = newPage();
+    let y = BODY_TOP_Y;
+
+    function drawHeaderFooter(pageIndex, totalPages){
+      const p = pages[pageIndex];
+      const headerY = PAGE_H - M_TOP + 10;
+
+      drawBold(p, bodyFont, headerLeft, M_LEFT, headerY, FONT_SIZE);
+      const hrw = measureText(bodyFont, headerRight, FONT_SIZE);
+      drawBold(p, bodyFont, headerRight, PAGE_W - M_RIGHT - hrw, headerY, FONT_SIZE);
+
+      if (referenceNumber){
+        const refText = "Reference: " + referenceNumber;
+        const rw = measureText(bodyFont, refText, FONT_SIZE);
+        p.drawText(refText, { x: PAGE_W - M_RIGHT - rw, y: headerY - 14, size: FONT_SIZE, font: bodyFont });
       }
 
-      function clearCanvas(){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        hasDrawInk = false;
-        drawStatus.textContent = "Empty";
-        drawStatus.classList.remove("good");
-        drawStatus.classList.add("bad");
+      const footerY = M_BOTTOM - 6;
+      p.drawText(footerCenter, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
+
+      const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
+      const prw = measureText(bodyFont, pr, FONT_SIZE);
+      p.drawText(pr, { x: PAGE_W - M_RIGHT - prw, y: footerY, size: FONT_SIZE, font: bodyFont });
+    }
+
+    function ensureSpace(linesNeeded){
+      const need = linesNeeded * LINE_H;
+      if (y - need < BODY_BOTTOM_Y){
+        page = newPage();
+        y = BODY_TOP_Y;
       }
+    }
 
-      function markDrawHasInk(){
-        hasDrawInk = true;
-        drawStatus.textContent = "Ready";
-        drawStatus.classList.remove("bad");
-        drawStatus.classList.add("good");
+    function drawJustifiedPlainLine(words, xStart, width, isLastLine){
+      if (!words || !words.length) { y -= LINE_H; return; }
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+
+      let wordsW = 0;
+      for (const w of words) wordsW += measureText(bodyFont, w, FONT_SIZE);
+
+      const gaps = Math.max(0, words.length - 1);
+      const baseW = wordsW + (spaceW * gaps);
+      const extra = Math.max(0, width - baseW);
+      const perGap = (gaps > 0 && !isLastLine) ? (spaceW + (extra / gaps)) : spaceW;
+
+      let x = xStart;
+      for (let i=0;i<words.length;i++){
+        const w = words[i];
+        page.drawText(w, { x, y, size: FONT_SIZE, font: bodyFont });
+        x += measureText(bodyFont, w, FONT_SIZE);
+        if (i !== words.length - 1) x += perGap;
       }
+      y -= LINE_H;
+    }
 
-      function currentHasSignature(){
-        return (mode === "Draw") ? hasDrawInk : hasTypeInk;
+    function drawJustifiedStyledLine(tokens, xStart, width, isLastLine){
+      if (!tokens || !tokens.length) { y -= LINE_H; return; }
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+
+      let wordsW = 0;
+      for (const t of tokens) wordsW += measureText(bodyFont, t.text, FONT_SIZE);
+
+      const gaps = Math.max(0, tokens.length - 1);
+      const baseW = wordsW + (spaceW * gaps);
+      const extra = Math.max(0, width - baseW);
+      const perGap = (gaps > 0 && !isLastLine) ? (spaceW + (extra / gaps)) : spaceW;
+
+      let x = xStart;
+      for (let i=0;i<tokens.length;i++){
+        const t = tokens[i];
+        if (t.bold) drawBold(page, bodyFont, t.text, x, y, FONT_SIZE);
+        else page.drawText(t.text, { x, y, size: FONT_SIZE, font: bodyFont });
+
+        x += measureText(bodyFont, t.text, FONT_SIZE);
+        if (i !== tokens.length - 1) x += perGap;
       }
+      y -= LINE_H;
+    }
 
-      function refreshUI(){
-        const hasSig = currentHasSignature();
-        adoptTop.disabled = !hasSig;
+    function drawCheckboxAtBaseline(x, baselineY, size){
+      const ascent = 9;
+      const boxTopY = baselineY + ascent;
+      page.drawRectangle({
+        x: x,
+        y: boxTopY - size,
+        width: size,
+        height: size,
+        borderWidth: 1,
+        borderColor: rgb(0,0,0)
+      });
+    }
 
-        const stored = getStored();
-        const last = stored.meta && stored.meta.lastAdopted ? stored.meta.lastAdopted : "—";
-        renderStatus(root, mode, hasSig, last);
+    function drawCheckmark(x, baselineY, size){
+      const ascent = 9;
+      const boxTopY = baselineY + ascent;
+      const boxBottomY = boxTopY - size;
 
-        setAdoptedUI(root, stored.dataUrl || "");
-      }
+      const padding = 2;
+      const x1 = x + padding;
+      const x2 = x + size - padding;
+      const y1 = boxBottomY + padding;
+      const y2 = boxTopY - padding;
 
-      async function adopt(){
-        if (!currentHasSignature()) return;
+      page.drawLine({ start: { x: x1, y: y1 }, end: { x: x2, y: y2 }, thickness: 1.2, color: rgb(0,0,0) });
+      page.drawLine({ start: { x: x2, y: y1 }, end: { x: x1, y: y2 }, thickness: 1.2, color: rgb(0,0,0) });
+    }
 
-        let dataUrl = "";
-        const meta = { mode, lastAdopted: nowStamp() };
+    function drawBasisCheckboxRow(){
+      const box = 10;
+      const gapAfterBox = 6;
+      const itemGap = 16;
 
-        if (mode === "Draw"){
-          dataUrl = canvas.toDataURL("image/png");
+      ensureSpace(2);
+
+      const baselineY = y;
+      let x = M_LEFT;
+
+      const items = [
+        { label: "Accrual Basis", value: "Accrual Basis" },
+        { label: "Cash Basis", value: "Cash Basis" },
+        { label: "Mixed Method", value: "Mixed Method" },
+        { label: "Other:", value: "Other" }
+      ];
+
+      for (let i=0;i<items.length;i++){
+        const item = items[i];
+
+        drawCheckboxAtBaseline(x, baselineY, box);
+        const isSelected = (selectedBasis === item.value);
+        if (isSelected) drawCheckmark(x, baselineY, box);
+
+        x += box + gapAfterBox;
+
+        if (item.label === "Other:") {
+          const otherLabel = "Other:";
+          page.drawText(otherLabel, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+          x += measureText(bodyFont, otherLabel, FONT_SIZE) + 6;
+
+          if (isSelected && otherBasisText) {
+            page.drawText(otherBasisText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+            const textWidth = measureText(bodyFont, otherBasisText, FONT_SIZE);
+            page.drawLine({ start: {x: x, y: baselineY - 1.2}, end: {x: x + textWidth, y: baselineY - 1.2}, thickness: 0.7 });
+          } else {
+            const lineW = Math.max(120, (M_LEFT + MAX_W) - x);
+            page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
+          }
+          break;
         } else {
-          const typed = normalize(typeInput.value);
-          const val = typed ? ("/s/ " + typed) : "";
-          typePreview.textContent = val;
-          hasTypeInk = !!typed;
+          page.drawText(item.label, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+          x += measureText(bodyFont, item.label, FONT_SIZE) + itemGap;
+        }
+      }
 
-          const off = document.createElement("canvas");
-          off.width = 900;
-          off.height = 220;
-          const octx = off.getContext("2d");
-          octx.clearRect(0,0,off.width,off.height);
-          octx.fillStyle = "#ffffff";
-          octx.fillRect(0,0,off.width,off.height);
+      y -= LINE_H;
+    }
 
-          octx.fillStyle = "#0f172a";
-          octx.textAlign = "center";
-          octx.textBaseline = "middle";
-          octx.font = "bold 28px Arial Narrow, Arial, Helvetica, sans-serif";
-          octx.fillText(val, off.width/2, off.height/2);
+    function drawAmountLine(labelText, amount){
+      ensureSpace(1);
 
-          dataUrl = off.toDataURL("image/png");
-          meta.typedText = typed;
+      const baselineY = y;
+      let x = M_LEFT;
+
+      page.drawText(labelText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+      x += measureText(bodyFont, labelText, FONT_SIZE);
+
+      if (amount) {
+        page.drawText(amount, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
+        const amountWidth = measureText(bodyFont, amount, FONT_SIZE);
+        page.drawLine({ start: {x: x, y: baselineY - 1.2}, end: {x: x + amountWidth, y: baselineY - 1.2}, thickness: 0.7 });
+      } else {
+        const lineW = Math.max(100, (M_LEFT + MAX_W) - x - 50);
+        page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
+      }
+
+      y -= LINE_H;
+    }
+
+    function drawSignatureBlockAtBottomOfLastPage(){
+      const savedPage = page;
+      const savedY = y;
+
+      page = pages[pages.length - 1];
+      y = M_BOTTOM + 160;
+
+      const gapBetweenRows = 3 * LINE_H;
+
+      const leftLineX = M_LEFT;
+      const rightLineX = M_LEFT + MAX_W * 0.70;
+
+      const leftLineW = (rightLineX - leftLineX) - 22;
+      const rightLineW = (M_LEFT + MAX_W) - rightLineX;
+
+      const lineY = y + 6;
+
+      page.drawLine({ start:{x:leftLineX,y:lineY}, end:{x:leftLineX+leftLineW,y:lineY}, thickness:0.9 });
+      page.drawLine({ start:{x:rightLineX,y:lineY}, end:{x:rightLineX+rightLineW,y:lineY}, thickness:0.9 });
+
+      const labelY = y - (LINE_H - 2);
+      page.drawText("Signature of Authorized Signatory", { x: leftLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
+      page.drawText("Date", { x: rightLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
+
+      y -= gapBetweenRows;
+
+      const pnLineY = y + 6;
+      page.drawLine({ start:{x:leftLineX,y:pnLineY}, end:{x:leftLineX+leftLineW,y:pnLineY}, thickness:0.9 });
+      page.drawText("Printed Name and Title", { x: leftLineX, y: y - (LINE_H - 2), size: FONT_SIZE, font: bodyFont });
+
+      y -= (2 * LINE_H);
+
+      page = savedPage;
+      y = savedY;
+    }
+
+    let signaturePending = false;
+
+    for (let i=0;i<paragraphs.length;i++){
+      const p = paragraphs[i];
+
+      if (isBasisCheckboxLine(p)) { drawBasisCheckboxRow(); continue; }
+
+      if (isServiceFeesLine(p)) {
+        const labelText = "Service Fees. The total service fees charged per month by Firm to Client shall be: $";
+        drawAmountLine(labelText, serviceFees);
+        continue;
+      }
+
+      if (isRetainerAmountLine(p)) {
+        const labelText = "Retainer Fee Amount. The total retainer amount to be paid by Client shall be: $";
+        drawAmountLine(labelText, retainerAmount);
+        continue;
+      }
+
+      if (!signaturePending && isSignatureTrigger(p)) {
+        signaturePending = true;
+
+        while (i + 1 < paragraphs.length) {
+          const nxt = normalize(paragraphs[i+1]).toLowerCase();
+          if (nxt === "date" || nxt.includes("printed name and title") || nxt.includes("signature of authorized signatory")) {
+            i++;
+            continue;
+          }
+          break;
+        }
+        continue;
+      }
+
+      if (isRomanSection(p)){
+        const s = parseRomanSection(p);
+        if (!s) continue;
+
+        const roman = s.roman + ".";
+        const title = s.title;
+
+        const romanX = M_LEFT;
+        const titleX = M_LEFT + 22;
+
+        ensureSpace(2);
+
+        drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
+        drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
+        y -= LINE_H;
+        continue;
+      }
+
+      const lead = parseLeadLabel(p);
+      if (lead){
+        const leadText = lead.lead + ".";
+        const restText = lead.rest;
+
+        const leadW = measureText(bodyFont, leadText, FONT_SIZE);
+        const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+
+        const firstX = M_LEFT + leadW + spaceW;
+        const firstW = Math.max(20, (M_LEFT + MAX_W) - firstX);
+
+        const restWords = tokenizePlain(restText);
+        const widths = restWords.map(w => measureText(bodyFont, w, FONT_SIZE));
+
+        let bestK = 0;
+        let bestScore = 1e18;
+
+        let wAcc = 0;
+        for (let k = 0; k < restWords.length; k++){
+          if (k === 0) wAcc = widths[0];
+          else wAcc += spaceW + widths[k];
+          if (wAcc > firstW) break;
+
+          const slack = firstW - wAcc;
+
+          const remWords = restWords.slice(k+1);
+          let remCost = 0;
+          if (remWords.length){
+            const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
+            const remLines = breakLinesDP(remWords, remWidths, spaceW, MAX_W);
+            remCost = 0;
+            for (let li=0; li<remLines.length; li++){
+              const seg = remLines[li];
+              let lw = 0;
+              for (let t=seg.start; t<seg.end; t++){
+                if (t === seg.start) lw = remWidths[t];
+                else lw += spaceW + remWidths[t];
+              }
+              const isLast = (li === remLines.length - 1);
+              if (!isLast){
+                const s2 = (MAX_W - lw);
+                remCost += (s2*s2);
+              }
+            }
+          }
+
+          const total = (slack*slack) + remCost;
+          if (total < bestScore){
+            bestScore = total;
+            bestK = k;
+          }
         }
 
-        meta.timezone = (Intl && Intl.DateTimeFormat) ? (Intl.DateTimeFormat().resolvedOptions().timeZone || "") : "";
-        meta.platform = (navigator && navigator.platform) ? navigator.platform : "";
-        meta.userAgent = (navigator && navigator.userAgent) ? navigator.userAgent : "";
-        meta.publicIP = await getPublicIP();
+        ensureSpace(1);
 
-        setStored(dataUrl, meta);
-        refreshUI();
+        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
+        drawUnderline(page, M_LEFT, y, leadW);
+
+        if (restWords.length){
+          const firstWords = restWords.slice(0, bestK+1);
+          drawJustifiedPlainLine(firstWords, firstX, firstW, true);
+        } else {
+          y -= LINE_H;
+        }
+
+        const remWords = restWords.slice(bestK+1);
+        if (remWords.length){
+          const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
+          const lines = breakLinesDP(remWords, remWidths, spaceW, MAX_W);
+
+          ensureSpace(lines.length);
+
+          for (let li=0; li<lines.length; li++){
+            const seg = lines[li];
+            const isLast = (li === lines.length - 1);
+            const lineWords = remWords.slice(seg.start, seg.end);
+            drawJustifiedPlainLine(lineWords, M_LEFT, MAX_W, isLast);
+          }
+        }
+        continue;
+      }
+
+      if (p.includes("**")) {
+        const parts = parseInlineBold(p);
+        const tokens = tokenizeStyled(parts);
+
+        const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+        const widths2 = tokens.map(t => measureText(bodyFont, t.text, FONT_SIZE));
+        const words2 = tokens.map(t => t.text);
+
+        const lines2 = breakLinesDP(words2, widths2, spaceW, MAX_W);
+
+        ensureSpace(Math.max(1, lines2.length));
+
+        for (let li=0; li<lines2.length; li++){
+          const seg = lines2[li];
+          const isLast = (li === lines2.length - 1);
+          const lineTokens = tokens.slice(seg.start, seg.end);
+          drawJustifiedStyledLine(lineTokens, M_LEFT, MAX_W, isLast);
+        }
+        continue;
+      }
+
+      const words = tokenizePlain(p);
+      if (!words.length) continue;
+
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+      const widths3 = words.map(w => measureText(bodyFont, w, FONT_SIZE));
+      const lines3 = breakLinesDP(words, widths3, spaceW, MAX_W);
+
+      ensureSpace(Math.max(1, lines3.length));
+
+      for (let li=0; li<lines3.length; li++){
+        const seg = lines3[li];
+        const isLast = (li === lines3.length - 1);
+        const lineWords = words.slice(seg.start, seg.end);
+        drawJustifiedPlainLine(lineWords, M_LEFT, MAX_W, isLast);
+      }
+    }
+
+    if (signaturePending){
+      drawSignatureBlockAtBottomOfLastPage();
+    }
+
+    const totalPages = pages.length;
+    for (let i=0;i<totalPages;i++){
+      drawHeaderFooter(i, totalPages);
+    }
+
+    const out = await pdfDoc.save();
+    return new Uint8Array(out);
+  }
+
+  function setIframePdf(frameEl, bytes){
+    try{
+      const blob = new Blob([bytes], { type:"application/pdf" });
+      const url = URL.createObjectURL(blob);
+      frameEl.src = url;
+      setTimeout(() => { try{ URL.revokeObjectURL(url); } catch{} }, 600000);
+    } catch {}
+  }
+
+  function getStoredValue(key){
+    try{
+      const v1 = localStorage.getItem(key);
+      if (v1) return v1;
+    } catch {}
+    try{
+      const v2 = sessionStorage.getItem(key);
+      if (v2) return v2;
+    } catch {}
+    return "";
+  }
+
+  function getAdoptedTypedSignatureText(){
+    const keys = [
+      "carbyne_adopted_signature_text",
+      "carbyne_adopted_signature_typed",
+      "carbyne_adopted_signature_typed_text",
+      "carbyne_typed_signature",
+      "carbyne_typed_signature_text",
+      "carbyne_signature_text",
+      "carbyne_signature_typed",
+      "carbyne_signature_typed_text",
+      "adopted_signature_text",
+      "adopted_signature_typed",
+      "adopted_signature_typed_text",
+      "typed_signature",
+      "typed_signature_text",
+      "signature_text",
+      "signature_typed",
+      "signature_typed_text"
+    ];
+
+    const globals = [
+      window.__carbyne_adopted_signature_text,
+      window.carbyne_adopted_signature_text,
+      window.carbyneAdoptedSignatureText,
+      window.adoptedSignatureText
+    ].filter(Boolean).map(v => normalize(v));
+
+    for (const g of globals){
+      const s = normalize(g).trim();
+      if (s) return s;
+    }
+
+    for (const k of keys){
+      const v = getStoredValue(k);
+      const s = normalize(v).trim();
+      if (s) return s;
+    }
+
+    return "";
+  }
+
+  function getAdoptedSignatureImageValue(){
+    const keys = [
+      "carbyne_adopted_signature",
+      "carbyne_adopted_signature_png",
+      "carbyne_adopted_signature_b64",
+      "carbyne_adopted_signature_dataurl",
+      "carbyne_adopted_signature_data_url",
+      "carbyne_signature",
+      "carbyne_signature_png",
+      "carbyne_signature_b64",
+      "carbyne_signature_dataurl",
+      "carbyne_signature_data_url",
+      "adopted_signature",
+      "adopted_signature_png",
+      "adopted_signature_b64",
+      "adopted_signature_dataurl",
+      "adopted_signature_data_url"
+    ];
+
+    const globals = [
+      window.__carbyne_adopted_signature_dataurl,
+      window.carbyne_adopted_signature_dataurl,
+      window.carbyneAdoptedSignatureDataUrl,
+      window.carbyneAdoptedSignature,
+      window.adoptedSignatureDataUrl,
+      window.adoptedSignature
+    ].filter(Boolean).map(v => normalize(v));
+
+    for (const g of globals){
+      const s = normalize(g).trim();
+      if (s) return s;
+    }
+
+    for (const k of keys){
+      const v = getStoredValue(k);
+      const s = normalize(v).trim();
+      if (s) return s;
+    }
+
+    return "";
+  }
+
+  function getAdoptedSignature(){
+    // PRIORITY: First check for typed signature text
+    const typedText = getAdoptedTypedSignatureText();
+    if (typedText) {
+      console.log("✅ Found typed signature:", typedText);
+      return { kind:"text", text: typedText };
+    }
+
+    // Fall back to image signature
+    const raw = normalize(getAdoptedSignatureImageValue()).trim();
+    if (!raw) return null;
+
+    if (/^data:image\/png;base64,/i.test(raw)){
+      const b64 = raw.split(",")[1] || "";
+      if (!b64) return null;
+      return { kind:"png", bytes: b64ToBytes(b64) };
+    }
+
+    if (/^data:image\/jpeg;base64,/i.test(raw) || /^data:image\/jpg;base64,/i.test(raw)){
+      const b64 = raw.split(",")[1] || "";
+      if (!b64) return null;
+      return { kind:"jpg", bytes: b64ToBytes(b64) };
+    }
+
+    if (/^[A-Za-z0-9+/=]+$/.test(raw) && raw.length > 200){
+      try { return { kind:"png", bytes: b64ToBytes(raw) }; } catch {}
+    }
+
+    return null;
+  }
+
+  async function cropPngToInk(pngBytes){
+    const dataUrl = bytesToDataUrlPng(pngBytes);
+
+    const img = new Image();
+    img.decoding = "async";
+
+    const loaded = await new Promise((resolve, reject) => {
+      img.onload = () => resolve(true);
+      img.onerror = () => reject(new Error("Image load failed"));
+      img.src = dataUrl;
+    });
+
+    if (!loaded) return pngBytes;
+
+    const w = img.naturalWidth || img.width;
+    const h = img.naturalHeight || img.height;
+    if (!w || !h) return pngBytes;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return pngBytes;
+
+    ctx.clearRect(0,0,w,h);
+    ctx.drawImage(img, 0, 0);
+
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    let minX = w, minY = h, maxX = -1, maxY = -1;
+
+    for (let y = 0; y < h; y++){
+      for (let x = 0; x < w; x++){
+        const idx = (y * w + x) * 4;
+        const a = data[idx + 3];
+        if (a > 10){
+          if (x < minX) minX = x;
+          if (y < minY) minY = y;
+          if (x > maxX) maxX = x;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+
+    if (maxX < 0 || maxY < 0) return pngBytes;
+
+    const pad = 3;
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(w - 1, maxX + pad);
+    maxY = Math.min(h - 1, maxY + pad);
+
+    const cw = Math.max(1, (maxX - minX + 1));
+    const ch = Math.max(1, (maxY - minY + 1));
+
+    const cropCanvas = document.createElement("canvas");
+    cropCanvas.width = cw;
+    cropCanvas.height = ch;
+    const cctx = cropCanvas.getContext("2d");
+    if (!cctx) return pngBytes;
+
+    cctx.clearRect(0,0,cw,ch);
+    cctx.drawImage(canvas, minX, minY, cw, ch, 0, 0, cw, ch);
+
+    const outUrl = cropCanvas.toDataURL("image/png");
+    const outB64 = outUrl.split(",")[1] || "";
+    if (!outB64) return pngBytes;
+
+    try { return b64ToBytes(outB64); } catch { return pngBytes; }
+  }
+
+  async function signPdfBytes(pdfBytes, fontBytes){
+    const lib = window.PDFLib;
+    if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
+    const { PDFDocument, StandardFonts, rgb } = lib;
+
+    const sig = getAdoptedSignature();
+    if (!sig) throw new Error("No adopted signature available");
+
+    console.log("📝 Signature type:", sig.kind);
+
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    // CRITICAL: Embed the Arial Narrow font for the signature
+    let bodyFont = null;
+    const fontkitReady = await ensureFontkit();
+    
+    if (fontkitReady && typeof pdfDoc.registerFontkit === "function") {
+      try{
+        pdfDoc.registerFontkit(window.fontkit);
+        bodyFont = await pdfDoc.embedFont(fontBytes, { subset: true });
+        console.log("✅ Arial Narrow font embedded for signature");
+      } catch (e) {
+        console.error("❌ Failed to embed Arial Narrow for signature:", e);
+        bodyFont = null;
+      }
+    }
+    
+    if (!bodyFont){
+      bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      console.log("⚠️ Using Helvetica fallback for signature");
+    }
+
+    const pages = pdfDoc.getPages();
+    const lastPage = pages[pages.length - 1];
+
+    const PAGE_W = 612;
+    const M_LEFT = 36;
+    const M_RIGHT = 36;
+    const M_BOTTOM = 28.8;
+    const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
+
+    const signatureBlockY = M_BOTTOM + 160;
+    const leftLineX = M_LEFT;
+    const rightLineX = M_LEFT + MAX_W * 0.70;
+    const leftLineW = (rightLineX - leftLineX) - 22;
+    const lineY = signatureBlockY + 6;
+
+    if (sig.kind === "text"){
+      const fontSize = 12;  // Arial Narrow 12pt for typed signatures
+      const maxTextW = Math.max(40, leftLineW - 2);
+
+      let text = normalize(sig.text).replace(/\s+/g, " ").trim();
+      if (!text) throw new Error("No typed signature text available");
+
+      console.log("📝 Drawing typed signature:", text, "at Arial Narrow", fontSize + "pt");
+
+      // Truncate if needed
+      while (text.length > 0 && measureText(bodyFont, text, fontSize) > maxTextW){
+        text = text.slice(0, -1);
+      }
+
+      if (!text) throw new Error("Typed signature did not fit");
+
+      // Draw typed signature at Arial Narrow 12pt, left-aligned on the signature line
+      lastPage.drawText(text, {
+        x: leftLineX,
+        y: lineY - 4,  // Adjusted for 12pt font size
+        size: fontSize,
+        font: bodyFont,
+        color: rgb(0, 0, 0)
+      });
+
+      console.log("✅ Typed signature drawn at x:", leftLineX, "y:", lineY - 4, "size:", fontSize);
+
+    } else {
+      // Draw image signature
+      let embeddedImg = null;
+
+      if (sig.kind === "png"){
+        const cropped = await cropPngToInk(sig.bytes);
+        embeddedImg = await pdfDoc.embedPng(cropped);
+      } else {
+        embeddedImg = await pdfDoc.embedJpg(sig.bytes);
+      }
+
+      const imgNaturalW = embeddedImg.width;
+      const imgNaturalH = embeddedImg.height;
+
+      const maxW = Math.max(60, leftLineW);
+      const maxH = 26;
+
+      const scaleW = maxW / imgNaturalW;
+      const scaleH = maxH / imgNaturalH;
+      const scale = Math.min(scaleW, scaleH, 1);
+
+      const drawW = imgNaturalW * scale;
+      const drawH = imgNaturalH * scale;
+
+      const imgX = leftLineX;
+      const imgY = lineY - 3;
+
+      lastPage.drawImage(embeddedImg, {
+        x: imgX,
+        y: imgY,
+        width: drawW,
+        height: drawH
+      });
+
+      console.log("✅ Image signature drawn at x:", imgX, "y:", imgY);
+    }
+
+    const out = await pdfDoc.save();
+    return new Uint8Array(out);
+  }
+
+  window.carbyne_masterserviceagreement_page_mount = async function(args){
+    const root = args && args.root ? args.root : document;
+    const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
+
+    const frame = root.querySelector("#msaFrame");
+    const signBtn = root.querySelector("#msaSignBtn");
+
+    let done = false;
+
+    let latestPdfBytes = null;
+    let latestFontBytes = null;
+
+    function safeDisable(){ try{ if (signBtn) signBtn.disabled = true; } catch {} }
+    function safeEnable(){ try{ if (signBtn) signBtn.disabled = false; } catch {} }
+
+    safeDisable();
+    setStatus(root, "Loading agreement…");
+
+    try{
+      const [txt, fontBytes] = await Promise.all([
+        fetchText(AGREEMENT_TXT_URL),
+        fetchBytes(ARIAL_NARROW_TTF_URL)
+      ]);
+
+      latestFontBytes = fontBytes;
+
+      const pdfBytes = await buildAgreementPdfBytes(referenceNumber, txt, fontBytes);
+      latestPdfBytes = pdfBytes;
+
+      if (frame) setIframePdf(frame, pdfBytes);
+
+      try{
+        const b64 = bytesToB64(pdfBytes);
+        window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+          detail: {
+            id: DOC_ID,
+            title: DOC_TITLE,
+            b64: b64,
+            meta: {
+              referenceNumber: referenceNumber || "",
+              createdAt: stamp()
+            }
+          }
+        }));
+      } catch {}
+
+      setStatus(root, "Ready", "good");
+      safeEnable();
+
+    } catch (e){
+      setStatus(root, "Unable to load agreement.", "bad");
+      safeDisable();
+      console.error("MSA load error:", e);
+    }
+
+    async function onSign(){
+      if (done) return;
+      if (!latestPdfBytes || !latestFontBytes) return;
+
+      safeDisable();
+      setStatus(root, "Signing…");
+
+      try{
+        const signedBytes = await signPdfBytes(latestPdfBytes, latestFontBytes);
+        latestPdfBytes = signedBytes;
+
+        if (frame) setIframePdf(frame, signedBytes);
 
         try{
-          const b64 = await buildSignaturePdfB64(referenceNumber, dataUrl, meta);
+          const b64 = bytesToB64(signedBytes);
           window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
             detail: {
-              id: DOC_ID_SIG,
-              title: "Electronic Signature",
+              id: DOC_ID,
+              title: DOC_TITLE,
               b64: b64,
               meta: {
                 referenceNumber: referenceNumber || "",
                 createdAt: stamp(),
-                publicIP: meta.publicIP || ""
+                signedAt: stamp()
               }
             }
           }));
         } catch {}
 
-        window.dispatchEvent(new CustomEvent("carbyne:signature:adopted", { detail: { dataUrl, meta } }));
+        setStatus(root, "Signed", "good");
+        safeEnable();
+      } catch (e){
+        setStatus(root, "Unable to sign document.", "bad");
+        console.error("MSA sign error:", e);
+        safeEnable();
       }
+    }
 
-      function clearAll(){
-        clearStored();
-        clearCanvas();
-        typeInput.value = "";
-        typePreview.textContent = "";
-        hasTypeInk = false;
-        refreshUI();
-      }
+    try{ if (signBtn) signBtn.addEventListener("click", onSign); } catch {}
 
-      function onTypeInput(){
-        const typed = normalize(typeInput.value);
-        const val = typed ? ("/s/ " + typed) : "";
-        typePreview.textContent = val;
-        hasTypeInk = !!typed;
-        refreshUI();
-      }
-
-      function startDraw(e){
-        if (mode !== "Draw") return;
-        drawing = true;
-
-        resizeCanvasToCSS(canvas);
-
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.strokeStyle = "#0f172a";
-        ctx.lineWidth = parseInt(stroke.value || "3",10) * (window.devicePixelRatio || 1);
-
-        const p = getPoint(e, canvas);
-        const dpr = window.devicePixelRatio || 1;
-        ctx.beginPath();
-        ctx.moveTo(p.x * dpr, p.y * dpr);
-
-        e.preventDefault();
-      }
-
-      function moveDraw(e){
-        if (!drawing || mode !== "Draw") return;
-        const p = getPoint(e, canvas);
-        const dpr = window.devicePixelRatio || 1;
-        ctx.lineTo(p.x * dpr, p.y * dpr);
-        ctx.stroke();
-        markDrawHasInk();
-        refreshUI();
-        e.preventDefault();
-      }
-
-      function endDraw(){
-        if (mode !== "Draw") return;
-        drawing = false;
-      }
-
-      function onResize(){
-        if (mode !== "Draw") return;
-        const prev = canvas.toDataURL("image/png");
-        resizeCanvasToCSS(canvas);
-        const img = new Image();
-        img.onload = () => {
-          ctx.clearRect(0,0,canvas.width,canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        };
-        img.src = prev;
-      }
-
-      function init(){
-        resizeCanvasToCSS(canvas);
-        drawStatus.classList.add("bad");
-
-        modeDrawBtn.addEventListener("click", ()=>setMode("Draw"));
-        modeTypeBtn.addEventListener("click", ()=>setMode("Type"));
-
-        typeInput.addEventListener("input", onTypeInput);
-
-        clearTop.addEventListener("click", clearAll);
-        clearDraw.addEventListener("click", ()=>{ clearCanvas(); refreshUI(); });
-        clearType.addEventListener("click", ()=>{ typeInput.value=""; typePreview.textContent=""; hasTypeInk=false; refreshUI(); });
-
-        adoptTop.addEventListener("click", ()=>{ adopt(); });
-
-        canvas.addEventListener("mousedown", startDraw);
-        canvas.addEventListener("mousemove", moveDraw);
-        window.addEventListener("mouseup", endDraw);
-
-        canvas.addEventListener("touchstart", startDraw, { passive:false });
-        canvas.addEventListener("touchmove", moveDraw, { passive:false });
-        window.addEventListener("touchend", endDraw);
-
-        window.addEventListener("resize", onResize);
-
-        const stored = getStored();
-        if (stored && stored.dataUrl){
-          setAdoptedUI(root, stored.dataUrl);
-        }
-
-        refreshUI();
-      }
-
-      init();
-
-      return function unmount(){
-        modeDrawBtn.replaceWith(modeDrawBtn.cloneNode(true));
-        modeTypeBtn.replaceWith(modeTypeBtn.cloneNode(true));
-        clearTop.replaceWith(clearTop.cloneNode(true));
-        adoptTop.replaceWith(adoptTop.cloneNode(true));
-        clearDraw.replaceWith(clearDraw.cloneNode(true));
-        clearType.replaceWith(clearType.cloneNode(true));
-        typeInput.replaceWith(typeInput.cloneNode(true));
-
-        canvas.removeEventListener("mousedown", startDraw);
-        canvas.removeEventListener("mousemove", moveDraw);
-        window.removeEventListener("mouseup", endDraw);
-
-        canvas.removeEventListener("touchstart", startDraw);
-        canvas.removeEventListener("touchmove", moveDraw);
-        window.removeEventListener("touchend", endDraw);
-
-        window.removeEventListener("resize", onResize);
-      };
+    return function unmount(){
+      done = true;
+      try{ if (signBtn) signBtn.removeEventListener("click", onSign); } catch {}
+      try{ if (frame) frame.src = "about:blank"; } catch {}
     };
-  })();
+  };
+})();
 </script>
 
 </body>
