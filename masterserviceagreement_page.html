@@ -1140,6 +1140,7 @@
     const M_RIGHT = 36;
     const M_BOTTOM = 28.8;
     const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
+    const LINE_H = 13;
 
     const signatureBlockY = M_BOTTOM + 160;
     const leftLineX = M_LEFT;
@@ -1236,6 +1237,43 @@
     });
 
     console.log("✅ Date drawn:", dateText, "at x:", rightLineX, "y:", lineY + 2, "size:", dateFontSize);
+
+    // NEW: Add printed name and title above the Printed Name and Title line
+    const gapBetweenRows = 3 * LINE_H;
+    const printedNameLineY = lineY - gapBetweenRows;
+
+    // Get intake data for name and title
+    const intakeData = getIntakeData();
+    let printedNameAndTitle = "";
+
+    if (intakeData) {
+      const firstName = normalize(intakeData.bi_first_name || "").trim();
+      const lastName = normalize(intakeData.bi_last_name || "").trim();
+      const title = normalize(intakeData.bi_title || "").trim();
+
+      const fullName = [firstName, lastName].filter(Boolean).join(" ");
+      
+      if (fullName && title) {
+        printedNameAndTitle = `${fullName}, ${title}`;
+      } else if (fullName) {
+        printedNameAndTitle = fullName;
+      }
+    }
+
+    if (printedNameAndTitle) {
+      const printedFontSize = 10; // Arial Narrow 10pt
+
+      // Draw printed name and title ABOVE the Printed Name and Title line
+      lastPage.drawText(printedNameAndTitle, {
+        x: leftLineX,
+        y: printedNameLineY + 2, // Same offset as signature (above the line)
+        size: printedFontSize,
+        font: bodyFont,
+        color: rgb(0, 0, 0)
+      });
+
+      console.log("✅ Printed name and title drawn:", printedNameAndTitle, "at x:", leftLineX, "y:", printedNameLineY + 2);
+    }
 
     const out = await pdfDoc.save();
     return new Uint8Array(out);
