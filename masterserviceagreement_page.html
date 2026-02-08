@@ -669,7 +669,8 @@
 
       page = pages[pages.length - 1];
 
-      y = M_BOTTOM + 170;
+      /* Move signature block DOWN a little bit */
+      y = M_BOTTOM + 160;
 
       const gapBetweenRows = 3 * LINE_H;
 
@@ -743,7 +744,6 @@
         const romanX = M_LEFT;
         const titleX = M_LEFT + 22;
 
-        /* Prevent a section header from being the last line on a page */
         ensureSpace(2);
 
         drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
