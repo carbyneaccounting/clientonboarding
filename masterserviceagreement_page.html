@@ -898,20 +898,49 @@
     } catch {}
   }
 
+  function getStoredValue(key){
+    try{
+      const v1 = localStorage.getItem(key);
+      if (v1) return v1;
+    } catch {}
+    try{
+      const v2 = sessionStorage.getItem(key);
+      if (v2) return v2;
+    } catch {}
+    return "";
+  }
+
   function getAdoptedSignatureBytes(){
     const candidates = [
+      "carbyne_adopted_signature",
       "carbyne_adopted_signature_png",
-      "carbyne_signature_png",
       "carbyne_adopted_signature_b64",
+      "carbyne_adopted_signature_dataurl",
+      "carbyne_adopted_signature_data_url",
+      "carbyne_signature",
+      "carbyne_signature_png",
       "carbyne_signature_b64",
-      "carbyne_adopted_signature"
+      "carbyne_signature_dataurl",
+      "carbyne_signature_data_url",
+      "adopted_signature",
+      "adopted_signature_png",
+      "adopted_signature_b64",
+      "adopted_signature_dataurl",
+      "adopted_signature_data_url"
     ];
 
-    for (const key of candidates){
-      const v = localStorage.getItem(key);
-      if (!v) continue;
+    const globals = [
+      window.__carbyne_adopted_signature_dataurl,
+      window.carbyne_adopted_signature_dataurl,
+      window.carbyneAdoptedSignatureDataUrl,
+      window.carbyneAdoptedSignature,
+      window.adoptedSignatureDataUrl,
+      window.adoptedSignature
+    ].filter(Boolean).map(v => normalize(v));
 
-      const s = normalize(v).trim();
+    const tryValue = (val) => {
+      const s = normalize(val).trim();
+      if (!s) return null;
 
       if (/^data:image\/png;base64,/i.test(s)){
         const b64 = s.split(",")[1] || "";
@@ -926,6 +955,20 @@
       if (/^[A-Za-z0-9+/=]+$/.test(s) && s.length > 200){
         try { return { kind:"png", bytes: b64ToBytes(s) }; } catch {}
       }
+
+      return null;
+    };
+
+    for (const g of globals){
+      const got = tryValue(g);
+      if (got) return got;
+    }
+
+    for (const key of candidates){
+      const v = getStoredValue(key);
+      if (!v) continue;
+      const got = tryValue(v);
+      if (got) return got;
     }
 
     return null;
@@ -937,7 +980,7 @@
     const { PDFDocument, StandardFonts } = lib;
 
     const sig = getAdoptedSignatureBytes();
-    if (!sig) throw new Error("No signature available");
+    if (!sig) throw new Error("No adopted signature available");
 
     const pdfDoc = await PDFDocument.load(pdfBytes);
 
@@ -1089,6 +1132,7 @@
         } catch {}
 
         setStatus(root, "Signed", "good");
+        safeEnable();
       } catch (e){
         setStatus(root, "Unable to sign document.", "bad");
         console.error("MSA sign error:", e);
