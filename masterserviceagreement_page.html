@@ -11,12 +11,28 @@
 <template id="carbyne_masterserviceagreement_page">
   <style>
     .msa-wrap{width:100%}
+
     .msa-h{
       display:flex;
       flex-direction:column;
       gap:6px;
       padding:2px 2px 12px;
     }
+
+    .msa-headrow{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .msa-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+
     .msa-title{
       margin:0;
       font-size:18px;
@@ -24,6 +40,7 @@
       color:#0b2f4e;
       letter-spacing:.2px;
     }
+
     .msa-sub{
       margin:0;
       font-size:12px;
@@ -33,31 +50,13 @@
       line-height:1.45;
     }
 
-    .msa-view{
-      width:100%;
-      border:1px solid rgba(0,0,0,.12);
-      border-radius:12px;
-      overflow:hidden;
-      background:#fff;
-      box-shadow:0 10px 22px rgba(2,6,23,.08);
-      position:relative;
-    }
-
-    .msa-iframe{
-      width:100%;
-      height:430px;
-      border:0;
-      display:block;
-      background:#fff;
-    }
-
-    /* Actions moved ABOVE the viewer */
+    /* Actions ABOVE the viewer, aligned with the header text */
     .msa-actions{
       display:flex;
       align-items:center;
       justify-content:flex-end;
       gap:8px;
-      margin:0 0 10px;
+      flex-shrink:0;
     }
 
     .msa-btn{
@@ -95,21 +94,43 @@
       box-shadow:0 4px 12px rgba(2,6,23,.08);
       border:1px solid rgba(0,0,0,.08);
       pointer-events:auto;
+      white-space:nowrap;
     }
     .msa-status.bad{color:#b91c1c;opacity:1}
     .msa-status.good{color:#0a7a3a;opacity:1}
+
+    .msa-view{
+      width:100%;
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+      box-shadow:0 10px 22px rgba(2,6,23,.08);
+      position:relative;
+    }
+
+    .msa-iframe{
+      width:100%;
+      height:430px;
+      border:0;
+      display:block;
+      background:#fff;
+    }
   </style>
 
   <div class="msa-wrap" id="msaRoot">
     <div class="msa-h">
-      <h2 class="msa-title">Master Service Agreement</h2>
-      <p class="msa-sub">Review the agreement below. When you are ready, select Electronic Sign.</p>
-    </div>
+      <div class="msa-headrow">
+        <div class="msa-left">
+          <h2 class="msa-title">Master Service Agreement</h2>
+          <p class="msa-sub">Review the agreement below. When you are ready, select Electronic Sign.</p>
+        </div>
 
-    <!-- MOVED ABOVE PDF VIEWER -->
-    <div class="msa-actions">
-      <div class="msa-status" id="msaStatus">Loading agreement…</div>
-      <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Electronic Sign</button>
+        <div class="msa-actions">
+          <div class="msa-status" id="msaStatus">Loading agreement…</div>
+          <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Electronic Sign</button>
+        </div>
+      </div>
     </div>
 
     <div class="msa-view">
