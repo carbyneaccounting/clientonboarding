@@ -688,17 +688,17 @@
       page.drawLine({ start:{x:leftLineX,y:lineY}, end:{x:leftLineX+leftLineW,y:lineY}, thickness:0.9 });
       page.drawLine({ start:{x:rightLineX,y:lineY}, end:{x:rightLineX+rightLineW,y:lineY}, thickness:0.9 });
 
-      const labelY = y - (13 - 2);
-      page.drawText("Signature of Authorized Signatory", { x: leftLineX, y: labelY, size: 10, font: bodyFont });
-      page.drawText("Date", { x: rightLineX, y: labelY, size: 10, font: bodyFont });
+      const labelY = y - (LINE_H - 2);
+      page.drawText("Signature of Authorized Signatory", { x: leftLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
+      page.drawText("Date", { x: rightLineX, y: labelY, size: FONT_SIZE, font: bodyFont });
 
       y -= gapBetweenRows;
 
       const pnLineY = y + 6;
       page.drawLine({ start:{x:leftLineX,y:pnLineY}, end:{x:leftLineX+leftLineW,y:pnLineY}, thickness:0.9 });
-      page.drawText("Printed Name and Title", { x: leftLineX, y: y - (13 - 2), size: 10, font: bodyFont });
+      page.drawText("Printed Name and Title", { x: leftLineX, y: y - (LINE_H - 2), size: FONT_SIZE, font: bodyFont });
 
-      y -= (2 * 13);
+      y -= (2 * LINE_H);
 
       page = savedPage;
       y = savedY;
@@ -749,9 +749,9 @@
 
         ensureSpace(2);
 
-        drawBold(page, bodyFont, roman, romanX, y, 10);
-        drawBold(page, bodyFont, title, titleX, y, 10);
-        y -= 13;
+        drawBold(page, bodyFont, roman, romanX, y, FONT_SIZE);
+        drawBold(page, bodyFont, title, titleX, y, FONT_SIZE);
+        y -= LINE_H;
         continue;
       }
 
@@ -760,14 +760,14 @@
         const leadText = lead.lead + ".";
         const restText = lead.rest;
 
-        const leadW = measureText(bodyFont, leadText, 10);
-        const spaceW = measureText(bodyFont, " ", 10);
+        const leadW = measureText(bodyFont, leadText, FONT_SIZE);
+        const spaceW = measureText(bodyFont, " ", FONT_SIZE);
 
         const firstX = M_LEFT + leadW + spaceW;
         const firstW = Math.max(20, (M_LEFT + MAX_W) - firstX);
 
         const restWords = tokenizePlain(restText);
-        const widths = restWords.map(w => measureText(bodyFont, w, 10));
+        const widths = restWords.map(w => measureText(bodyFont, w, FONT_SIZE));
 
         let bestK = 0;
         let bestScore = 1e18;
@@ -783,7 +783,7 @@
           const remWords = restWords.slice(k+1);
           let remCost = 0;
           if (remWords.length){
-            const remWidths = remWords.map(w => measureText(bodyFont, w, 10));
+            const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
             const remLines = breakLinesDP(remWords, remWidths, spaceW, MAX_W);
             remCost = 0;
             for (let li=0; li<remLines.length; li++){
@@ -810,19 +810,19 @@
 
         ensureSpace(1);
 
-        page.drawText(leadText, { x: M_LEFT, y, size: 10, font: bodyFont });
+        page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
         drawUnderline(page, M_LEFT, y, leadW);
 
         if (restWords.length){
           const firstWords = restWords.slice(0, bestK+1);
           drawJustifiedPlainLine(firstWords, firstX, firstW, true);
         } else {
-          y -= 13;
+          y -= LINE_H;
         }
 
         const remWords = restWords.slice(bestK+1);
         if (remWords.length){
-          const remWidths = remWords.map(w => measureText(bodyFont, w, 10));
+          const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
           const lines = breakLinesDP(remWords, remWidths, spaceW, MAX_W);
 
           ensureSpace(lines.length);
@@ -841,8 +841,8 @@
         const parts = parseInlineBold(p);
         const tokens = tokenizeStyled(parts);
 
-        const spaceW = measureText(bodyFont, " ", 10);
-        const widths2 = tokens.map(t => measureText(bodyFont, t.text, 10));
+        const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+        const widths2 = tokens.map(t => measureText(bodyFont, t.text, FONT_SIZE));
         const words2 = tokens.map(t => t.text);
 
         const lines2 = breakLinesDP(words2, widths2, spaceW, MAX_W);
@@ -861,8 +861,8 @@
       const words = tokenizePlain(p);
       if (!words.length) continue;
 
-      const spaceW = measureText(bodyFont, " ", 10);
-      const widths3 = words.map(w => measureText(bodyFont, w, 10));
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+      const widths3 = words.map(w => measureText(bodyFont, w, FONT_SIZE));
       const lines3 = breakLinesDP(words, widths3, spaceW, MAX_W);
 
       ensureSpace(Math.max(1, lines3.length));
@@ -909,8 +909,20 @@
     return "";
   }
 
-  function getAdoptedSignatureBytes(){
+  function getAdoptedSignatureValue(){
     const candidates = [
+      "carbyne_adopted_signature_text",
+      "carbyne_adopted_signature_typed",
+      "carbyne_adopted_signature_name",
+      "carbyne_typed_signature",
+      "carbyne_signature_text",
+      "carbyne_signature_typed",
+      "adopted_signature_text",
+      "adopted_signature_typed",
+      "typed_signature",
+      "signature_text",
+      "signature_typed",
+
       "carbyne_adopted_signature",
       "carbyne_adopted_signature_png",
       "carbyne_adopted_signature_b64",
@@ -934,51 +946,58 @@
       window.carbyneAdoptedSignatureDataUrl,
       window.carbyneAdoptedSignature,
       window.adoptedSignatureDataUrl,
-      window.adoptedSignature
+      window.adoptedSignature,
+
+      window.__carbyne_adopted_signature_text,
+      window.carbyne_adopted_signature_text,
+      window.carbyneAdoptedSignatureText,
+      window.adoptedSignatureText
     ].filter(Boolean).map(v => normalize(v));
 
-    const tryValue = (val) => {
-      const s = normalize(val).trim();
-      if (!s) return null;
-
-      if (/^data:image\/png;base64,/i.test(s)){
-        const b64 = s.split(",")[1] || "";
-        if (b64) return { kind:"png", bytes: b64ToBytes(b64) };
-      }
-
-      if (/^data:image\/jpeg;base64,/i.test(s) || /^data:image\/jpg;base64,/i.test(s)){
-        const b64 = s.split(",")[1] || "";
-        if (b64) return { kind:"jpg", bytes: b64ToBytes(b64) };
-      }
-
-      if (/^[A-Za-z0-9+/=]+$/.test(s) && s.length > 200){
-        try { return { kind:"png", bytes: b64ToBytes(s) }; } catch {}
-      }
-
-      return null;
-    };
-
     for (const g of globals){
-      const got = tryValue(g);
-      if (got) return got;
+      const s = normalize(g).trim();
+      if (s) return s;
     }
 
     for (const key of candidates){
       const v = getStoredValue(key);
-      if (!v) continue;
-      const got = tryValue(v);
-      if (got) return got;
+      const s = normalize(v).trim();
+      if (s) return s;
     }
 
-    return null;
+    return "";
+  }
+
+  function getAdoptedSignature(){
+    const raw = getAdoptedSignatureValue();
+    const s = normalize(raw).trim();
+    if (!s) return null;
+
+    if (/^data:image\/png;base64,/i.test(s)){
+      const b64 = s.split(",")[1] || "";
+      if (!b64) return null;
+      return { kind:"png", bytes: b64ToBytes(b64) };
+    }
+
+    if (/^data:image\/jpeg;base64,/i.test(s) || /^data:image\/jpg;base64,/i.test(s)){
+      const b64 = s.split(",")[1] || "";
+      if (!b64) return null;
+      return { kind:"jpg", bytes: b64ToBytes(b64) };
+    }
+
+    if (/^[A-Za-z0-9+/=]+$/.test(s) && s.length > 200){
+      try { return { kind:"png", bytes: b64ToBytes(s) }; } catch {}
+    }
+
+    return { kind:"text", text: s };
   }
 
   async function signPdfBytes(pdfBytes, fontBytes){
     const lib = window.PDFLib;
     if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
-    const { PDFDocument, StandardFonts } = lib;
+    const { PDFDocument, StandardFonts, rgb } = lib;
 
-    const sig = getAdoptedSignatureBytes();
+    const sig = getAdoptedSignature();
     if (!sig) throw new Error("No adopted signature available");
 
     const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -1013,33 +1032,53 @@
     const leftLineW = (rightLineX - leftLineX) - 22;
     const lineY = signatureBlockY + 6;
 
-    let embeddedImg = null;
-    if (sig.kind === "png") embeddedImg = await pdfDoc.embedPng(sig.bytes);
-    else embeddedImg = await pdfDoc.embedJpg(sig.bytes);
+    if (sig.kind === "text"){
+      const fontSize = 10;
+      const maxTextW = Math.max(40, leftLineW - 2);
+      let text = normalize(sig.text).replace(/\s+/g, " ").trim();
 
-    const imgNaturalW = embeddedImg.width;
-    const imgNaturalH = embeddedImg.height;
+      if (text){
+        while (text.length > 0 && measureText(bodyFont, text, fontSize) > maxTextW){
+          text = text.slice(0, -1);
+        }
+        if (text){
+          lastPage.drawText(text, {
+            x: leftLineX,
+            y: lineY + 2,
+            size: fontSize,
+            font: bodyFont,
+            color: rgb(0,0,0)
+          });
+        }
+      }
+    } else {
+      let embeddedImg = null;
+      if (sig.kind === "png") embeddedImg = await pdfDoc.embedPng(sig.bytes);
+      else embeddedImg = await pdfDoc.embedJpg(sig.bytes);
 
-    const maxW = Math.max(60, leftLineW - 0);
-    const maxH = 26;
+      const imgNaturalW = embeddedImg.width;
+      const imgNaturalH = embeddedImg.height;
 
-    const scaleW = maxW / imgNaturalW;
-    const scaleH = maxH / imgNaturalH;
-    const scale = Math.min(scaleW, scaleH, 1);
+      const maxW = Math.max(60, leftLineW - 0);
+      const maxH = 26;
 
-    const drawW = imgNaturalW * scale;
-    const drawH = imgNaturalH * scale;
+      const scaleW = maxW / imgNaturalW;
+      const scaleH = maxH / imgNaturalH;
+      const scale = Math.min(scaleW, scaleH, 1);
 
-    /* ALIGN SIGNATURE TO THE LEFT EDGE OF THE LINE */
-    const imgX = leftLineX;
-    const imgY = lineY + 2;
+      const drawW = imgNaturalW * scale;
+      const drawH = imgNaturalH * scale;
 
-    lastPage.drawImage(embeddedImg, {
-      x: imgX,
-      y: imgY,
-      width: drawW,
-      height: drawH
-    });
+      const imgX = leftLineX;
+      const imgY = lineY + 2;
+
+      lastPage.drawImage(embeddedImg, {
+        x: imgX,
+        y: imgY,
+        width: drawW,
+        height: drawH
+      });
+    }
 
     const out = await pdfDoc.save();
     return new Uint8Array(out);
