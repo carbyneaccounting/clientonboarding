@@ -1,4 +1,4 @@
-<!-- ui.html - Complete Refactored Client Onboarding System -->
+<!-- ui.html - Complete Client Onboarding System -->
 <!doctype html>
 <html lang="en">
 <head>
@@ -15,7 +15,7 @@
 
   <style>
     /* ========================================================================
-       COMPLETE REFACTORED STYLES
+       COMPLETE STYLES
        ======================================================================== */
     
     * { box-sizing: border-box; }
@@ -615,7 +615,7 @@
 
   <script>
     /* ========================================================================
-       COMPLETE REFACTORED JAVASCRIPT
+       JAVASCRIPT
        ======================================================================== */
 
     // ========================================================================
@@ -632,10 +632,11 @@
     const TARGET_HEADER = "Unique Identifier";
     const CACHE_KEY = "carbyne_valid_codes_cache";
     const CACHE_TS_KEY = "carbyne_valid_codes_timestamp";
-    const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+    const CACHE_DURATION = 24 * 60 * 60 * 1000;
 
     const CLIENT_INTAKE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/clientintakeform.html";
     const SIGNATURE_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/electronicsignature.html";
+    const MSA_URL = "https://raw.githubusercontent.com/carbyneaccounting/clientonboarding/refs/heads/main/masterserviceagreement_page.html";
 
     const PACKET_KEY = "carbyne_pdf_packet_v1";
 
@@ -722,14 +723,6 @@
       } catch {}
     }
 
-    function findHeaderIndex(headers) {
-      const target = TARGET_HEADER.toLowerCase();
-      for (let i = 0; i < headers.length; i++) {
-        if (normalize(headers[i]).toLowerCase() === target) return i;
-      }
-      return -1;
-    }
-
     async function fetchValidCodes() {
       if (isFetching) {
         while (isFetching) await new Promise(r => setTimeout(r, 100));
@@ -750,19 +743,62 @@
         if (!rows || rows.length < 2) throw new Error("No rows");
         
         const headers = rows[0] || [];
-        const idx = findHeaderIndex(headers);
-        if (idx < 0) throw new Error("Missing header");
+        const uniqueIdIdx = headers.findIndex(h => normalize(h).toLowerCase() === "unique identifier");
+        
+        if (uniqueIdIdx < 0) throw new Error("Missing header");
 
         const codes = [];
         for (let r = 1; r < rows.length; r++) {
-          const cell = normalize((rows[r] || [])[idx] || "");
+          const cell = normalize((rows[r] || [])[uniqueIdIdx] || "");
           if (cell) codes.push(cell.toLowerCase());
         }
         
         setCachedCodes(codes);
+        
+        // Store the full data for A and R extraction
+        try {
+          localStorage.setItem("carbyne_excel_data", JSON.stringify({ headers, rows }));
+        } catch {}
+        
         return codes;
       } finally {
         isFetching = false;
+      }
+    }
+
+    function getColumnValuesForCode(code) {
+      try {
+        const rawData = localStorage.getItem("carbyne_excel_data");
+        if (!rawData) return { columnA: "", columnR: "" };
+        
+        const { headers, rows } = JSON.parse(rawData);
+        
+        const uniqueIdIdx = headers.findIndex(h => normalize(h).toLowerCase() === "unique identifier");
+        const columnAIdx = headers.findIndex(h => normalize(h).toLowerCase() === "a");
+        const columnRIdx = headers.findIndex(h => normalize(h).toLowerCase() === "r");
+        
+        if (uniqueIdIdx < 0 || columnAIdx < 0 || columnRIdx < 0) {
+          return { columnA: "", columnR: "" };
+        }
+        
+        const needle = normalize(code).toLowerCase();
+        
+        for (let r = 1; r < rows.length; r++) {
+          const row = rows[r] || [];
+          const rowCode = normalize(row[uniqueIdIdx] || "").toLowerCase();
+          
+          if (rowCode === needle) {
+            const columnA = normalize(row[columnAIdx] || "").trim();
+            const columnR = normalize(row[columnRIdx] || "").trim();
+            console.log("Found matching row - Column A:", columnA, "Column R:", columnR);
+            return { columnA, columnR };
+          }
+        }
+        
+        return { columnA: "", columnR: "" };
+      } catch (e) {
+        console.error("Error getting column values:", e);
+        return { columnA: "", columnR: "" };
       }
     }
 
@@ -772,12 +808,30 @@
       
       if (cached && Array.isArray(cached)) {
         fetchValidCodes().catch(() => {});
-        return cached.includes(needle);
+        const isValid = cached.includes(needle);
+        
+        if (isValid) {
+          const values = getColumnValuesForCode(code);
+          localStorage.setItem("carbyne_column_a", values.columnA);
+          localStorage.setItem("carbyne_column_r", values.columnR);
+          console.log("Stored column A:", values.columnA, "column R:", values.columnR);
+        }
+        
+        return isValid;
       }
       
       try {
         const codes = await fetchValidCodes();
-        return codes.includes(needle);
+        const isValid = codes.includes(needle);
+        
+        if (isValid) {
+          const values = getColumnValuesForCode(code);
+          localStorage.setItem("carbyne_column_a", values.columnA);
+          localStorage.setItem("carbyne_column_r", values.columnR);
+          console.log("Stored column A:", values.columnA, "column R:", values.columnR);
+        }
+        
+        return isValid;
       } catch {
         return false;
       }
@@ -803,7 +857,6 @@
         stepText.textContent = "Step " + step + " of " + TOTAL_STEPS;
       }
 
-      // Disable Previous button on page 1 (access code) OR page 2 (welcome)
       prevBtn.disabled = currentPage === 1 || currentPage === 2;
       nextBtn.disabled = currentPage === TOTAL_PAGES;
       if (currentPage === 1) nextBtn.disabled = true;
@@ -812,7 +865,7 @@
     }
 
     function prev() {
-      if (currentPage > 2) { // Can't go back past page 2 (welcome page)
+      if (currentPage > 2) {
         currentPage--;
         loadPage(currentPage);
       }
@@ -952,7 +1005,6 @@
         return;
       }
 
-      // Try to use PDFViewer overlay
       if (window.PDFViewer && typeof window.PDFViewer.open === "function") {
         const data = (outBytes instanceof Uint8Array) ? outBytes : new Uint8Array(outBytes);
         await window.PDFViewer.open(data, {
@@ -960,7 +1012,6 @@
           onBack: function() {}
         });
       } else {
-        // Fallback to new tab
         const blob = new Blob([outBytes], { type: "application/pdf" });
         const url = URL.createObjectURL(blob);
         window.open(url, "_blank");
@@ -982,6 +1033,9 @@
         localStorage.removeItem(STORAGE_KEY_PAGE);
         localStorage.removeItem(CACHE_KEY);
         localStorage.removeItem(CACHE_TS_KEY);
+        localStorage.removeItem("carbyne_column_a");
+        localStorage.removeItem("carbyne_column_r");
+        localStorage.removeItem("carbyne_excel_data");
         sessionStorage.removeItem(PACKET_KEY);
       } catch {}
     }
@@ -1064,7 +1118,6 @@
         const text = await res.text();
         const doc = new DOMParser().parseFromString(text, "text/html");
 
-        // Load styles
         const styles = Array.from(doc.querySelectorAll("style"));
         styles.forEach((st, idx) => {
           const css = (st.textContent || "").trim();
@@ -1077,7 +1130,6 @@
           document.head.appendChild(s);
         });
 
-        // Load scripts
         const scripts = Array.from(doc.querySelectorAll("script"));
         for (let i = 0; i < scripts.length; i++) {
           const sc = scripts[i];
@@ -1283,6 +1335,31 @@
       }
     }
 
+    async function loadMasterServiceAgreement(secureCode) {
+      unmountActive();
+      
+      const shell = buildShell(secureCode);
+      const content = shell.querySelector("#content");
+      content.innerHTML = `<div id="msaHost"></div>`;
+      
+      stage.innerHTML = "";
+      stage.appendChild(shell);
+
+      const host = content.querySelector("#msaHost");
+      try {
+        await loadExternalModule(
+          MSA_URL,
+          "carbyne_masterserviceagreement_page",
+          "carbyne_masterserviceagreement_page_mount",
+          host,
+          secureCode
+        );
+      } catch (e) {
+        host.innerHTML = `<div style="font-weight:950;color:#0f172a;opacity:.85;">Unable to load agreement.</div>`;
+        console.error("MSA load error:", e);
+      }
+    }
+
     function loadPlaceholder(secureCode) {
       unmountActive();
       
@@ -1329,6 +1406,11 @@
         return;
       }
 
+      if (n === 5) {
+        await loadMasterServiceAgreement(code);
+        return;
+      }
+
       loadPlaceholder(code);
     }
 
@@ -1344,7 +1426,6 @@
       } catch {}
     });
 
-    // Detect if user is returning to page via back button
     window.addEventListener("pageshow", function(event) {
       if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
         clearAllStorage();
@@ -1360,30 +1441,24 @@
       const hasStoredCode = !!localStorage.getItem(STORAGE_KEY_CODE);
       
       if (!hasStoredCode) {
-        // No stored code - start at page 1
         isAccessValidated = false;
         currentPage = 1;
       } else {
-        // Has stored code - resume where they left off (but at least page 2)
         isAccessValidated = true;
         const saved = parseInt(localStorage.getItem(STORAGE_KEY_PAGE) || "2", 10) || 2;
         currentPage = Math.max(2, Math.min(TOTAL_PAGES, saved));
       }
 
-      // Pre-fetch valid codes
       if (!getCachedCodes()) {
         fetchValidCodes().catch(() => {});
       }
 
-      // Attach event listeners
       prevBtn.addEventListener("click", prev);
       nextBtn.addEventListener("click", next);
 
-      // Load initial page
       loadPage(currentPage);
     }
 
-    // Start the application
     init();
   </script>
 </body>
