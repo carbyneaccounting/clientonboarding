@@ -127,7 +127,7 @@
 
         <div class="msa-actions">
           <div class="msa-status" id="msaStatus">Loading agreement…</div>
-          <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Electronic Sign</button>
+          <button class="msa-btn primary" id="msaSignBtn" type="button" disabled>Sign Document</button>
         </div>
       </div>
     </div>
@@ -159,6 +159,13 @@
       s += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
     }
     return btoa(s);
+  }
+
+  function b64ToBytes(b64){
+    const bin = atob(b64);
+    const out = new Uint8Array(bin.length);
+    for (let i=0;i<bin.length;i++) out[i] = bin.charCodeAt(i);
+    return out;
   }
 
   function stamp(){
@@ -360,6 +367,66 @@
     return parts.length > 0 ? parts : [{ text: text, bold: false }];
   }
 
+  function tokenizePlain(text){
+    return normalize(text).trim().split(/\s+/).filter(Boolean);
+  }
+
+  function tokenizeStyled(parts){
+    const out = [];
+    for (const part of parts){
+      const raw = normalize(part.text);
+      const words = raw.split(/\s+/).filter(Boolean);
+      for (const w of words){
+        out.push({ text: w, bold: !!part.bold });
+      }
+    }
+    return out;
+  }
+
+  function breakLinesDP(words, widths, spaceW, maxWidth){
+    const n = words.length;
+    const INF = 1e18;
+    const cost = new Array(n + 1).fill(INF);
+    const next = new Array(n + 1).fill(-1);
+    cost[n] = 0;
+
+    for (let i = n - 1; i >= 0; i--){
+      let lineW = 0;
+      for (let j = i; j < n; j++){
+        if (j === i) lineW = widths[j];
+        else lineW += spaceW + widths[j];
+        if (lineW > maxWidth) break;
+
+        const slack = maxWidth - lineW;
+        const isLast = (j === n - 1);
+
+        let penalty = 0;
+        if (!isLast){
+          const shortLinePenalty = (slack > maxWidth * 0.35) ? (slack * slack * 6) : 0;
+          penalty = (slack * slack) + shortLinePenalty;
+        }
+
+        const cand = penalty + cost[j + 1];
+        if (cand < cost[i]){
+          cost[i] = cand;
+          next[i] = j + 1;
+        }
+      }
+    }
+
+    const lines = [];
+    let i = 0;
+    while (i < n && next[i] !== -1){
+      const j = next[i];
+      lines.push({ start:i, end:j });
+      i = j;
+    }
+    if (!lines.length && n){
+      lines.push({ start:0, end:n });
+    }
+    return lines;
+  }
+
   async function buildAgreementPdfBytes(referenceNumber, agreementText, fontBytes){
     const lib = window.PDFLib;
     if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
@@ -457,66 +524,6 @@
       }
     }
 
-    function tokenizePlain(text){
-      return normalize(text).trim().split(/\s+/).filter(Boolean);
-    }
-
-    function tokenizeStyled(parts){
-      const out = [];
-      for (const part of parts){
-        const raw = normalize(part.text);
-        const words = raw.split(/\s+/).filter(Boolean);
-        for (const w of words){
-          out.push({ text: w, bold: !!part.bold });
-        }
-      }
-      return out;
-    }
-
-    function breakLinesDP(words, widths, spaceW, maxWidth){
-      const n = words.length;
-      const INF = 1e18;
-      const cost = new Array(n + 1).fill(INF);
-      const next = new Array(n + 1).fill(-1);
-      cost[n] = 0;
-
-      for (let i = n - 1; i >= 0; i--){
-        let lineW = 0;
-        for (let j = i; j < n; j++){
-          if (j === i) lineW = widths[j];
-          else lineW += spaceW + widths[j];
-          if (lineW > maxWidth) break;
-
-          const slack = maxWidth - lineW;
-          const isLast = (j === n - 1);
-
-          let penalty = 0;
-          if (!isLast){
-            const shortLinePenalty = (slack > maxWidth * 0.35) ? (slack * slack * 6) : 0;
-            penalty = (slack * slack) + shortLinePenalty;
-          }
-
-          const cand = penalty + cost[j + 1];
-          if (cand < cost[i]){
-            cost[i] = cand;
-            next[i] = j + 1;
-          }
-        }
-      }
-
-      const lines = [];
-      let i = 0;
-      while (i < n && next[i] !== -1){
-        const j = next[i];
-        lines.push({ start:i, end:j });
-        i = j;
-      }
-      if (!lines.length && n){
-        lines.push({ start:0, end:n });
-      }
-      return lines;
-    }
-
     function drawJustifiedPlainLine(words, xStart, width, isLastLine){
       if (!words || !words.length) { y -= LINE_H; return; }
       const spaceW = measureText(bodyFont, " ", FONT_SIZE);
@@ -536,7 +543,6 @@
         x += measureText(bodyFont, w, FONT_SIZE);
         if (i !== words.length - 1) x += perGap;
       }
-
       y -= LINE_H;
     }
 
@@ -561,7 +567,6 @@
         x += measureText(bodyFont, t.text, FONT_SIZE);
         if (i !== tokens.length - 1) x += perGap;
       }
-
       y -= LINE_H;
     }
 
@@ -669,7 +674,6 @@
 
       page = pages[pages.length - 1];
 
-      /* Move signature block DOWN a little bit */
       y = M_BOTTOM + 160;
 
       const gapBetweenRows = 3 * LINE_H;
@@ -894,6 +898,112 @@
     } catch {}
   }
 
+  function getAdoptedSignatureBytes(){
+    const candidates = [
+      "carbyne_adopted_signature_png",
+      "carbyne_signature_png",
+      "carbyne_adopted_signature_b64",
+      "carbyne_signature_b64",
+      "carbyne_adopted_signature"
+    ];
+
+    for (const key of candidates){
+      const v = localStorage.getItem(key);
+      if (!v) continue;
+
+      const s = normalize(v).trim();
+
+      if (/^data:image\/png;base64,/i.test(s)){
+        const b64 = s.split(",")[1] || "";
+        if (b64) return { kind:"png", bytes: b64ToBytes(b64) };
+      }
+
+      if (/^data:image\/jpeg;base64,/i.test(s) || /^data:image\/jpg;base64,/i.test(s)){
+        const b64 = s.split(",")[1] || "";
+        if (b64) return { kind:"jpg", bytes: b64ToBytes(b64) };
+      }
+
+      if (/^[A-Za-z0-9+/=]+$/.test(s) && s.length > 200){
+        try { return { kind:"png", bytes: b64ToBytes(s) }; } catch {}
+      }
+    }
+
+    return null;
+  }
+
+  async function signPdfBytes(pdfBytes, fontBytes){
+    const lib = window.PDFLib;
+    if (!lib || !lib.PDFDocument) throw new Error("PDFLib unavailable");
+    const { PDFDocument, StandardFonts } = lib;
+
+    const sig = getAdoptedSignatureBytes();
+    if (!sig) throw new Error("No signature available");
+
+    const pdfDoc = await PDFDocument.load(pdfBytes);
+
+    let bodyFont = null;
+    const fontkitReady = await ensureFontkit();
+    if (fontkitReady && typeof pdfDoc.registerFontkit === "function") {
+      try{
+        pdfDoc.registerFontkit(window.fontkit);
+        bodyFont = await pdfDoc.embedFont(fontBytes, { subset: true });
+      } catch {
+        bodyFont = null;
+      }
+    }
+    if (!bodyFont){
+      bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    }
+
+    const pages = pdfDoc.getPages();
+    const lastPage = pages[pages.length - 1];
+
+    const PAGE_W = 612;
+    const PAGE_H = 792;
+
+    const M_BOTTOM = 28.8;
+    const M_LEFT = 36;
+    const M_RIGHT = 36;
+    const MAX_W = PAGE_W - M_LEFT - M_RIGHT;
+
+    const signatureBlockY = M_BOTTOM + 160;
+    const leftLineX = M_LEFT;
+    const rightLineX = M_LEFT + MAX_W * 0.70;
+
+    const leftLineW = (rightLineX - leftLineX) - 22;
+    const lineY = signatureBlockY + 6;
+
+    let embeddedImg = null;
+    if (sig.kind === "png") embeddedImg = await pdfDoc.embedPng(sig.bytes);
+    else embeddedImg = await pdfDoc.embedJpg(sig.bytes);
+
+    const imgNaturalW = embeddedImg.width;
+    const imgNaturalH = embeddedImg.height;
+
+    const maxW = Math.max(60, leftLineW - 10);
+    const maxH = 26;
+
+    const scaleW = maxW / imgNaturalW;
+    const scaleH = maxH / imgNaturalH;
+    const scale = Math.min(scaleW, scaleH, 1);
+
+    const drawW = imgNaturalW * scale;
+    const drawH = imgNaturalH * scale;
+
+    const imgX = leftLineX + 6;
+    const imgY = lineY + 2;
+
+    lastPage.drawImage(embeddedImg, {
+      x: imgX,
+      y: imgY,
+      width: drawW,
+      height: drawH
+    });
+
+    const out = await pdfDoc.save();
+    return new Uint8Array(out);
+  }
+
   window.carbyne_masterserviceagreement_page_mount = async function(args){
     const root = args && args.root ? args.root : document;
     const referenceNumber = args && args.referenceNumber ? args.referenceNumber : "";
@@ -902,6 +1012,9 @@
     const signBtn = root.querySelector("#msaSignBtn");
 
     let done = false;
+
+    let latestPdfBytes = null;
+    let latestFontBytes = null;
 
     function safeDisable(){ try{ if (signBtn) signBtn.disabled = true; } catch {} }
     function safeEnable(){ try{ if (signBtn) signBtn.disabled = false; } catch {} }
@@ -915,7 +1028,10 @@
         fetchBytes(ARIAL_NARROW_TTF_URL)
       ]);
 
+      latestFontBytes = fontBytes;
+
       const pdfBytes = await buildAgreementPdfBytes(referenceNumber, txt, fontBytes);
+      latestPdfBytes = pdfBytes;
 
       if (frame) setIframePdf(frame, pdfBytes);
 
@@ -943,11 +1059,41 @@
       console.error("MSA load error:", e);
     }
 
-    function onSign(){
+    async function onSign(){
       if (done) return;
-      window.dispatchEvent(new CustomEvent("carbyne:agreement:sign", {
-        detail: { id: DOC_ID, title: DOC_TITLE, referenceNumber: referenceNumber || "" }
-      }));
+      if (!latestPdfBytes || !latestFontBytes) return;
+
+      safeDisable();
+      setStatus(root, "Signing…");
+
+      try{
+        const signedBytes = await signPdfBytes(latestPdfBytes, latestFontBytes);
+        latestPdfBytes = signedBytes;
+
+        if (frame) setIframePdf(frame, signedBytes);
+
+        try{
+          const b64 = bytesToB64(signedBytes);
+          window.dispatchEvent(new CustomEvent("carbyne:pdfdoc:upsert", {
+            detail: {
+              id: DOC_ID,
+              title: DOC_TITLE,
+              b64: b64,
+              meta: {
+                referenceNumber: referenceNumber || "",
+                createdAt: stamp(),
+                signedAt: stamp()
+              }
+            }
+          }));
+        } catch {}
+
+        setStatus(root, "Signed", "good");
+      } catch (e){
+        setStatus(root, "Unable to sign document.", "bad");
+        console.error("MSA sign error:", e);
+        safeEnable();
+      }
     }
 
     try{ if (signBtn) signBtn.addEventListener("click", onSign); } catch {}
