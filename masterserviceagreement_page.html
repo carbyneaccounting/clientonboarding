@@ -387,11 +387,13 @@
     const PAGE_W = 612;
     const PAGE_H = 792;
 
-    /* Wider / taller margins */
-    const M_LEFT = 62;
-    const M_RIGHT = 62;
-    const M_TOP = 70;
-    const M_BOTTOM = 90;
+    /* Microsoft Word margins from your screenshot:
+       Top: 0.4"  Bottom: 0.4"  Left: 0.5"  Right: 0.5"  (72 pts per inch)
+    */
+    const M_TOP = 28.8;
+    const M_BOTTOM = 28.8;
+    const M_LEFT = 36;
+    const M_RIGHT = 36;
 
     const BODY_TOP_Y = PAGE_H - M_TOP - 24;
     const BODY_BOTTOM_Y = M_BOTTOM + 20;
@@ -442,7 +444,7 @@
         p.drawText(refText, { x: PAGE_W - M_RIGHT - rw, y: headerY - 14, size: FONT_SIZE, font: bodyFont });
       }
 
-      const footerY = M_BOTTOM - 18;
+      const footerY = M_BOTTOM - 6;
       p.drawText(footerCenter, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
 
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
@@ -665,14 +667,14 @@
     }
 
     function drawSignatureBlockAtBottomOfLastPage(){
-      const SIG_TOTAL_LINES = 5;                 /* 3*LINE_H gapBetweenRows + 2*LINE_H tail = 5 lines total movement */
-      const SIG_START_Y = BODY_BOTTOM_Y + ((SIG_TOTAL_LINES + 1) * LINE_H);
-
       const savedPage = page;
       const savedY = y;
 
       page = pages[pages.length - 1];
-      y = SIG_START_Y;
+
+      /* Place the block at the bottom under the text (Word-style),
+         but above the footer area. */
+      y = M_BOTTOM + 90;
 
       const gapBetweenRows = 3 * LINE_H;
 
