@@ -535,21 +535,51 @@
       return lines;
     }
 
-    function drawJustifiedPlainLine(words, xStart, width, isLastLine){
+    function drawPlainLine(words, xStart){
       if (!words || !words.length) { y -= LINE_H; return; }
       const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+      let x = xStart;
+      for (let i=0;i<words.length;i++){
+        const w = words[i];
+        page.drawText(w, { x, y, size: FONT_SIZE, font: bodyFont });
+        x += measureText(bodyFont, w, FONT_SIZE);
+        if (i !== words.length - 1) x += spaceW;
+      }
+      y -= LINE_H;
+    }
+
+    // ---- JUSTIFICATION CONTROL (PREVENT TERRIBLE SPACING) ----
+    // Only justify when there are 2+ gaps and the added space per gap is small.
+    // If justification would add too much space, fall back to normal spacing.
+    function drawJustifiedPlainLine(words, xStart, width, isLastLine){
+      if (!words || !words.length) { y -= LINE_H; return; }
+
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+      const gaps = Math.max(0, words.length - 1);
+
+      // Never justify last line or lines with 0/1 gap (these cause huge spacing)
+      if (isLastLine || gaps < 2){
+        drawPlainLine(words, xStart);
+        return;
+      }
 
       let wordsW = 0;
       for (const w of words) wordsW += measureText(bodyFont, w, FONT_SIZE);
 
-      const gaps = Math.max(0, words.length - 1);
       const baseLineW = wordsW + (spaceW * gaps);
+      const extra = Math.max(0, width - baseLineW);
 
-      let perGap = spaceW;
-      if (!isLastLine && gaps > 0){
-        const extra = Math.max(0, width - baseLineW);
-        perGap = spaceW + (extra / gaps);
+      // Cap extra spacing per gap to avoid "stretched letters" look
+      // (pdf-lib draws words with added gaps; extreme gaps look awful)
+      const maxExtraPerGap = spaceW * 0.60; // <- cap (60% of a normal space)
+      const extraPerGap = extra / gaps;
+
+      if (extraPerGap > maxExtraPerGap){
+        drawPlainLine(words, xStart);
+        return;
       }
+
+      const perGap = spaceW + extraPerGap;
 
       let x = xStart;
       for (let i=0;i<words.length;i++){
@@ -597,21 +627,49 @@
       return lines;
     }
 
-    function drawJustifiedStyledLine(tokens, xStart, width, isLastLine){
+    function drawStyledLine(tokens, xStart){
       if (!tokens || !tokens.length) { y -= LINE_H; return; }
       const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+      let x = xStart;
+      for (let i=0;i<tokens.length;i++){
+        const t = tokens[i];
+        if (t.bold){
+          drawBold(page, bodyFont, t.text, x, y, FONT_SIZE);
+        } else {
+          page.drawText(t.text, { x, y, size: FONT_SIZE, font: bodyFont });
+        }
+        x += measureText(bodyFont, t.text, FONT_SIZE);
+        if (i !== tokens.length - 1) x += spaceW;
+      }
+      y -= LINE_H;
+    }
+
+    function drawJustifiedStyledLine(tokens, xStart, width, isLastLine){
+      if (!tokens || !tokens.length) { y -= LINE_H; return; }
+
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+      const gaps = Math.max(0, tokens.length - 1);
+
+      if (isLastLine || gaps < 2){
+        drawStyledLine(tokens, xStart);
+        return;
+      }
 
       let wordsW = 0;
       for (const t of tokens) wordsW += measureText(bodyFont, t.text, FONT_SIZE);
 
-      const gaps = Math.max(0, tokens.length - 1);
       const baseLineW = wordsW + (spaceW * gaps);
+      const extra = Math.max(0, width - baseLineW);
 
-      let perGap = spaceW;
-      if (!isLastLine && gaps > 0){
-        const extra = Math.max(0, width - baseLineW);
-        perGap = spaceW + (extra / gaps);
+      const maxExtraPerGap = spaceW * 0.60;
+      const extraPerGap = extra / gaps;
+
+      if (extraPerGap > maxExtraPerGap){
+        drawStyledLine(tokens, xStart);
+        return;
       }
+
+      const perGap = spaceW + extraPerGap;
 
       let x = xStart;
       for (let i=0;i<tokens.length;i++){
@@ -865,7 +923,7 @@
         drawUnderline(page, M_LEFT, y, leadW);
 
         if (restLines.length){
-          drawJustifiedPlainLine(restLines[0], M_LEFT + leadW + spaceW, maxFirst, true);
+          drawPlainLine(restLines[0], M_LEFT + leadW + spaceW);
           for (let j=1;j<restLines.length;j++){
             const isLast = (j === restLines.length - 1);
             drawJustifiedPlainLine(restLines[j], M_LEFT, MAX_W, isLast);
