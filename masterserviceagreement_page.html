@@ -447,13 +447,16 @@
       try{
         pdfDoc.registerFontkit(window.fontkit);
         bodyFont = await pdfDoc.embedFont(fontBytes, { subset: true });
-      } catch {
+        console.log("✅ Arial Narrow font embedded successfully");
+      } catch (e) {
+        console.error("❌ Failed to embed Arial Narrow:", e);
         bodyFont = null;
       }
     }
 
     if (!bodyFont){
       bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      console.log("⚠️ Using Helvetica fallback font");
     }
 
     const PAGE_W = 612;
@@ -1103,20 +1106,28 @@
     const sig = getAdoptedSignature();
     if (!sig) throw new Error("No adopted signature available");
 
+    console.log("📝 Signature type:", sig.kind);
+
     const pdfDoc = await PDFDocument.load(pdfBytes);
 
+    // CRITICAL: Embed the Arial Narrow font for the signature
     let bodyFont = null;
     const fontkitReady = await ensureFontkit();
+    
     if (fontkitReady && typeof pdfDoc.registerFontkit === "function") {
       try{
         pdfDoc.registerFontkit(window.fontkit);
         bodyFont = await pdfDoc.embedFont(fontBytes, { subset: true });
-      } catch {
+        console.log("✅ Arial Narrow font embedded for signature");
+      } catch (e) {
+        console.error("❌ Failed to embed Arial Narrow for signature:", e);
         bodyFont = null;
       }
     }
+    
     if (!bodyFont){
       bodyFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      console.log("⚠️ Using Helvetica fallback for signature");
     }
 
     const pages = pdfDoc.getPages();
@@ -1141,19 +1152,29 @@
       let text = normalize(sig.text).replace(/\s+/g, " ").trim();
       if (!text) throw new Error("No typed signature text available");
 
+      console.log("📏 Signature text:", text);
+      console.log("📏 Max width:", maxTextW);
+
+      // Truncate if needed
       while (text.length > 0 && measureText(bodyFont, text, fontSize) > maxTextW){
         text = text.slice(0, -1);
       }
 
       if (!text) throw new Error("Typed signature did not fit");
 
+      const actualWidth = measureText(bodyFont, text, fontSize);
+      console.log("📏 Actual signature width:", actualWidth);
+
+      // Draw at leftLineX (left-aligned), at the correct Y position (above the line)
       lastPage.drawText(text, {
         x: leftLineX,
         y: lineY + 2,
         size: fontSize,
         font: bodyFont,
-        color: rgb(0,0,0)
+        color: rgb(0, 0, 0)
       });
+
+      console.log("✅ Typed signature drawn at x:", leftLineX, "y:", lineY + 2);
 
     } else {
       let embeddedImg = null;
@@ -1187,6 +1208,8 @@
         width: drawW,
         height: drawH
       });
+
+      console.log("✅ Image signature drawn at x:", imgX, "y:", imgY);
     }
 
     const out = await pdfDoc.save();
