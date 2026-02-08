@@ -208,9 +208,29 @@
       
       console.log("Retrieved from localStorage - Column A:", columnA, "Column R:", columnR);
       
+      // Format the numbers with commas and 2 decimal places
+      function formatCurrency(value) {
+        if (!value) return "";
+        
+        // Remove any existing formatting (commas, dollar signs, spaces)
+        const cleaned = String(value).replace(/[$,\s]/g, '');
+        
+        // Parse as a number
+        const num = parseFloat(cleaned);
+        
+        // Return empty if not a valid number
+        if (isNaN(num)) return "";
+        
+        // Format with commas and 2 decimal places
+        return num.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+      
       return {
-        serviceFees: normalize(columnA).trim(),
-        retainerAmount: normalize(columnR).trim()
+        serviceFees: formatCurrency(columnA),
+        retainerAmount: formatCurrency(columnR)
       };
     } catch (e) {
       console.error("Error getting column values from localStorage:", e);
@@ -615,16 +635,15 @@
       const baselineY = y;
       let x = M_LEFT;
       
+      // Draw the label text (which already includes "shall be: $")
       page.drawText(labelText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
       x += measureText(bodyFont, labelText, FONT_SIZE);
       
-      const dollarText = " $";
-      page.drawText(dollarText, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
-      x += measureText(bodyFont, dollarText, FONT_SIZE);
-      
       if (amount) {
+        // Draw the formatted amount directly (no extra dollar sign)
         page.drawText(amount, { x, y: baselineY, size: FONT_SIZE, font: bodyFont });
         
+        // Draw underline beneath the amount
         const amountWidth = measureText(bodyFont, amount, FONT_SIZE);
         page.drawLine({ 
           start: {x: x, y: baselineY - 1.2}, 
@@ -633,6 +652,7 @@
         });
         x += amountWidth;
       } else {
+        // No amount - draw the blank line
         const lineW = Math.max(100, (M_LEFT + MAX_W) - x - 50);
         page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
       }
@@ -683,13 +703,13 @@
       }
 
       if (isServiceFeesLine(p)) {
-        const labelText = "Service Fees. The total service fees charged per month by Firm to Client shall be:";
+        const labelText = "Service Fees. The total service fees charged per month by Firm to Client shall be: $";
         drawAmountLine(labelText, serviceFees);
         continue;
       }
 
       if (isRetainerAmountLine(p)) {
-        const labelText = "Retainer Fee Amount. The total retainer amount to be paid by Client shall be:";
+        const labelText = "Retainer Fee Amount. The total retainer amount to be paid by Client shall be: $";
         drawAmountLine(labelText, retainerAmount);
         continue;
       }
