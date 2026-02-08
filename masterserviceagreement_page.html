@@ -368,36 +368,24 @@
   }
 
   function parseInlineBold(text){
-    console.log("Parsing inline bold for text:", text.substring(0, 100));
-
     const parts = [];
     const boldRegex = /\*\*(.+?)\*\*/g;
     let lastIndex = 0;
     let match;
 
     while ((match = boldRegex.exec(text)) !== null) {
-      console.log("Found bold match:", match[1]);
-
       if (match.index > lastIndex) {
         const normalText = text.substring(lastIndex, match.index);
-        if (normalText) {
-          parts.push({ text: normalText, bold: false });
-        }
+        if (normalText) parts.push({ text: normalText, bold: false });
       }
-
       parts.push({ text: match[1], bold: true });
-
       lastIndex = match.index + match[0].length;
     }
 
     if (lastIndex < text.length) {
       const remainingText = text.substring(lastIndex);
-      if (remainingText) {
-        parts.push({ text: remainingText, bold: false });
-      }
+      if (remainingText) parts.push({ text: remainingText, bold: false });
     }
-
-    console.log("Parsed parts:", parts.length, "parts");
 
     return parts.length > 0 ? parts : [{ text: text, bold: false }];
   }
@@ -456,12 +444,6 @@
     const serviceFees = tableData.serviceFees;
     const retainerAmount = tableData.retainerAmount;
 
-    console.log("Business name extracted:", businessName);
-    console.log("Selected basis of accounting:", selectedBasis);
-    console.log("Other basis text:", otherBasisText);
-    console.log("Service Fees:", serviceFees);
-    console.log("Retainer Amount:", retainerAmount);
-
     const processedText = replaceClientNamePlaceholder(agreementText, businessName);
     const paragraphs = splitParagraphsKeepGrid(processedText);
 
@@ -490,6 +472,7 @@
       }
 
       const footerY = M_BOTTOM - 6;
+
       p.drawText(footerCenter, { x: M_LEFT, y: footerY, size: FONT_SIZE, font: bodyFont });
 
       const pr = footerRightPrefix + (pageIndex + 1) + " of " + totalPages;
@@ -521,7 +504,6 @@
       return out;
     }
 
-    // --- BETTER LINE BREAKING (DP) so lines are fuller, THEN justify to the right edge ---
     function breakLinesDP(words, widths, spaceW, maxWidth){
       const n = words.length;
       const INF = 1e18;
@@ -538,14 +520,10 @@
           if (lineW > maxWidth) break;
 
           const slack = maxWidth - lineW;
-
-          // last line: no raggedness penalty
           const isLast = (j === n - 1);
-          let penalty = 0;
 
+          let penalty = 0;
           if (!isLast){
-            // squared slack, but also heavily punish very short lines
-            // (this forces fuller lines, reducing ugly word spacing when justified)
             const shortLinePenalty = (slack > maxWidth * 0.35) ? (slack * slack * 6) : 0;
             penalty = (slack * slack) + shortLinePenalty;
           }
@@ -661,7 +639,6 @@
     }
 
     function drawBasisCheckboxRow(){
-      const { rgb } = window.PDFLib;
       const box = 10;
       const gapAfterBox = 6;
       const itemGap = 16;
@@ -684,10 +661,7 @@
         drawCheckboxAtBaseline(x, baselineY, box);
 
         const isSelected = (selectedBasis === item.value);
-
-        if (isSelected) {
-          drawCheckmark(x, baselineY, box);
-        }
+        if (isSelected) drawCheckmark(x, baselineY, box);
 
         x += box + gapAfterBox;
 
@@ -738,7 +712,6 @@
           end: {x: x + amountWidth, y: baselineY - 1.2},
           thickness: 0.7
         });
-        x += amountWidth;
       } else {
         const lineW = Math.max(100, (M_LEFT + MAX_W) - x - 50);
         page.drawLine({ start:{x:x,y:baselineY+2}, end:{x:x+lineW,y:baselineY+2}, thickness:0.9 });
@@ -747,13 +720,8 @@
       y -= LINE_H;
     }
 
-    function drawSignatureBlock(){
-      const gapBefore = 5 * LINE_H;
+    function drawSignatureBlockAtCurrentY(){
       const gapBetweenRows = 3 * LINE_H;
-
-      ensureSpace(10);
-
-      y -= gapBefore;
 
       const leftLineX = M_LEFT;
       const rightLineX = M_LEFT + MAX_W * 0.70;
@@ -779,7 +747,26 @@
       y -= (2 * LINE_H);
     }
 
+    function drawSignatureBlockAtBottomOfPage2(){
+      while (pages.length < 2) newPage();
+
+      const savedPage = page;
+      const savedY = y;
+
+      page = pages[1];
+
+      // place near bottom but above footer area
+      // BODY_BOTTOM_Y is above footer; add vertical room for the block
+      y = BODY_BOTTOM_Y + (10 * LINE_H);
+
+      drawSignatureBlockAtCurrentY();
+
+      page = savedPage;
+      y = savedY;
+    }
+
     let signatureDrawn = false;
+    let signatureNeedsBottomPage2 = false;
 
     for (let i=0;i<paragraphs.length;i++){
       const p = paragraphs[i];
@@ -802,8 +789,8 @@
       }
 
       if (!signatureDrawn && isSignatureTrigger(p)) {
-        drawSignatureBlock();
         signatureDrawn = true;
+        signatureNeedsBottomPage2 = true;
 
         while (i + 1 < paragraphs.length) {
           const nxt = normalize(paragraphs[i+1]).toLowerCase();
@@ -847,35 +834,28 @@
         const leadW = measureText(bodyFont, leadText, FONT_SIZE);
         const spaceW = measureText(bodyFont, " ", FONT_SIZE);
 
-        // first line width after the underlined lead label
         const firstX = M_LEFT + leadW + spaceW;
         const firstW = Math.max(20, (M_LEFT + MAX_W) - firstX);
 
         const restWords = tokenizePlain(restText);
         const widths = restWords.map(w => measureText(bodyFont, w, FONT_SIZE));
 
-        // break with DP for first line using firstW, then remaining using MAX_W
-        // We do: greedily fit some words in first line by DP on a prefix, then DP on remainder.
-        // Build best first break point by scanning possible k and choosing min overall.
         let bestK = 0;
         let bestScore = 1e18;
 
-        // compute prefix line widths
         let wAcc = 0;
         for (let k = 0; k < restWords.length; k++){
           if (k === 0) wAcc = widths[0];
           else wAcc += spaceW + widths[k];
           if (wAcc > firstW) break;
 
-          // score = slack^2 + DP on remainder (with MAX_W)
           const slack = firstW - wAcc;
-          const remWords = restWords.slice(k+1);
-          const remWidths = widths.slice(k+1);
 
+          const remWords = restWords.slice(k+1);
           let remCost = 0;
           if (remWords.length){
+            const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
             const remLines = breakLinesDP(remWords, remWidths, spaceW, MAX_W);
-            // compute dp cost approximation: sum squared slack except last
             remCost = 0;
             for (let li=0; li<remLines.length; li++){
               const seg = remLines[li];
@@ -904,7 +884,6 @@
         page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
         drawUnderline(page, M_LEFT, y, leadW);
 
-        // draw first line (not justified; it starts after the label)
         if (restWords.length){
           const firstWords = restWords.slice(0, bestK+1);
           drawJustifiedPlainLine(firstWords, firstX, firstW, true);
@@ -912,7 +891,6 @@
           y -= LINE_H;
         }
 
-        // remainder: DP + justify to right edge
         const remWords = restWords.slice(bestK+1);
         if (remWords.length){
           const remWidths = remWords.map(w => measureText(bodyFont, w, FONT_SIZE));
@@ -953,9 +931,8 @@
         continue;
       }
 
-      // normal paragraphs: DP break + justify (flush right)
       const words = tokenizePlain(p);
-      if (!words.length){ continue; }
+      if (!words.length) continue;
 
       const spaceW = measureText(bodyFont, " ", FONT_SIZE);
       const widths = words.map(w => measureText(bodyFont, w, FONT_SIZE));
@@ -969,6 +946,10 @@
         const lineWords = words.slice(seg.start, seg.end);
         drawJustifiedPlainLine(lineWords, M_LEFT, MAX_W, isLast);
       }
+    }
+
+    if (signatureNeedsBottomPage2){
+      drawSignatureBlockAtBottomOfPage2();
     }
 
     const totalPages = pages.length;
