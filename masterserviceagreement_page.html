@@ -1147,6 +1147,7 @@
     const leftLineW = (rightLineX - leftLineX) - 22;
     const lineY = signatureBlockY + 6;
 
+    // Draw the signature (typed or image)
     if (sig.kind === "text"){
       const fontSize = 12;  // Arial Narrow 12pt for typed signatures
       const maxTextW = Math.max(40, leftLineW - 2);
@@ -1215,6 +1216,26 @@
 
       console.log("✅ Image signature drawn at x:", imgX, "y:", imgY);
     }
+
+    // NEW: Add today's date above the Date line
+    const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+    const year = today.getFullYear();
+    const dateText = `${month}-${day}-${year}`;
+
+    const dateFontSize = 10;  // Arial Narrow 10pt for date
+
+    // Draw date ABOVE the Date line, left-aligned at rightLineX
+    lastPage.drawText(dateText, {
+      x: rightLineX,
+      y: lineY + 2,  // Same Y position as signature (above the line)
+      size: dateFontSize,
+      font: bodyFont,
+      color: rgb(0, 0, 0)
+    });
+
+    console.log("✅ Date drawn:", dateText, "at x:", rightLineX, "y:", lineY + 2, "size:", dateFontSize);
 
     const out = await pdfDoc.save();
     return new Uint8Array(out);
