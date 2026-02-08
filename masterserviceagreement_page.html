@@ -50,7 +50,6 @@
       line-height:1.45;
     }
 
-    /* Actions ABOVE the viewer, aligned with the header text */
     .msa-actions{
       display:flex;
       align-items:center;
@@ -240,11 +239,9 @@
 
       function formatCurrency(value) {
         if (!value) return "";
-
         const cleaned = String(value).replace(/[$,\s]/g, '');
         const num = parseFloat(cleaned);
         if (isNaN(num)) return "";
-
         return num.toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
@@ -327,23 +324,6 @@
 
   function measureText(font, text, size){
     try { return font.widthOfTextAtSize(text, size); } catch { return text.length * (size * 0.5); }
-  }
-
-  function wrapWords(font, text, size, maxWidth){
-    const words = text.split(/\s+/).filter(Boolean);
-    const lines = [];
-    let cur = "";
-    for (const w of words){
-      const test = cur ? (cur + " " + w) : w;
-      if (measureText(font, test, size) <= maxWidth){
-        cur = test;
-      } else {
-        if (cur) lines.push(cur);
-        cur = w;
-      }
-    }
-    if (cur) lines.push(cur);
-    return lines;
   }
 
   function drawUnderline(page, x, y, w){
@@ -483,7 +463,6 @@
     console.log("Retainer Amount:", retainerAmount);
 
     const processedText = replaceClientNamePlaceholder(agreementText, businessName);
-
     const paragraphs = splitParagraphsKeepGrid(processedText);
 
     console.log("Total paragraphs:", paragraphs.length);
@@ -530,23 +509,120 @@
       }
     }
 
-    function drawLineText(text, x){
-      page.drawText(text, { x, y, size: FONT_SIZE, font: bodyFont });
+    function tokenizePlain(text){
+      return normalize(text).trim().split(/\s+/).filter(Boolean);
+    }
+
+    function wrapPlainWordsToLines(words, maxWidth){
+      const lines = [];
+      let cur = [];
+      let curWidth = 0;
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+
+      for (const w of words){
+        const wW = measureText(bodyFont, w, FONT_SIZE);
+        const add = (cur.length ? spaceW : 0) + wW;
+        if (cur.length && (curWidth + add) > maxWidth){
+          lines.push(cur);
+          cur = [w];
+          curWidth = wW;
+        } else {
+          cur.push(w);
+          curWidth += add;
+        }
+      }
+      if (cur.length) lines.push(cur);
+      return lines;
+    }
+
+    function drawJustifiedPlainLine(words, xStart, width, isLastLine){
+      if (!words || !words.length) { y -= LINE_H; return; }
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+
+      let wordsW = 0;
+      for (const w of words) wordsW += measureText(bodyFont, w, FONT_SIZE);
+
+      const gaps = Math.max(0, words.length - 1);
+      const baseLineW = wordsW + (spaceW * gaps);
+
+      let perGap = spaceW;
+      if (!isLastLine && gaps > 0){
+        const extra = Math.max(0, width - baseLineW);
+        perGap = spaceW + (extra / gaps);
+      }
+
+      let x = xStart;
+      for (let i=0;i<words.length;i++){
+        const w = words[i];
+        page.drawText(w, { x, y, size: FONT_SIZE, font: bodyFont });
+        x += measureText(bodyFont, w, FONT_SIZE);
+        if (i !== words.length - 1) x += perGap;
+      }
+
       y -= LINE_H;
     }
 
-    function drawMixedLine(parts, x){
-      let currentX = x;
-
-      for (const part of parts) {
-        if (part.text) {
-          if (part.bold) {
-            drawBold(page, bodyFont, part.text, currentX, y, FONT_SIZE);
-          } else {
-            page.drawText(part.text, { x: currentX, y, size: FONT_SIZE, font: bodyFont });
-          }
-          currentX += measureText(bodyFont, part.text, FONT_SIZE);
+    function tokenizeStyled(parts){
+      const out = [];
+      for (const part of parts){
+        const raw = normalize(part.text);
+        const words = raw.split(/\s+/).filter(Boolean);
+        for (const w of words){
+          out.push({ text: w, bold: !!part.bold });
         }
+      }
+      return out;
+    }
+
+    function wrapStyledWordsToLines(tokens, maxWidth){
+      const lines = [];
+      let cur = [];
+      let curWidth = 0;
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+
+      for (const t of tokens){
+        const tW = measureText(bodyFont, t.text, FONT_SIZE);
+        const add = (cur.length ? spaceW : 0) + tW;
+
+        if (cur.length && (curWidth + add) > maxWidth){
+          lines.push(cur);
+          cur = [t];
+          curWidth = tW;
+        } else {
+          cur.push(t);
+          curWidth += add;
+        }
+      }
+      if (cur.length) lines.push(cur);
+      return lines;
+    }
+
+    function drawJustifiedStyledLine(tokens, xStart, width, isLastLine){
+      if (!tokens || !tokens.length) { y -= LINE_H; return; }
+      const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+
+      let wordsW = 0;
+      for (const t of tokens) wordsW += measureText(bodyFont, t.text, FONT_SIZE);
+
+      const gaps = Math.max(0, tokens.length - 1);
+      const baseLineW = wordsW + (spaceW * gaps);
+
+      let perGap = spaceW;
+      if (!isLastLine && gaps > 0){
+        const extra = Math.max(0, width - baseLineW);
+        perGap = spaceW + (extra / gaps);
+      }
+
+      let x = xStart;
+      for (let i=0;i<tokens.length;i++){
+        const t = tokens[i];
+        if (t.bold){
+          drawBold(page, bodyFont, t.text, x, y, FONT_SIZE);
+        } else {
+          page.drawText(t.text, { x, y, size: FONT_SIZE, font: bodyFont });
+        }
+        x += measureText(bodyFont, t.text, FONT_SIZE);
+        if (i !== tokens.length - 1) x += perGap;
       }
 
       y -= LINE_H;
@@ -777,82 +853,53 @@
         const restText = lead.rest;
 
         const leadW = measureText(bodyFont, leadText, FONT_SIZE);
-        const maxFirst = Math.max(10, MAX_W - (leadW + 1));
+        const spaceW = measureText(bodyFont, " ", FONT_SIZE);
+        const maxFirst = Math.max(10, MAX_W - (leadW + spaceW));
 
-        const restLines = wrapWords(bodyFont, restText, FONT_SIZE, maxFirst);
+        const restWords = tokenizePlain(restText);
+        const restLines = wrapPlainWordsToLines(restWords, maxFirst);
+
         ensureSpace(Math.max(1, restLines.length));
 
         page.drawText(leadText, { x: M_LEFT, y, size: FONT_SIZE, font: bodyFont });
         drawUnderline(page, M_LEFT, y, leadW);
 
-        const firstRest = restLines[0] || "";
-        page.drawText(" " + firstRest, {
-          x: M_LEFT + leadW,
-          y,
-          size: FONT_SIZE,
-          font: bodyFont
-        });
-        y -= LINE_H;
-
-        for (let j=1;j<restLines.length;j++){
-          drawLineText(restLines[j], M_LEFT);
+        if (restLines.length){
+          drawJustifiedPlainLine(restLines[0], M_LEFT + leadW + spaceW, maxFirst, true);
+          for (let j=1;j<restLines.length;j++){
+            const isLast = (j === restLines.length - 1);
+            drawJustifiedPlainLine(restLines[j], M_LEFT, MAX_W, isLast);
+          }
+        } else {
+          y -= LINE_H;
         }
 
         continue;
       }
 
       if (p.includes("**")) {
-        console.log("Processing paragraph with bold markers");
-
         const parts = parseInlineBold(p);
-        const lines = [];
-        let currentLine = [];
-        let currentWidth = 0;
-
-        for (const part of parts) {
-          const words = part.text.split(/\s+/).filter(Boolean);
-
-          for (const word of words) {
-            const wordWidth = measureText(bodyFont, word, FONT_SIZE);
-            const spaceWidth = measureText(bodyFont, " ", FONT_SIZE);
-            const testWidth = currentWidth + (currentLine.length > 0 ? spaceWidth : 0) + wordWidth;
-
-            if (testWidth <= MAX_W) {
-              if (currentLine.length > 0) {
-                currentLine.push({ text: " ", bold: false });
-                currentWidth += spaceWidth;
-              }
-              currentLine.push({ text: word, bold: part.bold });
-              currentWidth += wordWidth;
-            } else {
-              if (currentLine.length > 0) {
-                lines.push(currentLine);
-              }
-              currentLine = [{ text: word, bold: part.bold }];
-              currentWidth = wordWidth;
-            }
-          }
-        }
-
-        if (currentLine.length > 0) {
-          lines.push(currentLine);
-        }
+        const tokens = tokenizeStyled(parts);
+        const lines = wrapStyledWordsToLines(tokens, MAX_W);
 
         ensureSpace(Math.max(1, lines.length));
 
-        console.log("Drawing", lines.length, "lines with mixed formatting");
-
-        for (const line of lines) {
-          drawMixedLine(line, M_LEFT);
+        for (let j=0;j<lines.length;j++){
+          const isLast = (j === lines.length - 1);
+          drawJustifiedStyledLine(lines[j], M_LEFT, MAX_W, isLast);
         }
 
         continue;
       }
 
-      const lines = wrapWords(bodyFont, p, FONT_SIZE, MAX_W);
+      const words = tokenizePlain(p);
+      const lines = wrapPlainWordsToLines(words, MAX_W);
+
       ensureSpace(Math.max(1, lines.length));
-      for (const ln of lines){
-        drawLineText(ln, M_LEFT);
+
+      for (let j=0;j<lines.length;j++){
+        const isLast = (j === lines.length - 1);
+        drawJustifiedPlainLine(lines[j], M_LEFT, MAX_W, isLast);
       }
     }
 
